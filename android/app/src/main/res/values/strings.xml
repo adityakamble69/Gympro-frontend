@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">WorkoutWorldApp</string>
+    <string name="title_activity_main">WorkoutWorldApp</string>
+    <string name="package_name">com.gymro.app</string>
+    <string name="custom_url_scheme">com.gymro.app</string>
+</resources>

@@ -1,0 +1,997 @@
+import { useState, useEffect } from "react";
+import Sidebar from "../components/Sidebar";
+import api from "../services/api";
+import {
+  Chart as ChartJS, CategoryScale, LinearScale, BarElement,
+  LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler
+} from "chart.js";
+import { Bar, Line, Doughnut } from "react-chartjs-2";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+import { FaChartBar, FaUsers, FaClipboardCheck, FaFilePdf, FaFileExcel, FaRupeeSign, FaUserCheck, FaCalendarAlt } from "react-icons/fa";
+import ReportDrillDownModal from "../components/ReportDrillDownModal";
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
+
+const TABS = [
+  { key: "revenue", label: "Revenue", icon: FaRupeeSign },
+  { key: "members", label: "Member Growth", icon: FaUsers },
+  { key: "attendance", label: "Attendance", icon: FaClipboardCheck },
+];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const chartColors = {
+  blue: "rgba(96,165,250,1)", blueBg: "rgba(96,165,250,0.15)",
+  green: "rgba(52,211,153,1)", greenBg: "rgba(52,211,153,0.15)",
+  purple: "rgba(167,139,250,1)", purpleBg: "rgba(167,139,250,0.15)",
+  yellow: "rgba(251,191,36,1)", red: "rgba(248,113,113,1)", redBg: "rgba(248,113,113,0.15)",
+};
+const chartOpts = () => ({
+  responsive: true, maintainAspectRatio: false,
+  plugins: {
+    legend: { labels: { color: "#9ca3af", font: { size: 12 } } },
+    tooltip: { backgroundColor: "#1a1a1a", titleColor: "#f9fafb", bodyColor: "#9ca3af", borderColor: "#2a2a2a", borderWidth: 1 }
+  },
+  scales: {
+    x: { ticks: { color: "#6b7280" }, grid: { color: "rgba(255,255,255,0.04)" } },
+    y: { ticks: { color: "#6b7280" }, grid: { color: "rgba(255,255,255,0.04)" } },
+  }
+});
+
+function StatCard({ icon: Icon, label, value, color = "#60a5fa", sub, onClick, clickable }) {
+  return (
+    <div
+      onClick={onClick}
+      style={{ background: "var(--bg-surface)", border: `1px solid ${clickable ? "rgba(96,165,250,0.3)" : "var(--border-subtle)"}`, borderRadius: "var(--radius-lg)", padding: "16px 18px", display: "flex", alignItems: "center", gap: "12px", cursor: clickable ? "pointer" : "default", transition: "all 0.15s" }}
+      onMouseEnter={e => { if (clickable) { e.currentTarget.style.background = "var(--bg-elevated)"; e.currentTarget.style.transform = "translateY(-1px)"; } }}
+      onMouseLeave={e => { if (clickable) { e.currentTarget.style.background = "var(--bg-surface)"; e.currentTarget.style.transform = "translateY(0)"; } }}
+    >
+      <div style={{ width: "44px", height: "44px", borderRadius: "10px", flexShrink: 0, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Icon style={{ color, fontSize: "18px" }} />
+      </div>
+      <div>
+        <div style={{ fontSize: "22px", fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-display)" }}>{value}</div>
+        <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{label}</div>
+        {sub && <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{sub}</div>}
+        {clickable && <div style={{ fontSize: "10px", color: "#60a5fa", marginTop: "3px" }}>Click to view members →</div>}
+      </div>
+    </div>
+  );
+}
+
+function ChartCard({ title, height = 280, children }) {
+  return (
+    <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", padding: "20px 24px" }}>
+      <h3 style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "20px" }}>{title}</h3>
+      <div style={{ height: `${height}px` }}>{children}</div>
+    </div>
+  );
+}
+
+export default function Reports({ onLogout }) {
+  const [activeTab, setActiveTab] = useState("revenue");
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Revenue drill-down state (existing)
+  const [drill, setDrill] = useState(null);
+
+  // Member Growth drill-down state (NEW)
+  const [memberDrill, setMemberDrill] = useState(null);
+  // memberDrill: { mode, label, filter?, month?, type?, from?, to? }
+
+  // Attendance drill-down state (NEW)
+  const [attendDrill, setAttendDrill] = useState(null);
+  // attendDrill: { mode, label, filter?, month?, year?, date?, memberId?, memberName? }
+
+  // Date range picker state (NEW)
+  const [showDateRange, setShowDateRange] = useState(false);
+  const [showAttendDateRange, setShowAttendDateRange] = useState(false);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [attendDateFrom, setAttendDateFrom] = useState("");
+  const [attendDateTo, setAttendDateTo] = useState("");
+
+  const years = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i);
+
+  useEffect(() => { fetchData(); }, [activeTab, year]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get(`/reports/${activeTab}`, { params: { year } });
+      setData(res.data.data);
+    } catch { }
+    finally { setLoading(false); }
+  };
+
+  const buildMonthly = (rows, key) =>
+    MONTHS.map((_, i) => { const f = rows?.find(r => r.month === i + 1); return f ? Number(f[key]) : 0; });
+
+  // ── EXPORTS ───────────────────────────────────────────────────────────────
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(18); doc.setTextColor(40);
+    doc.text(`GymPro — ${TABS.find(t => t.key === activeTab)?.label} Report ${year}`, 14, 22);
+    doc.setFontSize(10); doc.setTextColor(120);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+    if (activeTab === "revenue" && data?.monthly) {
+      autoTable(doc, {
+        startY: 38, head: [["Month", "Revenue (₹)", "Transactions"]],
+        body: MONTHS.map((m, i) => { const r = data.monthly.find(x => x.month === i + 1); return [m, r ? `₹${Number(r.total).toLocaleString("en-IN")}` : "₹0", r?.count || 0]; }),
+        styles: { fontSize: 10 }, headStyles: { fillColor: [30, 30, 30], textColor: [200, 200, 200] }
+      });
+    }
+    doc.save(`gymro_${activeTab}_${year}.pdf`);
+  };
+
+  const exportExcel = () => {
+    let sheetData = [];
+    if (activeTab === "revenue" && data?.monthly)
+      sheetData = MONTHS.map((m, i) => { const r = data.monthly.find(x => x.month === i + 1); return { Month: m, "Revenue (₹)": r?.total || 0, Transactions: r?.count || 0 }; });
+    if (activeTab === "members" && data?.monthly)
+      sheetData = MONTHS.map((m, i) => { const r = data.monthly.find(x => x.month === i + 1); return { Month: m, "New Members": r?.new_members || 0 }; });
+    if (activeTab === "attendance" && data?.monthly)
+      sheetData = MONTHS.map((m, i) => { const r = data.monthly.find(x => x.month === i + 1); return { Month: m, Total: r?.total || 0, Present: r?.present || 0, Absent: r?.absent || 0 }; });
+    const ws = XLSX.utils.json_to_sheet(sheetData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Report");
+    XLSX.writeFile(wb, `gymro_${activeTab}_${year}.xlsx`);
+  };
+
+  // ── RENDER REVENUE ────────────────────────────────────────────────────────
+  const renderRevenue = () => {
+    if (!data) return null;
+    const { summary, monthly, byMethod } = data;
+    const monthlyTotals = buildMonthly(monthly, "total");
+
+    return (
+      <>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px", marginBottom: "20px" }}>
+          <StatCard icon={FaRupeeSign} label="This Year" value={`₹${Number(summary?.this_year || 0).toLocaleString("en-IN")}`} color="#60a5fa"
+            clickable onClick={() => setDrill({ mode: "month", month: null, year })}
+            sub="Click to see monthly" />
+          <StatCard icon={FaRupeeSign} label="Last Year" value={`₹${Number(summary?.last_year || 0).toLocaleString("en-IN")}`} color="#a78bfa"
+            clickable onClick={() => setDrill({ mode: "last-year", month: null, year })}
+            sub="Click to see monthly" />
+          <StatCard icon={FaRupeeSign} label="This Month" value={`₹${Number(summary?.this_month || 0).toLocaleString("en-IN")}`} color="#34d399"
+            clickable onClick={() => setDrill({ mode: "this-month", month: null, year })}
+            sub="Click to see members" />
+          <StatCard icon={FaRupeeSign} label="All Time" value={`₹${Number(summary?.all_time || 0).toLocaleString("en-IN")}`} color="#fbbf24"
+            clickable onClick={() => setDrill({ mode: "all-time", month: null, year })}
+            sub="Click to see years" />
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px", marginBottom: "16px" }}>
+          <ChartCard title={`Monthly Revenue — ${year} (click bar for details)`}>
+            <Bar
+              data={{ labels: MONTHS, datasets: [{ label: "Revenue (₹)", data: monthlyTotals, backgroundColor: chartColors.blueBg, borderColor: chartColors.blue, borderWidth: 2, borderRadius: 6 }] }}
+              options={{
+                ...chartOpts(),
+                onClick: (_, elements) => {
+                  if (elements.length > 0) {
+                    const mo = elements[0].index + 1;
+                    setDrill({ mode: "month", month: mo, year });
+                  }
+                },
+                plugins: {
+                  ...chartOpts().plugins,
+                  tooltip: { ...chartOpts().plugins.tooltip, callbacks: { label: (c) => ` ₹${Number(c.raw).toLocaleString("en-IN")}` } }
+                }
+              }}
+            />
+          </ChartCard>
+
+          <ChartCard title="Payment Method Breakdown (click segment)">
+            <Doughnut
+              data={{ labels: byMethod?.map(m => m.payment_method) || [], datasets: [{ data: byMethod?.map(m => m.total) || [], backgroundColor: [chartColors.blue, chartColors.green, chartColors.purple, chartColors.yellow], borderWidth: 0 }] }}
+              options={{
+                responsive: true, maintainAspectRatio: false,
+                onClick: (_, elements) => {
+                  if (elements.length > 0) {
+                    const method = byMethod[elements[0].index]?.payment_method;
+                    if (method) setDrill({ mode: "method", month: method, year });
+                  }
+                },
+                plugins: {
+                  legend: { position: "bottom", labels: { color: "#9ca3af", padding: 16, font: { size: 11 } } },
+                  tooltip: { ...chartOpts().plugins.tooltip }
+                }
+              }}
+            />
+            <div style={{ textAlign: "center", marginTop: "8px", fontSize: "10px", color: "var(--text-muted)" }}>Click a segment to see members</div>
+          </ChartCard>
+        </div>
+
+        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
+          <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--border-subtle)" }}>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Monthly Breakdown — Click any row</h3>
+          </div>
+          <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+                {["Month", "Revenue", "Transactions", "Avg per Transaction"].map(h => (
+                  <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {MONTHS.map((m, i) => {
+                const row = monthly?.find(r => r.month === i + 1);
+                const total = row?.total || 0; const count = row?.count || 0;
+                return (
+                  <tr key={m}
+                    onClick={() => count > 0 && setDrill({ mode: "month", month: i + 1, year })}
+                    style={{ borderBottom: "1px solid var(--border-subtle)", cursor: count > 0 ? "pointer" : "default", transition: "background 0.1s" }}
+                    onMouseEnter={e => { if (count > 0) e.currentTarget.style.background = "var(--bg-elevated)"; }}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    <td style={{ padding: "12px 20px", fontSize: "13px", fontWeight: 500 }}>
+                      <span style={{ color: count > 0 ? "var(--text-primary)" : "var(--text-muted)" }}>{m}</span>
+                      {count > 0 && <span style={{ marginLeft: "8px", fontSize: "10px", color: "var(--blue)", opacity: 0.7 }}>→ click for details</span>}
+                    </td>
+                    <td style={{ padding: "12px 20px", color: total > 0 ? "#34d399" : "var(--text-muted)", fontSize: "13px", fontWeight: 600 }}>₹{Number(total).toLocaleString("en-IN")}</td>
+                    <td style={{ padding: "12px 20px", color: "var(--text-secondary)", fontSize: "13px" }}>{count}</td>
+                    <td style={{ padding: "12px 20px", color: "var(--text-secondary)", fontSize: "13px" }}>{count > 0 ? `₹${Number(total / count).toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "—"}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  // ── RENDER MEMBERS (UPDATED) ───────────────────────────────────────────────
+  const renderMembers = () => {
+    if (!data) return null;
+    const { summary, monthly, byType } = data;
+    const monthlyNew = buildMonthly(monthly, "new_members");
+
+    return (
+      <>
+        {/* ── Date Range Filter Button (NEW) ── */}
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+          <button
+            onClick={() => setShowDateRange(true)}
+            style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 18px", background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.3)", borderRadius: "var(--radius-md)", color: "#60a5fa", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+          >
+            <FaCalendarAlt style={{ fontSize: "13px" }} /> Date Range Filter
+          </button>
+        </div>
+
+        {/* ── Stat Cards — all clickable (UPDATED) ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px", marginBottom: "20px" }}>
+          <StatCard icon={FaUsers} label="Total Members" value={summary?.total || 0} color="#60a5fa"
+            clickable onClick={() => setMemberDrill({ mode: "stat", filter: "all", label: "All Members" })} />
+          <StatCard icon={FaUserCheck} label="Active Members" value={summary?.active || 0} color="#34d399"
+            clickable onClick={() => setMemberDrill({ mode: "stat", filter: "active", label: "Active Members" })} />
+          <StatCard icon={FaUsers} label="Inactive" value={summary?.inactive || 0} color="#f87171"
+            clickable onClick={() => setMemberDrill({ mode: "stat", filter: "inactive", label: "Inactive Members" })} />
+          <StatCard icon={FaUsers} label="Joined This Month" value={summary?.this_month || 0} color="#fbbf24"
+            clickable onClick={() => setMemberDrill({ mode: "stat", filter: "this_month", label: "Joined This Month" })} />
+        </div>
+
+        {/* ── Charts ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px", marginBottom: "16px" }}>
+          {/* Line chart — click point to see that month's members */}
+          <ChartCard title={`New Members Per Month — ${year} (click point for details)`}>
+            <Line
+              data={{ labels: MONTHS, datasets: [{ label: "New Members", data: monthlyNew, borderColor: chartColors.green, backgroundColor: chartColors.greenBg, borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: chartColors.green, pointRadius: 5, pointHoverRadius: 8 }] }}
+              options={{
+                ...chartOpts(),
+                onClick: (_, elements) => {
+                  if (elements.length > 0) {
+                    const mo = elements[0].index + 1;
+                    const count = monthlyNew[elements[0].index];
+                    if (count > 0) setMemberDrill({ mode: "month", month: mo, year, label: `${MONTHS[mo - 1]} ${year} Joinings` });
+                  }
+                },
+                plugins: { ...chartOpts().plugins },
+              }}
+            />
+          </ChartCard>
+
+          {/* Doughnut — click segment to see those members */}
+          <ChartCard title="Membership Type (click segment)">
+            <Doughnut
+              data={{ labels: byType?.map(t => t.membership_type) || [], datasets: [{ data: byType?.map(t => t.count) || [], backgroundColor: [chartColors.blue, chartColors.green, chartColors.purple, chartColors.yellow, chartColors.red], borderWidth: 0 }] }}
+              options={{
+                responsive: true, maintainAspectRatio: false,
+                onClick: (_, elements) => {
+                  if (elements.length > 0) {
+                    const type = byType[elements[0].index]?.membership_type;
+                    if (type) setMemberDrill({ mode: "type", type, label: `${type} Members` });
+                  }
+                },
+                plugins: {
+                  legend: { position: "bottom", labels: { color: "#9ca3af", padding: 16, font: { size: 11 } } },
+                  tooltip: { ...chartOpts().plugins.tooltip }
+                }
+              }}
+            />
+            <div style={{ textAlign: "center", marginTop: "8px", fontSize: "10px", color: "var(--text-muted)" }}>Click a segment to see members</div>
+          </ChartCard>
+        </div>
+
+        {/* ── Monthly Joins Table — click row (UPDATED) ── */}
+        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Monthly Joins — Click any row</h3>
+          </div>
+          <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+                {["Month", "New Members"].map(h => (
+                  <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {MONTHS.map((m, i) => {
+                const r = monthly?.find(x => x.month === i + 1);
+                const c = r?.new_members || 0;
+                return (
+                  <tr key={m}
+                    onClick={() => c > 0 && setMemberDrill({ mode: "month", month: i + 1, year, label: `${m} ${year} Joinings` })}
+                    style={{ borderBottom: "1px solid var(--border-subtle)", cursor: c > 0 ? "pointer" : "default", transition: "background 0.1s" }}
+                    onMouseEnter={e => { if (c > 0) e.currentTarget.style.background = "var(--bg-elevated)"; }}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    <td style={{ padding: "12px 20px", color: c > 0 ? "var(--text-primary)" : "var(--text-muted)", fontSize: "13px" }}>
+                      {m}
+                      {c > 0 && <span style={{ marginLeft: "8px", fontSize: "10px", color: "#60a5fa", opacity: 0.7 }}>→ click for details</span>}
+                    </td>
+                    <td style={{ padding: "12px 20px", color: c > 0 ? "#60a5fa" : "var(--text-muted)", fontSize: "13px", fontWeight: 600 }}>{c}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  // ── RENDER ATTENDANCE (UPDATED) ───────────────────────────────────────────
+  const renderAttendance = () => {
+    if (!data) return null;
+    const { summary, monthly, weekly, topMembers } = data;
+    const monthlyPresent = buildMonthly(monthly, "present");
+
+    return (
+      <>
+        {/* Date Range Filter Button */}
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+          <button
+            onClick={() => setShowAttendDateRange(true)}
+            style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 18px", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: "var(--radius-md)", color: "#a78bfa", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+          >
+            <FaCalendarAlt style={{ fontSize: "13px" }} /> Date Range Filter
+          </button>
+        </div>
+
+        {/* Stat Cards — all clickable */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px", marginBottom: "20px" }}>
+          <StatCard icon={FaClipboardCheck} label="Total Records" value={summary?.total || 0} color="#60a5fa"
+            clickable onClick={() => setAttendDrill({ mode: "stat", filter: "all", label: "All Attendance Records" })} />
+          <StatCard icon={FaUserCheck} label="Total Present" value={summary?.present || 0} color="#34d399"
+            clickable onClick={() => setAttendDrill({ mode: "stat", filter: "present", label: "All Present Records" })} />
+          <StatCard icon={FaCalendarAlt} label="Today" value={summary?.today || 0} color="#fbbf24"
+            clickable onClick={() => setAttendDrill({ mode: "stat", filter: "today", label: "Today's Check-ins" })} />
+          <StatCard icon={FaCalendarAlt} label="This Month" value={summary?.this_month || 0} color="#a78bfa"
+            clickable onClick={() => setAttendDrill({ mode: "stat", filter: "this_month", label: "This Month's Check-ins" })} />
+        </div>
+
+        {/* Charts */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px", marginBottom: "16px" }}>
+          {/* Bar chart — click bar for that month */}
+          <ChartCard title={`Monthly Attendance — ${year} (click bar for details)`}>
+            <Bar
+              data={{ labels: MONTHS, datasets: [{ label: "Present", data: monthlyPresent, backgroundColor: chartColors.purpleBg, borderColor: chartColors.purple, borderWidth: 2, borderRadius: 6 }] }}
+              options={{
+                ...chartOpts(),
+                onClick: (_, elements) => {
+                  if (elements.length > 0) {
+                    const mo = elements[0].index + 1;
+                    if (monthlyPresent[elements[0].index] > 0)
+                      setAttendDrill({ mode: "month", month: mo, year, label: `${MONTHS[mo - 1]} ${year} Attendance` });
+                  }
+                },
+              }}
+            />
+          </ChartCard>
+
+          {/* Line chart — click point for that day */}
+          <ChartCard title="Last 30 Days Daily Trend (click point for details)">
+            <Line
+              data={{
+                labels: weekly?.map(w => {
+                  const d = new Date(w.day);
+                  return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+                }) || [],
+                datasets: [{ label: "Check-ins", data: weekly?.map(w => w.count) || [], borderColor: chartColors.yellow, backgroundColor: "rgba(251,191,36,0.1)", borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: chartColors.yellow, pointRadius: 5, pointHoverRadius: 8 }]
+              }}
+              options={{
+                ...chartOpts(),
+                onClick: (_, elements) => {
+                  if (elements.length > 0 && weekly) {
+                    const dayObj = weekly[elements[0].index];
+                    if (dayObj?.count > 0) {
+                      const d = new Date(dayObj.day);
+                      const dateStr = d.toISOString().split("T")[0];
+                      const label = `${d.getDate()} ${MONTHS[d.getMonth()]} — Check-ins`;
+                      setAttendDrill({ mode: "day", date: dateStr, label });
+                    }
+                  }
+                },
+              }}
+            />
+          </ChartCard>
+        </div>
+
+        {/* Top 5 Members — click row for member history */}
+        {topMembers?.length > 0 && (
+          <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
+                Top 5 Most Active Members
+                <span style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 400, marginLeft: "8px" }}>— Click any row for full history</span>
+              </h3>
+            </div>
+            <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+                  {["Rank", "Member", "Membership", "Visits"].map(h => (
+                    <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {topMembers.map((m, i) => (
+                  <tr key={i}
+                    onClick={() => setAttendDrill({ mode: "member", memberId: m.member_id, label: `${m.full_name} — Attendance History` })}
+                    style={{ borderBottom: "1px solid var(--border-subtle)", cursor: "pointer", transition: "background 0.1s" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    <td style={{ padding: "12px 20px", color: "var(--text-muted)", fontSize: "13px" }}>#{i + 1}</td>
+                    <td style={{ padding: "12px 20px", fontSize: "13px" }}>
+                      <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{m.full_name}</span>
+                      <span style={{ marginLeft: "8px", fontSize: "10px", color: "#a78bfa", opacity: 0.7 }}>→ click for history</span>
+                    </td>
+                    <td style={{ padding: "12px 20px" }}>
+                      <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 600, background: "rgba(96,165,250,0.1)", color: "#60a5fa" }}>{m.membership_type}</span>
+                    </td>
+                    <td style={{ padding: "12px 20px", color: "#34d399", fontSize: "13px", fontWeight: 700 }}>{m.visits}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  // ── DATE RANGE MODAL (NEW) ─────────────────────────────────────────────────
+  const DateRangeModal = () => (
+    <div onClick={() => setShowDateRange(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1500, backdropFilter: "blur(4px)" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-lg)", padding: "20px 20px", width: "min(400px, 92vw)", boxShadow: "0 24px 60px rgba(0,0,0,0.6)" }}>
+        <h3 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 20px" }}>📅 Date Range Filter</h3>
+        <p style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "20px" }}>Is range mein join kiye members dekhein</p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "24px" }}>
+          <div>
+            <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>From Date</label>
+            <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+              style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+          </div>
+          <div>
+            <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>To Date</label>
+            <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+              style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+          <button onClick={() => setShowDateRange(false)}
+            style={{ padding: "9px 18px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-muted)", cursor: "pointer", fontSize: "13px" }}>
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              if (!dateFrom || !dateTo) return alert("Dono dates select karo");
+              if (dateFrom > dateTo) return alert("From date, To date se pehle honi chahiye");
+              setShowDateRange(false);
+              setMemberDrill({ mode: "daterange", from: dateFrom, to: dateTo, label: `${dateFrom} → ${dateTo}` });
+            }}
+            style={{ padding: "9px 18px", background: "#60a5fa", border: "none", borderRadius: "var(--radius-md)", color: "#0a0a0a", cursor: "pointer", fontSize: "13px", fontWeight: 700 }}>
+            Show Members
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg-base)", fontFamily: "var(--font-body)" }}>
+        <Sidebar onLogout={onLogout} />
+        <main style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+
+          {/* Header */}
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-surface)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+            <div>
+              <h1 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Reports & Analytics</h1>
+              <p style={{ color: "var(--text-muted)", fontSize: "12px", margin: "3px 0 0" }}>Visual insights from your gym data</p>
+            </div>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+              <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ padding: "8px 12px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "13px", cursor: "pointer", outline: "none" }}>
+                {years.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+              <button onClick={exportPDF} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "var(--radius-md)", color: "#f87171", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}>
+                <FaFilePdf /> PDF
+              </button>
+              <button onClick={exportExcel} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)", borderRadius: "var(--radius-md)", color: "#34d399", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}>
+                <FaFileExcel /> Excel
+              </button>
+            </div>
+          </div>
+
+          <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px" }}>
+            {/* Tabs */}
+            <div style={{ display: "flex", gap: "4px", marginBottom: "20px", background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", padding: "6px", overflowX: "auto" }}>
+              {TABS.map(({ key, label, icon: Icon }) => (
+                <button key={key} onClick={() => setActiveTab(key)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 16px", borderRadius: "var(--radius-md)", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 600, background: activeTab === key ? "var(--bg-active)" : "transparent", color: activeTab === key ? "var(--text-primary)" : "var(--text-muted)", transition: "all 0.15s", whiteSpace: "nowrap", flex: 1, justifyContent: "center" }}>
+                  <Icon style={{ fontSize: "12px" }} /> {label}
+                </button>
+              ))}
+            </div>
+
+            {loading ? (
+              <div style={{ textAlign: "center", padding: "80px", color: "var(--text-muted)" }}>Loading report data...</div>
+            ) : (
+              <>
+                {activeTab === "revenue" && renderRevenue()}
+                {activeTab === "members" && renderMembers()}
+                {activeTab === "attendance" && renderAttendance()}
+              </>
+            )}
+          </div>
+        </main>
+      </div>
+
+      {/* Revenue Drill-down Modal (existing) */}
+      <ReportDrillDownModal
+        open={!!drill}
+        onClose={() => setDrill(null)}
+        mode={drill?.mode}
+        month={drill?.month}
+        year={drill?.year}
+        drill={drill}  
+      />
+      {/* Member Growth Drill-down Modal (NEW) */}
+      <MemberDrillDownModal
+        drill={memberDrill}
+        onClose={() => setMemberDrill(null)}
+      />
+
+      {/* Member Date Range Picker Modal */}
+      {showDateRange && <DateRangeModal />}
+
+      {/* Attendance Date Range Picker Modal */}
+      {showAttendDateRange && (
+        <div onClick={() => setShowAttendDateRange(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1500, backdropFilter: "blur(4px)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-lg)", padding: "20px 20px", width: "min(400px, 92vw)", boxShadow: "0 24px 60px rgba(0,0,0,0.6)" }}>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 20px" }}>📅 Attendance Date Range</h3>
+            <p style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "20px" }}>Is range mein check-in records dekhein</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "24px" }}>
+              <div>
+                <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>From Date</label>
+                <input type="date" value={attendDateFrom} onChange={e => setAttendDateFrom(e.target.value)}
+                  style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+              </div>
+              <div>
+                <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>To Date</label>
+                <input type="date" value={attendDateTo} onChange={e => setAttendDateTo(e.target.value)}
+                  style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <button onClick={() => setShowAttendDateRange(false)}
+                style={{ padding: "9px 18px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-muted)", cursor: "pointer", fontSize: "13px" }}>
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (!attendDateFrom || !attendDateTo) return alert("Dono dates select karo");
+                  if (attendDateFrom > attendDateTo) return alert("From date, To date se pehle honi chahiye");
+                  setShowAttendDateRange(false);
+                  setAttendDrill({ mode: "daterange", from: attendDateFrom, to: attendDateTo, label: `${attendDateFrom} to ${attendDateTo} Attendance` });
+                }}
+                style={{ padding: "9px 18px", background: "#a78bfa", border: "none", borderRadius: "var(--radius-md)", color: "#0a0a0a", cursor: "pointer", fontSize: "13px", fontWeight: 700 }}>
+                Show Records
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Attendance Drill-down Modal */}
+      <AttendanceDrillDownModal
+        drill={attendDrill}
+        onClose={() => setAttendDrill(null)}
+      />
+
+      <style>{`
+        @media (max-width: 640px) {
+          .rpt-hide-mobile { display: none !important; }
+        }
+      `}</style>
+    </>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Member Growth Drill-Down Modal (NEW COMPONENT)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+
+const STATUS_STYLE = {
+  active: { bg: "rgba(52,211,153,0.12)", color: "#34d399" },
+  inactive: { bg: "rgba(248,113,113,0.12)", color: "#f87171" },
+  expired: { bg: "rgba(251,191,36,0.12)", color: "#fbbf24" },
+};
+
+function MemberDrillDownModal({ drill, onClose }) {
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const open = !!drill;
+
+  // ESC to close
+  useEffect(() => {
+    if (!open) return;
+    const fn = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, [open, onClose]);
+
+  // Fetch members based on drill mode
+  useEffect(() => {
+    if (!drill) { setMembers([]); return; }
+    setLoading(true); setMembers([]); setSearch("");
+
+    let url = "";
+    if (drill.mode === "stat") url = `/reports/members/drilldown/stat?filter=${drill.filter}`;
+    if (drill.mode === "month") url = `/reports/members/drilldown/month/${drill.year}/${drill.month}`;
+    if (drill.mode === "type") url = `/reports/members/drilldown/type/${encodeURIComponent(drill.type)}`;
+    if (drill.mode === "daterange") url = `/reports/members/drilldown/daterange?from=${drill.from}&to=${drill.to}`;
+
+    api.get(url)
+      .then(r => setMembers(r.data.data || []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [drill]);
+
+  if (!open) return null;
+
+  const filtered = members.filter(m => {
+    const q = search.toLowerCase();
+    return !search || m.full_name?.toLowerCase().includes(q) || m.phone?.includes(search) || m.email?.toLowerCase().includes(q);
+  });
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.78)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1400, padding: "20px", backdropFilter: "blur(4px)" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "var(--bg-surface)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border-default)", width: "min(900px,96vw)", maxHeight: "90vh", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.7)", animation: "memberDrillIn 0.2s cubic-bezier(0.16,1,0.3,1)" }}>
+
+        {/* Header */}
+        <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-elevated)", borderRadius: "var(--radius-lg) var(--radius-lg) 0 0", flexShrink: 0 }}>
+          <div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--text-primary)" }}>👥 {drill.label}</div>
+            {!loading && <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{members.length} members</div>}
+          </div>
+          <button onClick={onClose} style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}>✕</button>
+        </div>
+
+        {/* Summary Strip */}
+        {!loading && members.length > 0 && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", borderBottom: "1px solid var(--border-subtle)", overflowX: "auto" }}>
+            {[
+              { icon: "✅", label: "Active", value: members.filter(m => m.status === "active").length, color: "#34d399" },
+              { icon: "❌", label: "Inactive", value: members.filter(m => m.status === "inactive").length, color: "#f87171" },
+              { icon: "👥", label: "Total", value: members.length, color: "#60a5fa" },
+            ].map(c => (
+              <div key={c.label} style={{ padding: "12px 18px", textAlign: "center", borderRight: "1px solid var(--border-subtle)", background: "var(--bg-elevated)" }}>
+                <div style={{ fontSize: "16px", marginBottom: "3px" }}>{c.icon}</div>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: c.color }}>{c.value}</div>
+                <div style={{ fontSize: "10px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c.label}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Search */}
+        {!loading && members.length > 0 && (
+          <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border-subtle)", flexShrink: 0 }}>
+            <div style={{ position: "relative" }}>
+              <span style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px" }}>🔍</span>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, phone, or email..."
+                style={{ width: "100%", padding: "8px 12px 8px 30px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "12px", outline: "none", boxSizing: "border-box" }} />
+            </div>
+          </div>
+        )}
+
+        {/* Body */}
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          {loading ? (
+            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "13px" }}>Loading members...</div>
+          ) : members.length === 0 ? (
+            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "13px" }}>Is filter mein koi member nahi mila</div>
+          ) : (
+            <>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
+                <thead>
+                  <tr style={{ background: "var(--bg-elevated)", position: "sticky", top: 0, zIndex: 1 }}>
+                    {["#", "Member", "Phone / Email", "Membership Type", "Status", "Join Date", "Expiry"].map(h => (
+                      <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((m, idx) => {
+                    const st = STATUS_STYLE[m.status] || STATUS_STYLE.inactive;
+                    return (
+                      <tr key={m.id} style={{ borderBottom: "1px solid var(--border-subtle)", transition: "background 0.1s" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "11px" }}>{idx + 1}</td>
+                        <td style={{ padding: "11px 14px" }}>
+                          <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "13px" }}>{m.full_name}</div>
+                        </td>
+                        <td style={{ padding: "11px 14px" }}>
+                          <div style={{ color: "var(--text-secondary)", fontSize: "12px" }}>{m.phone || "—"}</div>
+                          <div style={{ color: "var(--text-muted)", fontSize: "10px", marginTop: "1px" }}>{m.email || ""}</div>
+                        </td>
+                        <td style={{ padding: "11px 14px" }}>
+                          <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 600, background: "rgba(96,165,250,0.1)", color: "#60a5fa", whiteSpace: "nowrap" }}>
+                            {m.membership_type || "—"}
+                          </span>
+                        </td>
+                        <td style={{ padding: "11px 14px" }}>
+                          <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: st.bg, color: st.color, textTransform: "capitalize" }}>
+                            {m.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "11px", whiteSpace: "nowrap" }}>{fmtDate(m.created_at)}</td>
+                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "11px", whiteSpace: "nowrap" }}>{fmtDate(m.membership_end)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <div style={{ padding: "12px 20px", borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between" }}>
+                <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>Showing {filtered.length} of {members.length} members</span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes memberDrillIn {
+          from { transform: translateY(16px); opacity: 0; }
+          to   { transform: translateY(0);    opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Attendance Drill-Down Modal
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const fmtTime = (d) => {
+  if (!d) return "—";
+  const dt = new Date(d);
+  return dt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+};
+
+function AttendanceDrillDownModal({ drill, onClose }) {
+  const [records, setRecords] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const open = !!drill;
+
+  // ESC to close
+  useEffect(() => {
+    if (!open) return;
+    const fn = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, [open, onClose]);
+
+  // Fetch records based on drill mode
+  useEffect(() => {
+    if (!drill) { setRecords([]); setSummary(null); return; }
+    setLoading(true); setRecords([]); setSummary(null); setSearch("");
+
+    let url = "";
+    if (drill.mode === "stat") url = `/reports/attendance/drilldown/stat?filter=${drill.filter}`;
+    if (drill.mode === "month") url = `/reports/attendance/drilldown/month/${drill.year}/${drill.month}`;
+    if (drill.mode === "day") url = `/reports/attendance/drilldown/day/${drill.date}`;
+    if (drill.mode === "member") url = `/reports/attendance/drilldown/member/${drill.memberId}`;
+    if (drill.mode === "daterange") url = `/reports/attendance/drilldown/daterange?from=${drill.from}&to=${drill.to}`;
+
+    api.get(url)
+      .then(r => {
+        setRecords(r.data.data || []);
+        if (r.data.summary) setSummary(r.data.summary);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [drill]);
+
+  if (!open) return null;
+
+  const filtered = records.filter(r => {
+    const q = search.toLowerCase();
+    return !search || r.full_name?.toLowerCase().includes(q) || r.phone?.includes(search);
+  });
+
+  const presentCount = records.filter(r => r.status === "present").length;
+  const uniqueMembers = new Set(records.map(r => r.member_id)).size;
+
+  // Group by date for member mode
+  const isMemberMode = drill.mode === "member";
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.78)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1450, padding: "20px", backdropFilter: "blur(4px)" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "var(--bg-surface)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border-default)", width: "min(920px,96vw)", maxHeight: "90vh", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.7)", animation: "attendDrillIn 0.2s cubic-bezier(0.16,1,0.3,1)" }}>
+
+        {/* Header */}
+        <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-elevated)", borderRadius: "var(--radius-lg) var(--radius-lg) 0 0", flexShrink: 0 }}>
+          <div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--text-primary)" }}>
+              🏋️ {drill.label}
+            </div>
+            {!loading && (
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+                {records.length} records
+                {isMemberMode && summary && ` • ${summary.present} present visits`}
+              </div>
+            )}
+          </div>
+          <button onClick={onClose} style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}>✕</button>
+        </div>
+
+        {/* Summary Strip */}
+        {!loading && records.length > 0 && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", borderBottom: "1px solid var(--border-subtle)", overflowX: "auto" }}>
+            {[
+              { icon: "✅", label: "Present", value: presentCount, color: "#34d399" },
+              { icon: "👥", label: isMemberMode ? "Total Visits" : "Unique Members", value: isMemberMode ? records.length : uniqueMembers, color: "#60a5fa" },
+              { icon: "📋", label: "Total Records", value: records.length, color: "#a78bfa" },
+            ].map(c => (
+              <div key={c.label} style={{ padding: "12px 18px", textAlign: "center", borderRight: "1px solid var(--border-subtle)", background: "var(--bg-elevated)" }}>
+                <div style={{ fontSize: "16px", marginBottom: "3px" }}>{c.icon}</div>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: c.color }}>{c.value}</div>
+                <div style={{ fontSize: "10px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c.label}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Search */}
+        {!loading && records.length > 0 && !isMemberMode && (
+          <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border-subtle)", flexShrink: 0 }}>
+            <div style={{ position: "relative" }}>
+              <span style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px" }}>🔍</span>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by member name or phone..."
+                style={{ width: "100%", padding: "8px 12px 8px 30px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "12px", outline: "none", boxSizing: "border-box" }} />
+            </div>
+          </div>
+        )}
+
+        {/* Body */}
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          {loading ? (
+            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "13px" }}>Loading attendance records...</div>
+          ) : records.length === 0 ? (
+            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "13px" }}>Is filter mein koi record nahi mila</div>
+          ) : (
+            <>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
+                <thead>
+                  <tr style={{ background: "var(--bg-elevated)", position: "sticky", top: 0, zIndex: 1 }}>
+                    {(isMemberMode
+                      ? ["#", "Date", "Check-In", "Check-Out", "Duration", "Status"]
+                      : ["#", "Member", "Phone", "Membership", "Check-In", "Check-Out", "Duration", "Status"]
+                    ).map(h => (
+                      <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((r, idx) => {
+                    // Calculate duration
+                    let duration = "—";
+                    if (r.check_in && r.check_out) {
+                      const mins = Math.round((new Date(r.check_out) - new Date(r.check_in)) / 60000);
+                      if (mins >= 60) duration = `${Math.floor(mins / 60)}h ${mins % 60}m`;
+                      else duration = `${mins}m`;
+                    }
+                    const isPresent = r.status === "present";
+
+                    return (
+                      <tr key={r.id} style={{ borderBottom: "1px solid var(--border-subtle)", transition: "background 0.1s" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "11px" }}>{idx + 1}</td>
+
+                        {isMemberMode ? (
+                          <td style={{ padding: "11px 14px", color: "var(--text-primary)", fontSize: "12px", fontWeight: 600, whiteSpace: "nowrap" }}>
+                            {fmtDate(r.date)}
+                          </td>
+                        ) : (
+                          <>
+                            <td style={{ padding: "11px 14px" }}>
+                              <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "13px" }}>{r.full_name}</div>
+                            </td>
+                            <td style={{ padding: "11px 14px", color: "var(--text-secondary)", fontSize: "12px" }}>{r.phone || "—"}</td>
+                            <td style={{ padding: "11px 14px" }}>
+                              <span style={{ padding: "3px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: 600, background: "rgba(96,165,250,0.1)", color: "#60a5fa", whiteSpace: "nowrap" }}>
+                                {r.membership_type || "—"}
+                              </span>
+                            </td>
+                          </>
+                        )}
+
+                        <td style={{ padding: "11px 14px", color: "#34d399", fontSize: "12px", fontWeight: 600, whiteSpace: "nowrap" }}>{fmtTime(r.check_in)}</td>
+                        <td style={{ padding: "11px 14px", color: r.check_out ? "#60a5fa" : "var(--text-muted)", fontSize: "12px", whiteSpace: "nowrap" }}>{r.check_out ? fmtTime(r.check_out) : "—"}</td>
+                        <td style={{ padding: "11px 14px", color: "#fbbf24", fontSize: "12px", whiteSpace: "nowrap" }}>{duration}</td>
+                        <td style={{ padding: "11px 14px" }}>
+                          <span style={{ padding: "3px 10px", borderRadius: "99px", fontSize: "10px", fontWeight: 700, background: isPresent ? "rgba(52,211,153,0.12)" : "rgba(248,113,113,0.12)", color: isPresent ? "#34d399" : "#f87171", textTransform: "capitalize" }}>
+                            {r.status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <div style={{ padding: "12px 20px", borderTop: "1px solid var(--border-subtle)" }}>
+                <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+                  Showing {filtered.length} of {records.length} records
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes attendDrillIn {
+          from { transform: translateY(16px); opacity: 0; }
+          to   { transform: translateY(0);    opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
