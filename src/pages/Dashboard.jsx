@@ -14,7 +14,7 @@ import {
   FaEye, FaEyeSlash
 } from "react-icons/fa";
 import NotificationBell from "../components/NotificationBell";
-import RevenueDrillDown from "../components/RevenueDrillDown";
+import RevenueDrillDown from "../components/Revenuedrilldown";
 
 const fmt     = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
 const fmtDate = (d) => new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
