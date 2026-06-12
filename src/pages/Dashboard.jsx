@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -11,10 +11,11 @@ import {
   FaUsers, FaUserTie, FaClipboardCheck, FaRupeeSign,
   FaArrowRight, FaArrowUp, FaArrowDown, FaSync,
   FaCheckCircle, FaTimesCircle, FaClock, FaExclamationTriangle,
-  FaEye, FaEyeSlash, FaTimes, FaCheck
+  FaEye, FaEyeSlash, FaTimes, FaCheck, FaSearch, FaUser
 } from "react-icons/fa";
 import NotificationBell from "../components/NotificationBell";
 import RevenueDrillDown from "../components/Revenuedrilldown";
+import MemberProfileDrawer from "../components/MemberProfileDrawer";
 
 const fmt     = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
 const fmtDate = (d) => new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
@@ -160,21 +161,24 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
   const fetchExpired = async (pg = 1) => {
     setLoading(true);
     try {
-      const r = await api.get(`/members?page=${pg}&limit=8&search=expired`);
-      // filter client-side to ensure only expired status
-      const all = r.data.data || [];
-      const expired = all.filter(m => m.status === "expired");
-      setMembers(expired);
-      setTotal(r.data.pagination?.total || count);
-      setTotalPages(r.data.pagination?.totalPages || 1);
-      // fetch dues for these members
+      // Fetch all members with large limit and filter by status client-side
+      // (backend search is by name/email/phone, not status)
+      const r = await api.get(`/members?page=1&limit=200`);
+      const all = (r.data.data || []).filter(m => m.status === "expired");
+      const perPage = 8;
+      const start = (pg - 1) * perPage;
+      const pageItems = all.slice(start, start + perPage);
+      setMembers(pageItems);
+      setTotal(all.length);
+      setTotalPages(Math.ceil(all.length / perPage) || 1);
+      // fetch dues for visible members
       const entries = await Promise.all(
-        expired.map(async (m) => {
+        pageItems.map(async (m) => {
           try {
             const pr = await api.get(`/payments/member/${m.id}`);
             const pending = (pr.data.data || []).filter(p => p.status === "pending");
-            const total = pending.reduce((s, p) => s + Number(p.due_amount || p.amount || 0), 0);
-            return [m.id, { total, payments: pending, marking: false }];
+            const tot = pending.reduce((s, p) => s + Number(p.due_amount || p.amount || 0), 0);
+            return [m.id, { total: tot, payments: pending, marking: false }];
           } catch { return [m.id, { total: 0, payments: [], marking: false }]; }
         })
       );
@@ -492,7 +496,13 @@ export default function Dashboard({ onLogout }) {
 
   const [shown, setShown] = useState({ activeMembers: false, thisMonthRev: false });
   const toggle = (key) => setShown(s => ({ ...s, [key]: !s[key] }));
-  const [showExpired, setShowExpired] = useState(false);
+  const [showExpired,     setShowExpired]     = useState(false);
+  const [searchQuery,     setSearchQuery]     = useState("");
+  const [searchResults,   setSearchResults]   = useState([]);
+  const [searchLoading,   setSearchLoading]   = useState(false);
+  const [showSearchDrop,  setShowSearchDrop]  = useState(false);
+  const [profileMember,   setProfileMember]   = useState(null);
+  const searchTimer = useRef(null);
 
   const fetchAll = async (isRefresh = false) => {
     isRefresh ? setRefreshing(true) : setLoading(true);
@@ -521,6 +531,20 @@ export default function Dashboard({ onLogout }) {
     const interval = setInterval(() => fetchAll(true), 120000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    clearTimeout(searchTimer.current);
+    if (!searchQuery.trim()) { setSearchResults([]); setShowSearchDrop(false); return; }
+    setSearchLoading(true); setShowSearchDrop(true);
+    searchTimer.current = setTimeout(async () => {
+      try {
+        const r = await api.get(`/members?page=1&limit=6&search=${encodeURIComponent(searchQuery.trim())}`);
+        setSearchResults(r.data.data || []);
+      } catch { setSearchResults([]); }
+      finally { setSearchLoading(false); }
+    }, 350);
+    return () => clearTimeout(searchTimer.current);
+  }, [searchQuery]);
 
   const hour  = new Date().getHours();
   const greet = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
@@ -565,6 +589,58 @@ export default function Dashboard({ onLogout }) {
               Dashboard
             </h1>
             <div className="dash-header-actions">
+              {/* ── Member Search ── */}
+              <div style={{ position: "relative" }} onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) { setShowSearchDrop(false); } }}>
+                <div style={{ position: "relative", width: "220px" }}>
+                  <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px", pointerEvents: "none" }} />
+                  <input
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    onFocus={() => searchQuery.trim() && setShowSearchDrop(true)}
+                    placeholder="Search member..."
+                    style={{ width: "100%", padding: "7px 28px 7px 30px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)", fontSize: "12px", outline: "none", fontFamily: "var(--font-body)", boxSizing: "border-box" }}
+                    onKeyDown={e => { if (e.key === "Escape") { setSearchQuery(""); setShowSearchDrop(false); } }}
+                  />
+                  {searchQuery && (
+                    <button onClick={() => { setSearchQuery(""); setShowSearchDrop(false); }} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0, display: "flex", alignItems: "center" }}>
+                      <FaTimes style={{ fontSize: "10px" }} />
+                    </button>
+                  )}
+                </div>
+                {/* Dropdown */}
+                {showSearchDrop && (
+                  <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", boxShadow: "0 8px 24px rgba(0,0,0,0.5)", zIndex: 500, overflow: "hidden", minWidth: "260px" }}>
+                    {searchLoading ? (
+                      <div style={{ padding: "14px 16px", fontSize: "12px", color: "var(--text-muted)", textAlign: "center" }}>Searching...</div>
+                    ) : searchResults.length === 0 ? (
+                      <div style={{ padding: "14px 16px", fontSize: "12px", color: "var(--text-muted)", textAlign: "center" }}>No members found</div>
+                    ) : (
+                      searchResults.map(m => {
+                        const statusColor = m.status === "active" ? "var(--green)" : m.status === "expired" ? "var(--red)" : "var(--yellow)";
+                        return (
+                          <div key={m.id}
+                            tabIndex={0}
+                            onClick={() => { setProfileMember(m); setSearchQuery(""); setShowSearchDrop(false); }}
+                            onKeyDown={e => e.key === "Enter" && (() => { setProfileMember(m); setSearchQuery(""); setShowSearchDrop(false); })()}
+                            style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid var(--border-subtle)", transition: "background 0.1s" }}
+                            onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
+                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                          >
+                            <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: "var(--bg-active)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, color: "var(--accent-bright)", flexShrink: 0 }}>
+                              {m.full_name?.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase()}
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.full_name}</div>
+                              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "1px" }}>{m.phone} · {m.membership_type || "—"}</div>
+                            </div>
+                            <span style={{ fontSize: "10px", fontWeight: 600, padding: "2px 7px", borderRadius: "99px", background: m.status === "active" ? "var(--green-bg)" : m.status === "expired" ? "var(--red-bg)" : "var(--yellow-bg)", color: statusColor, flexShrink: 0, textTransform: "capitalize" }}>{m.status}</span>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+              </div>
               {lastUpdated && (
                 <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
                   Updated {lastUpdated.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
@@ -735,6 +811,13 @@ export default function Dashboard({ onLogout }) {
           navigate={navigate}
         />
       )}
+
+      {/* Member Profile Drawer (from search) */}
+      <MemberProfileDrawer
+        member={profileMember}
+        onClose={() => setProfileMember(null)}
+        onEdit={() => { setProfileMember(null); navigate("/members"); }}
+      />
     </div>
   );
 }
