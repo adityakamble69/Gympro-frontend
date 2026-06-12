@@ -223,6 +223,7 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
   const [pendingLoading,  setPendingLoading]  = useState(true);
   const [discountType,    setDiscountType]    = useState("flat");
   const [discountValue,   setDiscountValue]   = useState("");
+  const [dueDate,         setDueDate]         = useState("");   // "promise to pay by" date
 
   const plan        = plans.find(p => p.name === selectedPlan);
   const days        = daysLeft(member.membership_end);
@@ -313,6 +314,7 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
         payment_for:    plan?.duration_type || "monthly",
         payment_method: payMethod,
         payment_date:   new Date().toISOString().split("T")[0],
+        due_date:       dueAmt > 0 && dueDate ? dueDate : undefined,
         status:         dueAmt > 0 ? "pending" : "paid",
         notes:          notes || `Renewal — ${selectedPlan}`,
         plan_name:      selectedPlan,
@@ -602,6 +604,41 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
                   )}
                 </div>
               </div>
+            );
+          })()}
+
+          {/* Promise to Pay by — only when balance is due */}
+          {plan && (() => {
+            const paid = Number(paidAmount) || 0;
+            const due  = Math.max(0, afterDiscount - paid);
+            if (due <= 0) return null;
+            const minDate = new Date(); minDate.setDate(minDate.getDate() + 1);
+            const minStr  = minDate.toISOString().split("T")[0];
+            return (
+              <Field label="Promise to Pay by (Optional)">
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <input
+                    style={{ ...inputStyle, borderColor: dueDate ? "rgba(245,158,11,0.5)" : "var(--border-default)" }}
+                    type="date"
+                    min={minStr}
+                    value={dueDate}
+                    onChange={e => setDueDate(e.target.value)}
+                    onFocus={e => e.target.style.borderColor = "rgba(245,158,11,0.7)"}
+                    onBlur={e => e.target.style.borderColor = dueDate ? "rgba(245,158,11,0.5)" : "var(--border-default)"}
+                  />
+                  {dueDate ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#f59e0b", padding: "5px 8px", background: "rgba(245,158,11,0.08)", borderRadius: "6px", border: "1px solid rgba(245,158,11,0.2)" }}>
+                      <span>⏰</span>
+                      <span>Auto-reminder will be sent if ₹{(Math.max(0, afterDiscount - (Number(paidAmount)||0))).toLocaleString("en-IN")} is not paid by {new Date(dueDate).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" })}</span>
+                      <button onClick={() => setDueDate("")} style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer", color: "#f59e0b", padding: 0, fontSize: "11px" }}>✕</button>
+                    </div>
+                  ) : (
+                    <p style={{ fontSize: "11px", color: "var(--text-muted)", margin: 0 }}>
+                      📅 Set a date — member ko us din reminder aayega agar payment pending hai
+                    </p>
+                  )}
+                </div>
+              </Field>
             );
           })()}
 
