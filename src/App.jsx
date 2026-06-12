@@ -12,6 +12,7 @@ import Reports         from "./pages/Reports";
 import Profile         from "./pages/Profile";
 import MembershipPlans from "./pages/MembershipPlans";
 import Inquiries       from "./pages/Inquiries";
+import InquiryForm from "./pages/InquiryForm";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
@@ -53,6 +54,7 @@ function App() {
             <Route path="/reports"          element={<Reports         onLogout={handleLogout} />} />
             <Route path="/profile"          element={<Profile         onLogout={handleLogout} />} />
             <Route path="/inquiries"        element={<Inquiries       onLogout={handleLogout} />} />
+            <Route path="/inquiry" element={<InquiryForm />} />
             <Route path="*"                 element={<Navigate to="/dashboard" />} />
           </>
         )}
