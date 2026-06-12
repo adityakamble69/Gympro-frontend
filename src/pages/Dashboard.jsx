@@ -190,18 +190,27 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
     if (!info || info.payments.length === 0 || info.marking) return;
     setDueMap(prev => ({ ...prev, [memberId]: { ...prev[memberId], marking: true } }));
     try {
-      await Promise.all(info.payments.map(p =>
-        api.put(`/payments/${p.id}`, {
-          member_id: p.member_id, amount: Number(p.amount),
-          paid_amount: Number(p.amount), due_amount: 0,
-          payment_date: new Date().toISOString().split("T")[0],
+      await Promise.all(info.payments.map(p => {
+        const totalAmt = Number(p.amount) || Number(p.due_amount) || 1;
+        const payDate  = p.payment_date
+          ? new Date(p.payment_date).toISOString().split("T")[0]
+          : new Date().toISOString().split("T")[0];
+        return api.put(`/payments/${p.id}`, {
+          member_id:      p.member_id,
+          amount:         totalAmt,
+          paid_amount:    totalAmt,
+          due_amount:     0,
+          payment_date:   payDate,
           payment_method: p.payment_method || "cash",
-          payment_for: p.payment_for || "monthly",
-          status: "paid", months_covered: p.months_covered || 1,
-          notes: p.notes || null, plan_name: p.plan_name || null,
-          plan_start: p.plan_start || null, plan_end: p.plan_end || null,
-        })
-      ));
+          payment_for:    p.payment_for    || "monthly",
+          status:         "paid",
+          months_covered: Number(p.months_covered) || 1,
+          notes:          p.notes      || null,
+          plan_name:      p.plan_name  || null,
+          plan_start:     p.plan_start ? new Date(p.plan_start).toISOString().split("T")[0] : null,
+          plan_end:       p.plan_end   ? new Date(p.plan_end).toISOString().split("T")[0]   : null,
+        });
+      }));
       setDueMap(prev => ({ ...prev, [memberId]: { total: 0, payments: [], marking: false } }));
     } catch { setDueMap(prev => ({ ...prev, [memberId]: { ...prev[memberId], marking: false } })); }
   };
