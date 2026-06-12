@@ -4,7 +4,8 @@ import api from "../services/api";
 import {
   FaPlus, FaSearch, FaTimes,
   FaChevronLeft, FaChevronRight, FaUsers, FaUser,
-  FaWhatsapp, FaEnvelope, FaCheck, FaPaperPlane, FaSyncAlt, FaTrash
+  FaWhatsapp, FaEnvelope, FaCheck, FaPaperPlane, FaSyncAlt, FaTrash,
+  FaEye, FaEyeSlash, FaRupeeSign
 } from "react-icons/fa";
 import MemberProfileDrawer from "../components/MemberProfileDrawer";
 
@@ -636,7 +637,7 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
 }
 
 // ─── Mobile Member Card ────────────────────────────────────────────────────────
-const MemberCard = ({ m, plans, onProfile, onRenew, onNotify, onDelete }) => {
+const MemberCard = ({ m, plans, onProfile, onRenew, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone }) => {
   const days = daysLeft(m.membership_end);
   const warn = days !== null && days <= 7 && days >= 0;
   return (
@@ -654,7 +655,18 @@ const MemberCard = ({ m, plans, onProfile, onRenew, onNotify, onDelete }) => {
           <div style={{ fontWeight: 700, fontSize: "14px", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "5px" }}>
             <FaUser style={{ fontSize: "9px", opacity: 0.4 }} /> {m.full_name}
           </div>
-          <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{m.phone} · {m.email}</div>
+          <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+            <span>{phoneVisible[m.id] ? m.phone : m.phone ? "••••••" + m.phone.slice(-4) : "—"}</span>
+            {m.phone && (
+              <button
+                onClick={e => { e.stopPropagation(); setPhoneVisible(prev => ({ ...prev, [m.id]: !prev[m.id] })); }}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: "0", display: "flex", alignItems: "center" }}
+              >
+                {phoneVisible[m.id] ? <FaEyeSlash style={{ fontSize: "11px" }} /> : <FaEye style={{ fontSize: "11px" }} />}
+              </button>
+            )}
+            <span>· {m.email}</span>
+          </div>
         </div>
         <StatusBadge status={m.status} />
       </div>
@@ -675,6 +687,24 @@ const MemberCard = ({ m, plans, onProfile, onRenew, onNotify, onDelete }) => {
           </span>
         )}
       </div>
+
+      {/* Due Amount */}
+      {dueInfo?.total > 0 && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 10px", borderRadius: "var(--radius-sm)", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>Due:</span>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#f59e0b" }}>₹{Number(dueInfo.total).toLocaleString("en-IN")}</span>
+          </div>
+          <button
+            onClick={() => onMarkPaid(m.id)}
+            disabled={dueInfo?.marking}
+            style={{ padding: "3px 8px", borderRadius: "var(--radius-sm)", background: dueInfo?.marking ? "var(--bg-elevated)" : "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.3)", color: dueInfo?.marking ? "var(--text-muted)" : "var(--green)", cursor: dueInfo?.marking ? "not-allowed" : "pointer", fontSize: "10px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}
+          >
+            <FaCheck style={{ fontSize: "8px" }} />
+            {dueInfo?.marking ? "Marking..." : "Mark Paid"}
+          </button>
+        </div>
+      )}
 
       {/* Actions */}
       <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
@@ -766,6 +796,8 @@ export default function Members({ onLogout }) {
   const [profileMember, setProfileMember] = useState(null);
   const [renewMember, setRenewMember] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [phoneVisible, setPhoneVisible] = useState({});   // { [memberId]: true/false }
+  const [dueMap, setDueMap] = useState({});               // { [memberId]: { total, payments, loading, marking } }
   const searchTimer = useRef(null);
 
   useEffect(() => { fetchMembers(1, ""); fetchPlans(); }, []);
@@ -778,8 +810,61 @@ export default function Members({ onLogout }) {
   const fetchPlans = async () => { try { const r = await api.get("/membership-plans?status=active"); setPlans(r.data.data || []); } catch (e) { } };
   const fetchMembers = async (page = 1, q = "") => {
     setLoading(true);
-    try { const r = await api.get(`/members?page=${page}&limit=10&search=${encodeURIComponent(q)}`); setMembers(r.data.data || []); setPagination(r.data.pagination || {}); }
+    try {
+      const r = await api.get(`/members?page=${page}&limit=10&search=${encodeURIComponent(q)}`);
+      const mems = r.data.data || [];
+      setMembers(mems);
+      setPagination(r.data.pagination || {});
+      // Fetch dues for all members
+      fetchDuesForMembers(mems);
+    }
     catch (e) { console.error(e); } finally { setLoading(false); }
+  };
+
+  const fetchDuesForMembers = async (mems) => {
+    if (!mems.length) return;
+    const entries = await Promise.all(
+      mems.map(async (m) => {
+        try {
+          const r = await api.get(`/payments/member/${m.id}`);
+          const pending = (r.data.data || []).filter(p => p.status === "pending");
+          const total = pending.reduce((s, p) => s + Number(p.due_amount || p.amount || 0), 0);
+          return [m.id, { total, payments: pending, loading: false, marking: false }];
+        } catch {
+          return [m.id, { total: 0, payments: [], loading: false, marking: false }];
+        }
+      })
+    );
+    setDueMap(Object.fromEntries(entries));
+  };
+
+  const markDuePaid = async (memberId) => {
+    const info = dueMap[memberId];
+    if (!info || info.payments.length === 0 || info.marking) return;
+    setDueMap(prev => ({ ...prev, [memberId]: { ...prev[memberId], marking: true } }));
+    try {
+      await Promise.all(info.payments.map(p =>
+        api.put(`/payments/${p.id}`, {
+          member_id:      p.member_id,
+          amount:         Number(p.amount),
+          paid_amount:    Number(p.amount),
+          due_amount:     0,
+          payment_date:   new Date().toISOString().split("T")[0],
+          payment_method: p.payment_method || "cash",
+          payment_for:    p.payment_for    || "monthly",
+          status:         "paid",
+          months_covered: p.months_covered || 1,
+          notes:          p.notes          || null,
+          plan_name:      p.plan_name      || null,
+          plan_start:     p.plan_start     || null,
+          plan_end:       p.plan_end       || null,
+        })
+      ));
+      setDueMap(prev => ({ ...prev, [memberId]: { total: 0, payments: [], loading: false, marking: false } }));
+    } catch (e) {
+      console.error(e);
+      setDueMap(prev => ({ ...prev, [memberId]: { ...prev[memberId], marking: false } }));
+    }
   };
 
   const handlePlanSelect = (planName) => {
@@ -856,7 +941,7 @@ export default function Members({ onLogout }) {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
               <thead>
                 <tr style={{ background: "var(--bg-elevated)" }}>
-                  {["Name", "Contact", "Membership Plan", "Period", "Status", "Actions"].map(h => (
+                  {["Name", "Contact", "Membership Plan", "Due Amount", "Period", "Status", "Actions"].map(h => (
                     <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
@@ -865,7 +950,7 @@ export default function Members({ onLogout }) {
                 {loading ? (
                   [...Array(6)].map((_, i) => <tr key={i}>{[...Array(6)].map((_, j) => <td key={j} style={{ padding: "14px 16px", borderBottom: "1px solid var(--border-subtle)" }}><div style={{ height: "12px", borderRadius: "4px", background: "var(--bg-elevated)", width: j === 0 ? "140px" : "80px" }} /></td>)}</tr>)
                 ) : members.length === 0 ? (
-                  <tr><td colSpan={6} style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)" }}>
+                  <tr><td colSpan={7} style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)" }}>
                     <FaUsers style={{ fontSize: "32px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />
                     {search ? `No members match "${search}"` : "No members yet. Add your first one!"}
                   </td></tr>
@@ -889,10 +974,41 @@ export default function Members({ onLogout }) {
                           <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{m.email}</div>
                         </td>
                         <td style={{ padding: "14px 16px" }}>
-                          <div style={{ color: "var(--text-secondary)" }}>{m.email || "—"}</div>
-                          <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{m.phone}</div>
+                          <div style={{ color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "6px" }}>{m.email || "—"}</div>
+                          <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span>{phoneVisible[m.id] ? m.phone : m.phone ? "••••••" + m.phone.slice(-4) : "—"}</span>
+                            {m.phone && (
+                              <button
+                                onClick={() => setPhoneVisible(prev => ({ ...prev, [m.id]: !prev[m.id] }))}
+                                title={phoneVisible[m.id] ? "Hide phone" : "Show phone"}
+                                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: "0", display: "flex", alignItems: "center" }}
+                              >
+                                {phoneVisible[m.id] ? <FaEyeSlash style={{ fontSize: "11px" }} /> : <FaEye style={{ fontSize: "11px" }} />}
+                              </button>
+                            )}
+                          </div>
                         </td>
                         <td style={{ padding: "14px 16px" }}><MembershipBadge type={m.membership_type} plans={plans} /></td>
+                        <td style={{ padding: "14px 16px" }}>
+                          {dueMap[m.id]?.total > 0 ? (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#f59e0b" }}>
+                                ₹{Number(dueMap[m.id].total).toLocaleString("en-IN")}
+                              </span>
+                              <button
+                                onClick={() => markDuePaid(m.id)}
+                                disabled={dueMap[m.id]?.marking}
+                                title="Mark all dues as paid"
+                                style={{ padding: "3px 8px", borderRadius: "var(--radius-sm)", background: dueMap[m.id]?.marking ? "var(--bg-elevated)" : "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.3)", color: dueMap[m.id]?.marking ? "var(--text-muted)" : "var(--green)", cursor: dueMap[m.id]?.marking ? "not-allowed" : "pointer", fontSize: "10px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px", whiteSpace: "nowrap" }}
+                              >
+                                <FaCheck style={{ fontSize: "8px" }} />
+                                {dueMap[m.id]?.marking ? "Marking..." : "Mark Paid"}
+                              </button>
+                            </div>
+                          ) : (
+                            <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>—</span>
+                          )}
+                        </td>
                         <td style={{ padding: "14px 16px" }}>
                           <div style={{ fontSize: "12px", color: "var(--text-secondary)", whiteSpace: "nowrap" }}>{fmt(m.membership_start)}</div>
                           <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>→ {fmt(m.membership_end)}</div>
@@ -957,6 +1073,10 @@ export default function Members({ onLogout }) {
                   onRenew={setRenewMember}
                   onNotify={setNotifyMember}
                   onDelete={setDeleteId}
+                  dueInfo={dueMap[m.id]}
+                  onMarkPaid={markDuePaid}
+                  phoneVisible={phoneVisible}
+                  onTogglePhone={(id) => setPhoneVisible(prev => ({ ...prev, [id]: !prev[id] }))}
                 />
               ))
             )}
