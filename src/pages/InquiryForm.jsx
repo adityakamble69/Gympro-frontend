@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-
 const API = "https://gympro-backend-production-2c21.up.railway.app/api";
 
 export default function InquiryForm() {
