@@ -328,7 +328,7 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
   return (
     <div
       className="fade-in"
-      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.82)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200, backdropFilter: "blur(4px)", padding: "16px" }}
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.82)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10011, backdropFilter: "blur(4px)", padding: "16px" }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", width: "100%", maxWidth: "560px", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "var(--shadow-lg)" }}>

@@ -495,6 +495,13 @@ export default function MemberProfileDrawer({ member, onClose, onEdit, onRecordP
   const [loading,     setLoading]     = useState(true);
   const [activeTab,   setActiveTab]   = useState("profile");
 
+  // Lock body scroll so page doesn't shift when modal opens
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
   useEffect(() => {
     if (member) { setLoading(true); fetchAll(); }
   }, [member?.id]);
@@ -596,13 +603,14 @@ export default function MemberProfileDrawer({ member, onClose, onEdit, onRecordP
   return (
     <>
       {/* Overlay */}
-      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.78)", zIndex: 1300, backdropFilter: "blur(5px)" }} />
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.78)", zIndex: 1300 }} />
 
       {/* Modal */}
       <div className="mpd-modal" style={{
         position: "fixed", top: "50%", left: "50%",
         transform: "translate(-50%, -50%)",
         width: "min(720px, 96vw)",
+        height: "90vh",
         maxHeight: "90vh",
         background: "var(--bg-surface)",
         border: "1px solid var(--border-default)",
@@ -734,6 +742,7 @@ export default function MemberProfileDrawer({ member, onClose, onEdit, onRecordP
             transform: none !important;
             width: 100vw !important;
             max-width: 100vw !important;
+            height: 92vh !important;
             max-height: 92vh !important;
             border-radius: 20px 20px 0 0 !important;
             animation: mpdSlideUp 0.28s cubic-bezier(0.16,1,0.3,1) !important;

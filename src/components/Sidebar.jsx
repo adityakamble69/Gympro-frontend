@@ -237,7 +237,7 @@ export default function Sidebar({ onLogout }) {
             position: fixed;
             top: 12px;
             left: 12px;
-            z-index: 10000;
+            z-index: 1200;
             align-items: center;
             justify-content: center;
             width: 40px;
@@ -261,7 +261,7 @@ export default function Sidebar({ onLogout }) {
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.7);
-            z-index: 10001;
+            z-index: 1201;
             backdrop-filter: blur(2px);
             animation: fadeIn 0.2s ease;
           }
@@ -272,7 +272,7 @@ export default function Sidebar({ onLogout }) {
             top: 0;
             left: 0;
             height: 100dvh;
-            z-index: 10002;
+            z-index: 1202;
             transform: translateX(0);
             animation: slideInDrawer 0.25s cubic-bezier(0.16,1,0.3,1);
             box-shadow: 4px 0 40px rgba(0,0,0,0.8);

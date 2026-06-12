@@ -5,6 +5,7 @@
 //   <RevenueDrillDown stats={stats} /> // stats = data from /api/dashboard/stats
 
 import { useState, useEffect, useCallback } from "react";
+import ReactDOM from "react-dom";
 import {
   FaTimes, FaRupeeSign, FaCalendarAlt, FaChevronRight,
   FaChevronLeft, FaUser, FaClock, FaCheckCircle,
@@ -31,26 +32,31 @@ function useMobile() {
   return mobile;
 }
 
-// ── Overlay Modal Shell ───────────────────────────────────────────────────────
+// ── Overlay Modal Shell (Portal — renders on document.body) ──────────────────
+// Mounting directly on body means NO parent z-index or stacking context can
+// ever overlap this modal, regardless of sidebar or any other fixed element.
 function Modal({ title, onClose, children, width = "600px" }) {
   const isMobile = useMobile();
 
   useEffect(() => {
     const esc = (e) => e.key === "Escape" && onClose();
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", esc);
-    return () => window.removeEventListener("keydown", esc);
+    return () => {
+      window.removeEventListener("keydown", esc);
+      document.body.style.overflow = "";
+    };
   }, [onClose]);
 
-  // Mobile: full-screen bottom sheet style
   const containerStyle = isMobile
     ? {
-        position: "fixed", inset: 0, zIndex: 1401,
+        position: "fixed", inset: 0,
         background: "var(--bg-surface)",
         display: "flex", flexDirection: "column",
         animation: "slideUp .25s ease"
       }
     : {
-        position: "fixed", top: "50%", left: "50%", zIndex: 1401,
+        position: "fixed", top: "50%", left: "50%",
         transform: "translate(-50%,-50%)",
         width: `min(${width}, 95vw)`, maxHeight: "88vh",
         background: "var(--bg-surface)", border: "1px solid var(--border-default)",
@@ -59,15 +65,18 @@ function Modal({ title, onClose, children, width = "600px" }) {
         animation: "modalPop .2s ease"
       };
 
-  return (
-    <>
-      {!isMobile && (
-        <div onClick={onClose} style={{
-          position: "fixed", inset: 0, zIndex: 1400,
+  const content = (
+    <div style={{ position: "fixed", inset: 0, zIndex: 99999, isolation: "isolate" }}>
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        style={{
+          position: "fixed", inset: 0,
           background: "rgba(0,0,0,0.72)", backdropFilter: "blur(6px)"
-        }} />
-      )}
-      <div style={containerStyle}>
+        }}
+      />
+      {/* Modal panel */}
+      <div style={{ ...containerStyle, zIndex: 100000 }}>
         <style>{`
           @keyframes modalPop {
             from { transform:translate(-50%,-48%); opacity:0; scale:.97 }
@@ -105,8 +114,10 @@ function Modal({ title, onClose, children, width = "600px" }) {
           {children}
         </div>
       </div>
-    </>
+    </div>
   );
+
+  return ReactDOM.createPortal(content, document.body);
 }
 
 // ── Loading Spinner ───────────────────────────────────────────────────────────
