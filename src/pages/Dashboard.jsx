@@ -11,7 +11,7 @@ import {
   FaUsers, FaUserTie, FaClipboardCheck, FaRupeeSign,
   FaArrowRight, FaArrowUp, FaArrowDown, FaSync,
   FaCheckCircle, FaTimesCircle, FaClock, FaExclamationTriangle,
-  FaEye, FaEyeSlash
+  FaEye, FaEyeSlash, FaTimes, FaCheck
 } from "react-icons/fa";
 import NotificationBell from "../components/NotificationBell";
 import RevenueDrillDown from "../components/Revenuedrilldown";
@@ -68,18 +68,22 @@ const StatCard = ({ icon: Icon, label, value, color, bg, sub, onClick, trend, tr
 );
 
 // ── Mini Stat ──────────────────────────────────────────────────────────────────
-const MiniStat = ({ icon: Icon, label, value, color, delay = 0, masked = false, onToggleMask }) => (
-  <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)", padding: "16px 18px", transition: "all 0.18s", animationDelay: `${delay}s`, opacity: 0, position: "relative" }}
-    onMouseEnter={e => { e.currentTarget.style.borderColor = color; e.currentTarget.style.background = "var(--bg-elevated)"; }}
-    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.background = "var(--bg-surface)"; }}
+const MiniStat = ({ icon: Icon, label, value, color, delay = 0, masked = false, onToggleMask, onClick }) => (
+  <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)", padding: "16px 18px", transition: "all 0.18s", animationDelay: `${delay}s`, opacity: 0, position: "relative", cursor: onClick ? "pointer" : "default" }}
+    onClick={onClick}
+    onMouseEnter={e => { e.currentTarget.style.borderColor = color; e.currentTarget.style.background = "var(--bg-elevated)"; if (onClick) e.currentTarget.style.transform = "translateY(-2px)"; }}
+    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.background = "var(--bg-surface)"; e.currentTarget.style.transform = "translateY(0)"; }}
   >
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
       <Icon style={{ fontSize: "13px", color, marginBottom: "10px" }} />
-      {onToggleMask && (
-        <button onClick={onToggleMask} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "11px", padding: "0", opacity: 0.6 }} title={masked ? "Show" : "Hide"}>
-          {masked ? <FaEye /> : <FaEyeSlash />}
-        </button>
-      )}
+      <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        {onToggleMask && (
+          <button onClick={onToggleMask} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "11px", padding: "0", opacity: 0.6 }} title={masked ? "Show" : "Hide"}>
+            {masked ? <FaEye /> : <FaEyeSlash />}
+          </button>
+        )}
+        {onClick && <FaArrowRight style={{ fontSize: "9px", color: "var(--text-muted)", opacity: 0.5 }} />}
+      </div>
     </div>
     <div style={{ fontFamily: "var(--font-display)", fontSize: masked ? "16px" : "19px", fontWeight: 700, color: masked ? "var(--text-muted)" : "var(--text-primary)", lineHeight: 1, marginBottom: "4px", letterSpacing: masked ? "0.15em" : "normal" }}>
       {masked ? MASK : value}
@@ -140,6 +144,189 @@ const MemberRow = ({ m }) => {
     </div>
   );
 };
+
+// ── Expired Members Modal ──────────────────────────────────────────────────────
+function ExpiredMembersModal({ count, onClose, navigate }) {
+  const [members,     setMembers]     = useState([]);
+  const [loading,     setLoading]     = useState(true);
+  const [phoneVis,    setPhoneVis]    = useState({});
+  const [dueMap,      setDueMap]      = useState({});
+  const [page,        setPage]        = useState(1);
+  const [totalPages,  setTotalPages]  = useState(1);
+  const [total,       setTotal]       = useState(0);
+
+  const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+
+  const fetchExpired = async (pg = 1) => {
+    setLoading(true);
+    try {
+      const r = await api.get(`/members?page=${pg}&limit=8&search=expired`);
+      // filter client-side to ensure only expired status
+      const all = r.data.data || [];
+      const expired = all.filter(m => m.status === "expired");
+      setMembers(expired);
+      setTotal(r.data.pagination?.total || count);
+      setTotalPages(r.data.pagination?.totalPages || 1);
+      // fetch dues for these members
+      const entries = await Promise.all(
+        expired.map(async (m) => {
+          try {
+            const pr = await api.get(`/payments/member/${m.id}`);
+            const pending = (pr.data.data || []).filter(p => p.status === "pending");
+            const total = pending.reduce((s, p) => s + Number(p.due_amount || p.amount || 0), 0);
+            return [m.id, { total, payments: pending, marking: false }];
+          } catch { return [m.id, { total: 0, payments: [], marking: false }]; }
+        })
+      );
+      setDueMap(Object.fromEntries(entries));
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { fetchExpired(1); }, []);
+
+  const markDuePaid = async (memberId) => {
+    const info = dueMap[memberId];
+    if (!info || info.payments.length === 0 || info.marking) return;
+    setDueMap(prev => ({ ...prev, [memberId]: { ...prev[memberId], marking: true } }));
+    try {
+      await Promise.all(info.payments.map(p =>
+        api.put(`/payments/${p.id}`, {
+          member_id: p.member_id, amount: Number(p.amount),
+          paid_amount: Number(p.amount), due_amount: 0,
+          payment_date: new Date().toISOString().split("T")[0],
+          payment_method: p.payment_method || "cash",
+          payment_for: p.payment_for || "monthly",
+          status: "paid", months_covered: p.months_covered || 1,
+          notes: p.notes || null, plan_name: p.plan_name || null,
+          plan_start: p.plan_start || null, plan_end: p.plan_end || null,
+        })
+      ));
+      setDueMap(prev => ({ ...prev, [memberId]: { total: 0, payments: [], marking: false } }));
+    } catch { setDueMap(prev => ({ ...prev, [memberId]: { ...prev[memberId], marking: false } })); }
+  };
+
+  return (
+    <div
+      className="fade-in"
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.82)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200, backdropFilter: "blur(4px)", padding: "16px" }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", width: "100%", maxWidth: "560px", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "var(--shadow-lg)" }}>
+
+        {/* Header */}
+        <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexShrink: 0 }}>
+          <div>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+              <FaTimesCircle style={{ color: "var(--red)", fontSize: "16px" }} />
+              Expired Members
+            </h2>
+            <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "4px" }}>{count} members with expired membership</p>
+          </div>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <button
+              onClick={() => { onClose(); navigate("/members"); }}
+              style={{ padding: "6px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}
+            >
+              View All <FaArrowRight style={{ fontSize: "9px" }} />
+            </button>
+            <button onClick={onClose} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <FaTimes style={{ fontSize: "11px" }} />
+            </button>
+          </div>
+        </div>
+
+        {/* List */}
+        <div style={{ overflowY: "auto", flex: 1 }}>
+          {loading ? (
+            [...Array(4)].map((_, i) => (
+              <div key={i} style={{ padding: "14px 24px", borderBottom: "1px solid var(--border-subtle)", display: "flex", gap: "12px", alignItems: "center" }}>
+                <div className="skeleton" style={{ width: "36px", height: "36px", borderRadius: "50%", flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div className="skeleton" style={{ height: "12px", width: "45%", marginBottom: "6px" }} />
+                  <div className="skeleton" style={{ height: "10px", width: "65%" }} />
+                </div>
+                <div className="skeleton" style={{ height: "24px", width: "70px", borderRadius: "6px" }} />
+              </div>
+            ))
+          ) : members.length === 0 ? (
+            <div style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)" }}>
+              <FaCheckCircle style={{ fontSize: "28px", color: "var(--green)", marginBottom: "10px", display: "block", margin: "0 auto 10px" }} />
+              No expired members found!
+            </div>
+          ) : (
+            members.map(m => {
+              const due = dueMap[m.id];
+              const isPhoneVis = phoneVis[m.id];
+              return (
+                <div key={m.id} style={{ padding: "12px 24px", borderBottom: "1px solid var(--border-subtle)", display: "flex", gap: "12px", alignItems: "flex-start", transition: "background 0.1s" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
+                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                >
+                  {/* Avatar */}
+                  <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, color: "var(--red)", flexShrink: 0 }}>
+                    {m.full_name?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                  </div>
+
+                  {/* Info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: "13px", color: "var(--text-primary)" }}>{m.full_name}</div>
+                    <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+                      <span>{isPhoneVis ? m.phone : m.phone ? "••••••" + m.phone.slice(-4) : "—"}</span>
+                      {m.phone && (
+                        <button
+                          onClick={() => setPhoneVis(p => ({ ...p, [m.id]: !p[m.id] }))}
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0, display: "flex", alignItems: "center" }}
+                        >
+                          {isPhoneVis ? <FaEyeSlash style={{ fontSize: "10px" }} /> : <FaEye style={{ fontSize: "10px" }} />}
+                        </button>
+                      )}
+                      <span style={{ color: "var(--border-default)" }}>·</span>
+                      <span>{m.membership_type || "—"}</span>
+                      <span style={{ color: "var(--border-default)" }}>·</span>
+                      <span style={{ color: "var(--red)" }}>Expired {fmtDate(m.membership_end)}</span>
+                    </div>
+
+                    {/* Due badge */}
+                    {due?.total > 0 && (
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", marginTop: "5px", padding: "3px 8px", borderRadius: "99px", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)" }}>
+                        <span style={{ fontSize: "10px", fontWeight: 700, color: "#f59e0b" }}>Due ₹{Number(due.total).toLocaleString("en-IN")}</span>
+                        <button
+                          onClick={() => markDuePaid(m.id)}
+                          disabled={due.marking}
+                          style={{ background: "none", border: "none", cursor: due.marking ? "not-allowed" : "pointer", color: due.marking ? "var(--text-muted)" : "var(--green)", fontSize: "10px", fontWeight: 700, padding: 0, display: "flex", alignItems: "center", gap: "3px" }}
+                        >
+                          <FaCheck style={{ fontSize: "8px" }} />
+                          {due.marking ? "..." : "Mark Paid"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Expired badge */}
+                  <span style={{ padding: "3px 8px", borderRadius: "99px", fontSize: "10px", fontWeight: 600, background: "var(--red-bg)", color: "var(--red)", flexShrink: 0, marginTop: "2px" }}>Expired</span>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div style={{ padding: "12px 24px", borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+            <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>Page {page} of {totalPages}</span>
+            <div style={{ display: "flex", gap: "6px" }}>
+              <button onClick={() => { setPage(p => p - 1); fetchExpired(page - 1); }} disabled={page === 1}
+                style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page === 1 ? "var(--text-muted)" : "var(--text-secondary)", cursor: page === 1 ? "not-allowed" : "pointer", fontSize: "12px" }}>‹</button>
+              <button onClick={() => { setPage(p => p + 1); fetchExpired(page + 1); }} disabled={page === totalPages}
+                style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page === totalPages ? "var(--text-muted)" : "var(--text-secondary)", cursor: page === totalPages ? "not-allowed" : "pointer", fontSize: "12px" }}>›</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 const SectionCard = ({ children, style = {} }) => (
   <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", padding: "22px", ...style }}>
@@ -296,6 +483,7 @@ export default function Dashboard({ onLogout }) {
 
   const [shown, setShown] = useState({ activeMembers: false, thisMonthRev: false });
   const toggle = (key) => setShown(s => ({ ...s, [key]: !s[key] }));
+  const [showExpired, setShowExpired] = useState(false);
 
   const fetchAll = async (isRefresh = false) => {
     isRefresh ? setRefreshing(true) : setLoading(true);
@@ -436,7 +624,7 @@ export default function Dashboard({ onLogout }) {
         {/* ── Mini Stats (Week checkins + expired) ── */}
         <div className="dash-mini-grid">
           <MiniStat icon={FaCheckCircle}         color="var(--green)"  label="Week Checkins"   value={loading ? "—" : attendStats?.weekCount ?? 0} delay={0.25} />
-          <MiniStat icon={FaTimesCircle}         color="var(--red)"    label="Expired Members" value={loading ? "—" : expiredMembers}              delay={0.28} />
+          <MiniStat icon={FaTimesCircle}         color="var(--red)"    label="Expired Members" value={loading ? "—" : expiredMembers}              delay={0.28} onClick={() => !loading && expiredMembers > 0 && setShowExpired(true)} />
         </div>
 
         {/* ── Charts Row ── */}
@@ -529,6 +717,15 @@ export default function Dashboard({ onLogout }) {
         </div>
 
       </main>
+
+      {/* Expired Members Modal */}
+      {showExpired && (
+        <ExpiredMembersModal
+          count={expiredMembers}
+          onClose={() => setShowExpired(false)}
+          navigate={navigate}
+        />
+      )}
     </div>
   );
 }
