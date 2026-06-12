@@ -108,14 +108,14 @@ function PaymentsTable({ payments, search, filter }) {
 }
 
 // ── Year Months List ──────────────────────────────────────────────────────────
-function YearMonthsList({ year, onMonthClick, title }) {
+function YearMonthsList({ year, onMonthClick, title, cachedGet }) {
   const [months,  setMonths]  = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    api.get(`/reports/drilldown/year/${year}`)
-      .then(r => setMonths(r.data.data || []))
+    cachedGet(`/reports/drilldown/year/${year}`)
+      .then(data => setMonths(data.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [year]);
@@ -169,14 +169,14 @@ function YearMonthsList({ year, onMonthClick, title }) {
     </>
   );
 }
-function AllYearsList({ onYearClick }) {
+function AllYearsList({ onYearClick, cachedGet }) {
   const [years,   setYears]   = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    api.get("/reports/drilldown/all-years")
-      .then(r => setYears(r.data.data || []))
+    cachedGet("/reports/drilldown/all-years")
+      .then(data => setYears(data.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -220,7 +220,7 @@ function AllYearsList({ onYearClick }) {
     </div>
   );
 }
-function DateRangeView({ from, to, onBack }) {
+function DateRangeView({ from, to, onBack, cachedGet }) {
   const [payments, setPayments] = useState([]);
   const [summary,  setSummary]  = useState(null);
   const [loading,  setLoading]  = useState(true);
@@ -230,8 +230,8 @@ function DateRangeView({ from, to, onBack }) {
   useEffect(() => {
     if (!from || !to) return;
     setLoading(true);
-    api.get("/reports/drilldown/daterange", { params: { from, to } })
-      .then(r => { setPayments(r.data.data || []); setSummary(r.data.summary); })
+    cachedGet(`/reports/drilldown/daterange?from=${from}&to=${to}`)
+      .then(data => { setPayments(data.data || []); setSummary(data.summary); })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [from, to]);
@@ -285,7 +285,8 @@ function DateRangeView({ from, to, onBack }) {
 }
 
 // ── MAIN MODAL ────────────────────────────────────────────────────────────────
-export default function ReportDrillDownModal({ open, onClose, mode, month, year, drill }) {
+export default function ReportDrillDownModal({ open, onClose, mode, month, year, drill, cachedGet }) {
+
   const [stack,    setStack]    = useState([]);
   const [payments, setPayments] = useState([]);
   const [loading,  setLoading]  = useState(false);
@@ -323,20 +324,20 @@ export default function ReportDrillDownModal({ open, onClose, mode, month, year,
     if (!top) return;
     if (top.view === "payments") {
       setLoading(true); setPayments([]);
-      api.get(`/reports/drilldown/members/${top.year}/${top.month}`)
-        .then(r => setPayments(r.data.data || []))
+      cachedGet(`/reports/drilldown/members/${top.year}/${top.month}`)
+        .then(data => setPayments(data.data || []))
         .catch(console.error)
         .finally(() => setLoading(false));
     } else if (top.view === "this-month-payments") {
       setLoading(true); setPayments([]);
-      api.get("/reports/drilldown/this-month")
-        .then(r => setPayments(r.data.data || []))
+      cachedGet("/reports/drilldown/this-month")
+        .then(data => setPayments(data.data || []))
         .catch(console.error)
         .finally(() => setLoading(false));
     } else if (top.view === "method-payments") {
       setLoading(true); setPayments([]);
-      api.get(`/reports/drilldown/method/${top.method}`, { params: { year: top.year } })
-        .then(r => setPayments(r.data.data || []))
+      cachedGet(`/reports/drilldown/method/${top.method}?year=${top.year}`)
+        .then(data => setPayments(data.data || []))
         .catch(console.error)
         .finally(() => setLoading(false));
     }
@@ -486,7 +487,7 @@ export default function ReportDrillDownModal({ open, onClose, mode, month, year,
         <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
           {/* Date Range View */}
           {isDateRangeView && activeDateRange && (
-            <DateRangeView from={activeDateRange.from} to={activeDateRange.to} onBack={goBack} />
+            <DateRangeView from={activeDateRange.from} to={activeDateRange.to} onBack={goBack} cachedGet={cachedGet} />
           )}
 
           {!isDateRangeView && (
@@ -495,8 +496,8 @@ export default function ReportDrillDownModal({ open, onClose, mode, month, year,
             ) : (
               <>
                 {showSearchFilter && <PaymentsTable payments={payments} search={search} filter={filter} />}
-                {top?.view === "year-months"  && <YearMonthsList year={top.year} title={top.label} onMonthClick={(mo) => pushPaymentsOfMonth(top.year, mo)} />}
-                {top?.view === "all-years"    && <AllYearsList onYearClick={(yr) => pushMonthsOfYear(yr)} />}
+                {top?.view === "year-months"  && <YearMonthsList year={top.year} title={top.label} onMonthClick={(mo) => pushPaymentsOfMonth(top.year, mo)} cachedGet={cachedGet} />}
+                {top?.view === "all-years"    && <AllYearsList onYearClick={(yr) => pushMonthsOfYear(yr)} cachedGet={cachedGet} />}
               </>
             )
           )}

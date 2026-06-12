@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
 import api from "../services/api";
 import {
@@ -95,16 +95,35 @@ export default function Reports({ onLogout }) {
 
   const years = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - i);
 
+  // ── Cache: tab+year ke liye data store karo ──────────────────────────────
+  const dataCache = useRef({});        // { "revenue-2026": {...}, ... }
+  const drillCache = useRef({});       // { "/reports/drilldown/...": [...], ... }
+
   useEffect(() => { fetchData(); }, [activeTab, year]);
 
   const fetchData = async () => {
+    const cacheKey = `${activeTab}-${year}`;
+    if (dataCache.current[cacheKey]) {
+      setData(dataCache.current[cacheKey]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.get(`/reports/${activeTab}`, { params: { year } });
+      dataCache.current[cacheKey] = res.data.data;
       setData(res.data.data);
     } catch { }
     finally { setLoading(false); }
   };
+
+  // ── Cached API helper — drilldown modals ke liye ─────────────────────────
+  const cachedGet = useCallback(async (url) => {
+    if (drillCache.current[url]) return drillCache.current[url];
+    const res = await api.get(url);
+    drillCache.current[url] = res.data;
+    return res.data;
+  }, []);
 
   const buildMonthly = (rows, key) =>
     MONTHS.map((_, i) => { const f = rows?.find(r => r.month === i + 1); return f ? Number(f[key]) : 0; });
@@ -577,12 +596,14 @@ export default function Reports({ onLogout }) {
         mode={drill?.mode}
         month={drill?.month}
         year={drill?.year}
-        drill={drill}  
+        drill={drill}
+        cachedGet={cachedGet}
       />
       {/* Member Growth Drill-down Modal (NEW) */}
       <MemberDrillDownModal
         drill={memberDrill}
         onClose={() => setMemberDrill(null)}
+        cachedGet={cachedGet}
       />
 
       {/* Member Date Range Picker Modal */}
@@ -630,6 +651,7 @@ export default function Reports({ onLogout }) {
       <AttendanceDrillDownModal
         drill={attendDrill}
         onClose={() => setAttendDrill(null)}
+        cachedGet={cachedGet}
       />
 
       <style>{`
@@ -653,7 +675,7 @@ const STATUS_STYLE = {
   expired: { bg: "rgba(251,191,36,0.12)", color: "#fbbf24" },
 };
 
-function MemberDrillDownModal({ drill, onClose }) {
+function MemberDrillDownModal({ drill, onClose, cachedGet }) {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -679,11 +701,12 @@ function MemberDrillDownModal({ drill, onClose }) {
     if (drill.mode === "type") url = `/reports/members/drilldown/type/${encodeURIComponent(drill.type)}`;
     if (drill.mode === "daterange") url = `/reports/members/drilldown/daterange?from=${drill.from}&to=${drill.to}`;
 
-    api.get(url)
-      .then(r => setMembers(r.data.data || []))
+    const fetcher = cachedGet || ((u) => api.get(u).then(r => r.data));
+    fetcher(url)
+      .then(data => setMembers(data.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [drill]);
+  }, [drill, cachedGet]);
 
   if (!open) return null;
 
@@ -810,7 +833,7 @@ const fmtTime = (d) => {
   return dt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
 };
 
-function AttendanceDrillDownModal({ drill, onClose }) {
+function AttendanceDrillDownModal({ drill, onClose, cachedGet }) {
   const [records, setRecords] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -838,14 +861,15 @@ function AttendanceDrillDownModal({ drill, onClose }) {
     if (drill.mode === "member") url = `/reports/attendance/drilldown/member/${drill.memberId}`;
     if (drill.mode === "daterange") url = `/reports/attendance/drilldown/daterange?from=${drill.from}&to=${drill.to}`;
 
-    api.get(url)
-      .then(r => {
-        setRecords(r.data.data || []);
-        if (r.data.summary) setSummary(r.data.summary);
+    const fetcher = cachedGet || ((u) => api.get(u).then(r => r.data));
+    fetcher(url)
+      .then(data => {
+        setRecords(data.data || []);
+        if (data.summary) setSummary(data.summary);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [drill]);
+  }, [drill, cachedGet]);
 
   if (!open) return null;
 
