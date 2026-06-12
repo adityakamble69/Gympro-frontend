@@ -149,7 +149,9 @@ const MemberRow = ({ m }) => {
 // ── Expired Members Modal ──────────────────────────────────────────────────────
 function ExpiredMembersModal({ count, onClose, navigate }) {
   const [members,     setMembers]     = useState([]);
+  const [allExpired,  setAllExpired]  = useState([]);   // full list for export
   const [loading,     setLoading]     = useState(true);
+  const [exporting,   setExporting]   = useState(false);
   const [phoneVis,    setPhoneVis]    = useState({});
   const [dueMap,      setDueMap]      = useState({});
   const [page,        setPage]        = useState(1);
@@ -165,6 +167,7 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
       // (backend search is by name/email/phone, not status)
       const r = await api.get(`/members?page=1&limit=200`);
       const all = (r.data.data || []).filter(m => m.status === "expired");
+      if (pg === 1) setAllExpired(all); // store full list for export
       const perPage = 8;
       const start = (pg - 1) * perPage;
       const pageItems = all.slice(start, start + perPage);
@@ -219,6 +222,109 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
     } catch { setDueMap(prev => ({ ...prev, [memberId]: { ...prev[memberId], marking: false } })); }
   };
 
+  const exportToDoc = async () => {
+    if (allExpired.length === 0) return;
+    setExporting(true);
+    try {
+      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+              AlignmentType, WidthType, BorderStyle, ShadingType, HeadingLevel } = await import("docx");
+
+      const border = { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" };
+      const borders = { top: border, bottom: border, left: border, right: border };
+      const colWidths = [2000, 1800, 2400, 1800, 1360]; // sum = 9360 (US Letter 1" margins)
+
+      const headerRow = new TableRow({
+        tableHeader: true,
+        children: ["Member Name", "Phone", "Email", "Plan / Type", "Expired On"].map((txt, i) =>
+          new TableCell({
+            borders,
+            width: { size: colWidths[i], type: WidthType.DXA },
+            shading: { fill: "1E3A5F", type: ShadingType.CLEAR },
+            margins: { top: 80, bottom: 80, left: 120, right: 120 },
+            children: [new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: txt, bold: true, color: "FFFFFF", size: 20, font: "Arial" })]
+            })]
+          })
+        )
+      });
+
+      const dataRows = allExpired.map((m, idx) =>
+        new TableRow({
+          children: [
+            m.full_name || "—",
+            m.phone     || "—",
+            m.email     || "—",
+            m.membership_type || "—",
+            fmtDate(m.membership_end),
+          ].map((val, i) =>
+            new TableCell({
+              borders,
+              width: { size: colWidths[i], type: WidthType.DXA },
+              shading: { fill: idx % 2 === 0 ? "F8FAFC" : "FFFFFF", type: ShadingType.CLEAR },
+              margins: { top: 70, bottom: 70, left: 120, right: 120 },
+              children: [new Paragraph({
+                children: [new TextRun({ text: val, size: 18, font: "Arial", color: "1A1A2E" })]
+              })]
+            })
+          )
+        })
+      );
+
+      const today = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
+
+      const doc = new Document({
+        sections: [{
+          properties: {
+            page: {
+              size: { width: 12240, height: 15840 },
+              margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 }
+            }
+          },
+          children: [
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: "Expired Members Report", bold: true, size: 36, font: "Arial", color: "1E3A5F" })]
+            }),
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 60 },
+              children: [new TextRun({ text: `Generated on ${today}`, size: 20, font: "Arial", color: "888888" })]
+            }),
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 400 },
+              children: [new TextRun({ text: `Total Expired: ${allExpired.length}`, size: 22, bold: true, font: "Arial", color: "C0392B" })]
+            }),
+            new Table({
+              width: { size: 9360, type: WidthType.DXA },
+              columnWidths: colWidths,
+              rows: [headerRow, ...dataRows]
+            }),
+            new Paragraph({
+              spacing: { before: 400 },
+              alignment: AlignmentType.RIGHT,
+              children: [new TextRun({ text: `Total: ${allExpired.length} expired member(s)`, size: 18, italics: true, font: "Arial", color: "888888" })]
+            }),
+          ]
+        }]
+      });
+
+      const buffer = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(buffer);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `expired-members-${new Date().toISOString().slice(0,10)}.docx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Export failed:", e);
+      alert("Export failed. Make sure 'docx' package is installed:\nnpm install docx");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div
       className="fade-in"
@@ -237,6 +343,24 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
             <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "4px" }}>{count} members with expired membership</p>
           </div>
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <button
+              onClick={exportToDoc}
+              disabled={exporting || loading || allExpired.length === 0}
+              style={{
+                padding: "6px 12px", borderRadius: "var(--radius-sm)",
+                background: exporting ? "var(--bg-elevated)" : "rgba(59,130,246,0.12)",
+                border: "1px solid rgba(59,130,246,0.35)",
+                color: exporting ? "var(--text-muted)" : "var(--blue, #3b82f6)",
+                cursor: (exporting || loading || allExpired.length === 0) ? "not-allowed" : "pointer",
+                fontSize: "11px", fontWeight: 600,
+                display: "flex", alignItems: "center", gap: "5px",
+                opacity: (loading || allExpired.length === 0) ? 0.5 : 1,
+                transition: "all 0.15s"
+              }}
+              title="Export full expired members list as Word document"
+            >
+              {exporting ? "⏳ Exporting..." : "⬇ Export .doc"}
+            </button>
             <button
               onClick={() => { onClose(); navigate("/members"); }}
               style={{ padding: "6px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}
