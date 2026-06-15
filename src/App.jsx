@@ -13,6 +13,7 @@ import Profile         from "./pages/Profile";
 import MembershipPlans from "./pages/MembershipPlans";
 import Inquiries       from "./pages/Inquiries";
 import InquiryForm     from "./pages/InquiryForm";
+import NotFound        from "./pages/NotFound";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
@@ -34,13 +35,14 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* ✅ PUBLIC ROUTE — login ke bina accessible */}
-        <Route path="/inquiry" element={<InquiryForm />} />  {/* ← InquiryForm */}
+        {/* ✅ PUBLIC ROUTES — login ke bina accessible */}
+        <Route path="/inquiry" element={<InquiryForm />} />
+        <Route path="/login"   element={
+          isLoggedIn ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />
+        } />
 
         {/* PROTECTED ROUTES */}
-        {!isLoggedIn ? (
-          <Route path="*" element={<Login onLogin={handleLogin} />} />
-        ) : (
+        {isLoggedIn ? (
           <>
             <Route path="/"                 element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard"        element={<Dashboard       onLogout={handleLogout} />} />
@@ -54,9 +56,11 @@ function App() {
             <Route path="/reports"          element={<Reports         onLogout={handleLogout} />} />
             <Route path="/profile"          element={<Profile         onLogout={handleLogout} />} />
             <Route path="/inquiries"        element={<Inquiries       onLogout={handleLogout} />} />
-            <Route path="*"                 element={<Navigate to="/dashboard" />} />
           </>
-        )}
+        ) : null}
+
+        {/* 404 — sab unknown routes ke liye */}
+        <Route path="*" element={<NotFound />} />
 
       </Routes>
     </BrowserRouter>
