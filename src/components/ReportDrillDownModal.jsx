@@ -303,7 +303,15 @@ export default function ReportDrillDownModal({ open, onClose, mode, month, year,
     if (!open) { setActiveDateRange(null); setShowDatePicker(false); return; }
     setSearch(""); setFilter("all"); setPayments([]);
 
-    if (mode === "this-month") {
+    if (mode === "month") {
+      if (month === null) {
+        // "This Year" card clicked — show all months of selected year
+        setStack([{ view: "year-months", label: `This Year — ${year}`, year }]);
+      } else {
+        // Specific month bar/row clicked — go straight to payments
+        setStack([{ view: "payments", label: `${MONTH_NAMES[month]} ${year}`, year, month }]);
+      }
+    } else if (mode === "this-month") {
       setStack([{ view: "this-month-payments", label: "This Month" }]);
     } else if (mode === "last-year") {
       const ly = new Date().getFullYear() - 1;
