@@ -1085,10 +1085,9 @@ export default function Members({ onLogout }) {
               </div>
             ) : (
               members.map(m => (
-                // ✅ Fixed code
                 <MemberCard key={m.id} m={m} plans={plans}
                   onProfile={setProfileMember} onRenew={setRenewMember}
-                  onViewBill={setViewBillMember}   {/* ← yeh line add karo */}
+                  onViewBill={setViewBillMember}   
                   onNotify={setNotifyMember} onDelete={setDeleteId}
                   dueInfo={dueMap[m.id]} onMarkPaid={markDuePaid}
                   phoneVisible={phoneVisible}

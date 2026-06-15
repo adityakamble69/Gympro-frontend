@@ -35,7 +35,7 @@ const InfoRow = ({ icon: Icon, label, value, color }) => (
 // ── Stat Card ─────────────────────────────────────────────────────────────────
 const StatCard = ({ label, value, color }) => (
   <div style={{ background: "var(--bg-surface)", borderRadius: "var(--radius-sm)", padding: "10px 12px", border: "1px solid var(--border-subtle)" }}>
-    <div style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color }}>{value}</div>
+    <div style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</div>
     <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "2px" }}>{label}</div>
   </div>
 );
@@ -409,12 +409,13 @@ function TabPayments({ payments, loading, onRefresh }) {
 }
 
 // ── Attendance Heatmap (GitHub-style) ──────────────────────────────────────────
-const HEATMAP_WEEKS = 26; // ~6 months
 const HM_CELL = 11;
 const HM_GAP  = 3;
 const HM_DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
 
 function AttendanceHeatmap({ attendance, membershipEnd }) {
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 600;
+  const HEATMAP_WEEKS = isMobile ? 13 : 26; // 3 months on mobile, 6 on desktop
   const attendedDates = new Set(
     attendance.map(a => new Date(a.date).toISOString().slice(0, 10))
   );
@@ -495,12 +496,61 @@ function AttendanceHeatmap({ attendance, membershipEnd }) {
   );
 }
 
+// ── Month-wise Visit Count ────────────────────────────────────────────────────
+function MonthWiseCount({ attendance, membershipEnd }) {
+  if (!attendance || attendance.length === 0) return null;
+
+  const endDate = membershipEnd ? new Date(membershipEnd) : null;
+
+  // Group attendance by month, split into active vs expired
+  const monthMap = {};
+  attendance.forEach(a => {
+    const d = new Date(a.date);
+    const key = d.toLocaleDateString("en-IN", { month: "short", year: "numeric" });
+    const isAfterExpiry = endDate && d > endDate;
+    if (!monthMap[key]) monthMap[key] = { active: 0, expired: 0, sortKey: d.getFullYear() * 100 + d.getMonth() };
+    if (isAfterExpiry) monthMap[key].expired += 1;
+    else monthMap[key].active += 1;
+  });
+
+  // Sort months chronologically
+  const sorted = Object.entries(monthMap).sort((a, b) => b[1].sortKey - a[1].sortKey);
+
+  return (
+    <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
+      {sorted.map(([month, counts]) => (
+        <div key={month} style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "7px 12px", borderRadius: "var(--radius-sm)",
+          background: "var(--bg-surface)", border: "1px solid var(--border-subtle)"
+        }}>
+          <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-secondary)", minWidth: "70px" }}>{month}</span>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            {counts.active > 0 && (
+              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11px", fontWeight: 700, color: "var(--green)" }}>
+                <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--green)", flexShrink: 0 }} />
+                {counts.active} visit{counts.active > 1 ? "s" : ""}
+              </span>
+            )}
+            {counts.expired > 0 && (
+              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11px", fontWeight: 700, color: "var(--red)" }}>
+                <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--red)", flexShrink: 0 }} />
+                {counts.expired} after expiry
+              </span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── Tab: Attendance ───────────────────────────────────────────────────────────
 function TabAttendance({ attendance, loading, membershipEnd, thisMonthAtt, afterExpiryCount }) {
   return (
     <div style={{ padding: "20px 22px 24px" }}>
       {/* Stats Row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: afterExpiryCount > 0 ? "10px" : "18px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: afterExpiryCount > 0 ? "10px" : "18px" }}>
         <StatCard label="Total Visits" value={attendance.length} color="var(--text-primary)" />
         <StatCard label="This Month"   value={thisMonthAtt}      color="var(--blue)" />
         <StatCard label="Last Visit"   value={attendance.length > 0 ? fmt(attendance[0]?.date) : "—"} color="var(--text-muted)" />
@@ -537,6 +587,8 @@ function TabAttendance({ attendance, loading, membershipEnd, thisMonthAtt, after
           </div>
           <div style={{ background: "var(--bg-elevated)", borderRadius: "var(--radius-sm)", padding: "12px", border: "1px solid var(--border-subtle)" }}>
             <AttendanceHeatmap attendance={attendance} membershipEnd={membershipEnd} />
+            {/* Month-wise visit count breakdown */}
+            <MonthWiseCount attendance={attendance} membershipEnd={membershipEnd} />
           </div>
         </div>
       )}
@@ -824,6 +876,7 @@ export default function MemberProfileDrawer({ member, onClose, onEdit, onRecordP
             <TabAttendance
               attendance={attendance}
               loading={loading}
+              membershipEnd={member?.membership_end ? new Date(member.membership_end) : null}
               attChartData={attChartData}
               thisMonthAtt={thisMonthAtt}
               afterExpiryCount={afterExpiryCount}

@@ -665,18 +665,138 @@ function PlanSelect({ value, onChange, plans, style, includeOther = true }) {
   );
 }
 
+// ─── Searchable Member Input ───────────────────────────────────────────────────
+function MemberSearchInput({ value, onChange, members, style }) {
+  const [query,   setQuery]   = useState("");
+  const [open,    setOpen]    = useState(false);
+  const [focused, setFocused] = useState(false);
+  const wrapRef = useRef(null);
+
+  // Sync display text when editData changes (value is member_id)
+  useEffect(() => {
+    if (value) {
+      const m = members.find(m => String(m.id) === String(value));
+      if (m) setQuery(`${m.full_name} (${m.phone})`);
+    } else {
+      setQuery("");
+    }
+  }, [value, members]);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const filtered = query.trim().length === 0
+    ? members.slice(0, 8)
+    : members.filter(m =>
+        m.full_name?.toLowerCase().includes(query.toLowerCase()) ||
+        m.phone?.includes(query) ||
+        m.email?.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 10);
+
+  const handleSelect = (m) => {
+    setQuery(`${m.full_name} (${m.phone})`);
+    setOpen(false);
+    onChange(String(m.id));
+  };
+
+  const handleInputChange = (e) => {
+    setQuery(e.target.value);
+    setOpen(true);
+    if (!e.target.value) onChange("");
+  };
+
+  return (
+    <div ref={wrapRef} style={{ position: "relative" }}>
+      <div style={{ position: "relative" }}>
+        <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px", pointerEvents: "none" }} />
+        <input
+          value={query}
+          onChange={handleInputChange}
+          onFocus={() => { setFocused(true); setOpen(true); }}
+          onBlur={() => setFocused(false)}
+          placeholder="Search by name, phone or email..."
+          style={{ ...style, paddingLeft: "30px", borderColor: focused ? "var(--border-strong)" : "var(--border-default)" }}
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={() => { setQuery(""); onChange(""); setOpen(false); }}
+            style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "12px", padding: "2px", display: "flex", alignItems: "center" }}
+          >
+            <FaTimes />
+          </button>
+        )}
+      </div>
+      {open && filtered.length > 0 && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 9999,
+          background: "var(--bg-surface)", border: "1px solid var(--border-default)",
+          borderRadius: "var(--radius-sm)", boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+          maxHeight: "200px", overflowY: "auto"
+        }}>
+          {filtered.map(m => (
+            <div
+              key={m.id}
+              onMouseDown={() => handleSelect(m)}
+              style={{ padding: "9px 12px", cursor: "pointer", borderBottom: "1px solid var(--border-subtle)", transition: "background 0.1s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >
+              <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{m.full_name}</div>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "1px" }}>{m.phone}{m.email ? ` · ${m.email}` : ""}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      {open && query.trim().length > 0 && filtered.length === 0 && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 9999,
+          background: "var(--bg-surface)", border: "1px solid var(--border-default)",
+          borderRadius: "var(--radius-sm)", padding: "12px", fontSize: "12px", color: "var(--text-muted)", textAlign: "center"
+        }}>
+          No member found
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Payment Add/Edit Modal ────────────────────────────────────────────────────
 function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
   const isMobile = useMobile();
   const today = new Date().toISOString().split("T")[0];
-  const empty = { member_id: "", amount: "", paid_amount: "", payment_date: today, payment_method: "cash", payment_for: "", status: "paid", months_covered: 1, notes: "", plan_start: "", plan_end: "" };
+  const empty = {
+    member_id: "", amount: "", paid_amount: "", payment_date: today,
+    payment_method: "cash", payment_for: "", status: "paid",
+    months_covered: 1, notes: "", plan_start: "", plan_end: "",
+    due_date: "", discount_type: "flat", discount_value: "",
+  };
   const [form, setForm] = useState(empty);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (editData) {
-      setForm({ member_id: editData.member_id || "", amount: editData.amount || "", paid_amount: editData.paid_amount || "", payment_date: editData.payment_date?.split("T")[0] || today, payment_method: editData.payment_method || "cash", payment_for: editData.plan_name || editData.payment_for || "", status: editData.status || "paid", months_covered: editData.months_covered || 1, notes: editData.notes || "", plan_start: editData.plan_start?.split("T")[0] || "", plan_end: editData.plan_end?.split("T")[0] || "" });
+      setForm({
+        member_id:      editData.member_id || "",
+        amount:         editData.amount || "",
+        paid_amount:    editData.paid_amount || "",
+        payment_date:   editData.payment_date?.split("T")[0] || today,
+        payment_method: editData.payment_method || "cash",
+        payment_for:    editData.plan_name || editData.payment_for || "",
+        status:         editData.status || "paid",
+        months_covered: editData.months_covered || 1,
+        notes:          editData.notes || "",
+        plan_start:     editData.plan_start?.split("T")[0] || "",
+        plan_end:       editData.plan_end?.split("T")[0] || "",
+        due_date:       editData.due_date?.split("T")[0] || "",
+        discount_type:  editData.discount_type || "flat",
+        discount_value: editData.discount_amount || "",
+      });
     } else { setForm(empty); }
     setError("");
   }, [editData, isOpen]);
@@ -687,7 +807,15 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
     set("payment_for", planName);
     const plan = plans.find(p => p.name === planName);
     if (plan) {
-      set("amount", plan.price);
+      // Apply discount to auto-filled amount
+      const raw = Number(plan.price);
+      const dv  = Number(form.discount_value) || 0;
+      const disc = form.discount_type === "percent"
+        ? Math.min(raw, Math.round(raw * dv / 100))
+        : Math.min(raw, dv);
+      const afterDisc = Math.max(0, raw - disc);
+      set("amount", afterDisc);
+      set("paid_amount", afterDisc);
       const monthsMap = { monthly: 1, quarterly: 3, yearly: 12 };
       set("months_covered", monthsMap[plan.duration_type] || 1);
       const start = new Date(), end = new Date();
@@ -697,52 +825,259 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
     } else { set("plan_start", ""); set("plan_end", ""); }
   };
 
+  // Recalculate amount when discount changes while a plan is selected
+  const handleDiscountChange = (type, value) => {
+    set("discount_type", type);
+    set("discount_value", value);
+    const plan = plans.find(p => p.name === form.payment_for);
+    if (plan) {
+      const raw = Number(plan.price);
+      const dv  = Number(value) || 0;
+      const disc = type === "percent"
+        ? Math.min(raw, Math.round(raw * dv / 100))
+        : Math.min(raw, dv);
+      const afterDisc = Math.max(0, raw - disc);
+      setForm(f => ({ ...f, discount_type: type, discount_value: value, amount: afterDisc, paid_amount: afterDisc }));
+    } else {
+      setForm(f => ({ ...f, discount_type: type, discount_value: value }));
+    }
+  };
+
   const handleSubmit = async () => {
     if (!form.member_id || !form.amount || !form.payment_date) { setError("Member, amount and date are required"); return; }
     setSaving(true); setError("");
     try {
       const selectedPlan = plans.find(p => p.name === form.payment_for);
-      const payload = { ...form, paid_amount: form.paid_amount || form.amount, payment_for: selectedPlan ? selectedPlan.duration_type : (form.payment_for || "other"), plan_name: selectedPlan ? selectedPlan.name : null, plan_start: form.plan_start || null, plan_end: form.plan_end || null };
+      const planPrice    = selectedPlan ? Number(selectedPlan.price) : Number(form.amount);
+      const dv           = Number(form.discount_value) || 0;
+      const discAmt      = form.discount_value
+        ? (form.discount_type === "percent"
+            ? Math.min(planPrice, Math.round(planPrice * dv / 100))
+            : Math.min(planPrice, dv))
+        : 0;
+      const paidAmt = Number(form.paid_amount) || Number(form.amount);
+      const dueAmt  = Math.max(0, Number(form.amount) - paidAmt);
+      const payload = {
+        ...form,
+        paid_amount:     paidAmt,
+        due_amount:      dueAmt,
+        discount_amount: discAmt || null,
+        discount_type:   discAmt > 0 ? form.discount_type : null,
+        payment_for:     selectedPlan ? selectedPlan.duration_type : (form.payment_for || "other"),
+        plan_name:       selectedPlan ? selectedPlan.name : null,
+        plan_start:      form.plan_start || null,
+        plan_end:        form.plan_end   || null,
+        due_date:        form.due_date   || null,
+        status:          dueAmt > 0 ? "pending" : form.status,
+      };
+      delete payload.discount_value;
       await onSave(payload); onClose();
     } catch (e) { setError(e.response?.data?.message || "Save failed"); }
     finally { setSaving(false); }
   };
 
   if (!isOpen) return null;
+
   const inp = { width: "100%", padding: "9px 12px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "13px", outline: "none" };
   const lbl = { display: "block", marginBottom: "5px", fontSize: "11px", fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.08em" };
+
   const selectedPlan = plans.find(p => p.name === form.payment_for);
-  const dueAmount = form.amount && form.paid_amount ? Math.max(0, Number(form.amount) - Number(form.paid_amount)) : 0;
-  const isPartial = dueAmount > 0;
+  const planPrice    = selectedPlan ? Number(selectedPlan.price) : 0;
+  const dv           = Number(form.discount_value) || 0;
+  const discountAmt  = form.discount_value
+    ? (form.discount_type === "percent"
+        ? Math.min(planPrice, Math.round(planPrice * dv / 100))
+        : Math.min(planPrice, dv))
+    : 0;
+  const afterDiscount = Math.max(0, planPrice - discountAmt);
+  const paidAmt       = Number(form.paid_amount) || 0;
+  const dueAmount     = form.amount && form.paid_amount ? Math.max(0, Number(form.amount) - paidAmt) : 0;
+  const isPartial     = dueAmount > 0;
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: isMobile ? "flex-end" : "center", justifyContent: "center", zIndex: 1000, padding: isMobile ? 0 : "20px" }}>
-      <div style={{ background: "var(--bg-surface)", borderRadius: isMobile ? "16px 16px 0 0" : "var(--radius-lg)", border: "1px solid var(--border-default)", width: "100%", maxWidth: isMobile ? "100%" : "560px", maxHeight: isMobile ? "92vh" : "90vh", overflowY: "auto" }}>
-        <div style={{ padding: "20px 24px", paddingTop: isMobile ? "calc(20px + env(safe-area-inset-top))" : "20px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div><h3 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>{editData ? "Edit Payment" : "Record Payment"}</h3><p style={{ color: "var(--text-muted)", fontSize: "12px", margin: "3px 0 0" }}>{editData ? "Update payment details" : "Add a new payment record"}</p></div>
+      <div style={{ background: "var(--bg-surface)", borderRadius: isMobile ? "16px 16px 0 0" : "var(--radius-lg)", border: "1px solid var(--border-default)", width: "100%", maxWidth: isMobile ? "100%" : "600px", maxHeight: isMobile ? "92vh" : "90vh", overflowY: "auto" }}>
+
+        {/* Header */}
+        <div style={{ padding: "20px 24px", paddingTop: isMobile ? "calc(20px + env(safe-area-inset-top))" : "20px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: "var(--bg-surface)", zIndex: 10 }}>
+          <div>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>{editData ? "Edit Payment" : "Record Payment"}</h3>
+            <p style={{ color: "var(--text-muted)", fontSize: "12px", margin: "3px 0 0" }}>{editData ? "Update payment details" : "Add a new payment record"}</p>
+          </div>
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "16px" }}><FaTimes /></button>
         </div>
-        <div style={{ padding: "24px" }}>
-          {error && <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px", marginBottom: "16px" }}>{error}</div>}
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "14px" }}>
-            <div style={{ gridColumn: "1/-1" }}><label style={lbl}>Member *</label><select value={form.member_id} onChange={e => set("member_id", e.target.value)} style={inp}><option value="">— Select Member —</option>{members.map(m => <option key={m.id} value={m.id}>{m.full_name} ({m.phone})</option>)}</select></div>
-            <div style={{ gridColumn: "1/-1" }}>
-              <label style={lbl}>Payment For (Plan)</label>
-              <PlanSelect value={form.payment_for} onChange={e => handlePlanSelect(e.target.value)} plans={plans} style={inp} includeOther={true} />
-              {selectedPlan && <div style={{ marginTop: "8px", padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", display: "flex", gap: "20px", alignItems: "center" }}><span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Duration: <strong style={{ color: "var(--text-secondary)" }}>{selectedPlan.duration_days} days</strong></span><span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Price: <strong style={{ color: "var(--green)" }}>₹{Number(selectedPlan.price).toLocaleString("en-IN")}</strong></span><span style={{ fontSize: "11px", color: "var(--text-muted)", fontStyle: "italic" }}>Amount auto-filled ✓</span></div>}
+
+        <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "16px" }}>
+          {error && <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px" }}>{error}</div>}
+
+          {/* ── Member Search ── */}
+          <div>
+            <label style={lbl}>Member *</label>
+            <MemberSearchInput
+              value={form.member_id}
+              onChange={v => set("member_id", v)}
+              members={members}
+              style={inp}
+            />
+          </div>
+
+          {/* ── Plan Select ── */}
+          <div>
+            <label style={lbl}>Payment For (Plan)</label>
+            <PlanSelect value={form.payment_for} onChange={e => handlePlanSelect(e.target.value)} plans={plans} style={inp} includeOther={true} />
+            {selectedPlan && (
+              <div style={{ marginTop: "8px", padding: "9px 13px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", display: "flex", gap: "18px", alignItems: "center", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Duration: <strong style={{ color: "var(--text-secondary)" }}>{selectedPlan.duration_days} days</strong></span>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>MRP: <strong style={{ color: "var(--text-secondary)", textDecoration: discountAmt > 0 ? "line-through" : "none" }}>₹{Number(selectedPlan.price).toLocaleString("en-IN")}</strong></span>
+                {discountAmt > 0 && <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--green)" }}>After discount: ₹{afterDiscount.toLocaleString("en-IN")}</span>}
+                {discountAmt === 0 && <span style={{ fontSize: "11px", color: "var(--text-muted)", fontStyle: "italic" }}>Amount auto-filled ✓</span>}
+              </div>
+            )}
+          </div>
+
+          {/* ── Discount ── */}
+          <div>
+            <label style={lbl}>Discount (Optional)</label>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <div style={{ display: "flex", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-default)", overflow: "hidden", flexShrink: 0 }}>
+                {[{ val: "flat", label: "₹" }, { val: "percent", label: "%" }].map(opt => (
+                  <button key={opt.val} type="button"
+                    onClick={() => handleDiscountChange(opt.val, "")}
+                    style={{ padding: "9px 14px", background: form.discount_type === opt.val ? "var(--bg-active, rgba(255,255,255,0.08))" : "var(--bg-elevated)", border: "none", color: form.discount_type === opt.val ? "var(--text-primary)" : "var(--text-muted)", cursor: "pointer", fontWeight: form.discount_type === opt.val ? 700 : 400, fontSize: "13px", transition: "all 0.15s" }}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="number" min="0"
+                max={form.discount_type === "percent" ? 100 : planPrice || undefined}
+                value={form.discount_value}
+                placeholder={form.discount_type === "percent" ? "e.g. 10" : "e.g. 200"}
+                onChange={e => handleDiscountChange(form.discount_type, e.target.value)}
+                style={{ ...inp, flex: 1 }}
+              />
             </div>
-            <div><label style={lbl}>Total Amount (₹) *</label><input type="number" value={form.amount} onChange={e => set("amount", e.target.value)} placeholder="999" style={inp} /></div>
-            <div><label style={lbl}>Paid Amount (₹)</label><input type="number" value={form.paid_amount} onChange={e => set("paid_amount", e.target.value)} placeholder="Leave blank = full paid" style={{ ...inp, borderColor: isPartial ? "rgba(234,179,8,0.5)" : "var(--border-default)" }} /></div>
-            {isPartial && <div style={{ gridColumn: "1/-1" }}><div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--yellow-bg)", border: "1px solid rgba(234,179,8,0.3)", display: "flex", justifyContent: "space-between", alignItems: "center" }}><div style={{ display: "flex", alignItems: "center", gap: "8px" }}><FaExclamationTriangle style={{ color: "var(--yellow)", fontSize: "13px" }} /><span style={{ fontSize: "13px", color: "var(--yellow)", fontWeight: 600 }}>Partial Payment</span></div><div style={{ textAlign: "right" }}><div style={{ fontSize: "14px", fontWeight: 700, color: "var(--yellow)" }}>Due: {fmt(dueAmount)}</div><div style={{ fontSize: "10px", color: "var(--text-muted)" }}>Status → Pending</div></div></div></div>}
-            <div><label style={lbl}>Payment Date *</label><input type="date" value={form.payment_date} onChange={e => set("payment_date", e.target.value)} style={inp} /></div>
-            <div><label style={lbl}>Method</label><select value={form.payment_method} onChange={e => set("payment_method", e.target.value)} style={inp}><option value="cash">💵 Cash</option><option value="card">💳 Card</option><option value="upi">📱 UPI</option><option value="bank_transfer">🏦 Bank Transfer</option></select></div>
-            <div><label style={lbl}>Status</label><select value={isPartial ? "pending" : form.status} onChange={e => set("status", e.target.value)} style={inp} disabled={isPartial}><option value="paid">✅ Paid</option><option value="pending">⏳ Pending</option><option value="failed">❌ Failed</option><option value="refunded">↩️ Refunded</option></select></div>
-            <div><label style={lbl}>Months Covered</label><input type="number" min="1" max="12" value={form.months_covered} onChange={e => set("months_covered", e.target.value)} style={inp} /></div>
-            {selectedPlan && <><div><label style={lbl}>Plan Start</label><input type="date" value={form.plan_start} onChange={e => set("plan_start", e.target.value)} style={inp} /></div><div><label style={lbl}>Plan End</label><input type="date" value={form.plan_end} onChange={e => set("plan_end", e.target.value)} style={inp} /></div></>}
-            <div style={{ gridColumn: "1/-1" }}><label style={lbl}>Notes</label><textarea value={form.notes} onChange={e => set("notes", e.target.value)} placeholder="Optional notes..." rows={2} style={{ ...inp, resize: "vertical", fontFamily: "var(--font-body)" }} /></div>
+            {discountAmt > 0 && selectedPlan && (
+              <div style={{ marginTop: "6px", display: "flex", gap: "10px", padding: "7px 12px", borderRadius: "var(--radius-sm)", background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.2)", alignItems: "center", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>Original: <strong style={{ color: "var(--text-secondary)", textDecoration: "line-through" }}>₹{planPrice.toLocaleString("en-IN")}</strong></span>
+                <span style={{ fontSize: "11px", color: "var(--red)" }}>− ₹{discountAmt.toLocaleString("en-IN")}</span>
+                <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--green)" }}>= ₹{afterDiscount.toLocaleString("en-IN")}</span>
+              </div>
+            )}
+          </div>
+
+          {/* ── Amount fields ── */}
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={lbl}>Total Amount (₹) *</label>
+              <input type="number" value={form.amount} onChange={e => set("amount", e.target.value)} placeholder="999" style={inp} />
+            </div>
+            <div>
+              <label style={lbl}>Paid Amount (₹)</label>
+              <input type="number" value={form.paid_amount} onChange={e => set("paid_amount", e.target.value)} placeholder="Leave blank = full paid" style={{ ...inp, borderColor: isPartial ? "rgba(234,179,8,0.5)" : "var(--border-default)" }} />
+            </div>
+          </div>
+
+          {/* ── Payment Summary ── */}
+          {form.amount && (
+            <div style={{ padding: "12px 14px", borderRadius: "var(--radius-sm)", background: isPartial ? "rgba(245,158,11,0.07)" : "rgba(74,222,128,0.06)", border: `1px solid ${isPartial ? "rgba(245,158,11,0.3)" : "rgba(74,222,128,0.25)"}` }}>
+              <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Payment Summary</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                {discountAmt > 0 && selectedPlan && (
+                  <>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+                      <span style={{ color: "var(--text-muted)" }}>Plan Price</span>
+                      <span style={{ color: "var(--text-secondary)", textDecoration: "line-through" }}>₹{planPrice.toLocaleString("en-IN")}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+                      <span style={{ color: "var(--text-muted)" }}>Discount ({form.discount_type === "percent" ? `${form.discount_value}%` : "Flat"})</span>
+                      <span style={{ color: "var(--red)", fontWeight: 600 }}>− ₹{discountAmt.toLocaleString("en-IN")}</span>
+                    </div>
+                  </>
+                )}
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+                  <span style={{ color: "var(--text-muted)" }}>Payable Amount</span>
+                  <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>₹{Number(form.amount).toLocaleString("en-IN")}</span>
+                </div>
+                <div style={{ height: "1px", background: "var(--border-subtle)", margin: "2px 0" }} />
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+                  <span style={{ color: "var(--text-muted)" }}>Paid Now</span>
+                  <span style={{ color: "var(--green)", fontWeight: 700 }}>₹{(Number(form.paid_amount) || Number(form.amount)).toLocaleString("en-IN")}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                  <span style={{ fontWeight: 700, color: isPartial ? "#f59e0b" : "var(--green)" }}>
+                    {isPartial ? "⚠️ Balance Due" : "✅ Fully Paid"}
+                  </span>
+                  <span style={{ fontWeight: 800, color: isPartial ? "#f59e0b" : "var(--green)", fontFamily: "var(--font-display)" }}>
+                    ₹{dueAmount.toLocaleString("en-IN")}
+                  </span>
+                </div>
+                {isPartial && (
+                  <div style={{ marginTop: "2px", fontSize: "11px", color: "var(--text-muted)", background: "rgba(245,158,11,0.08)", padding: "5px 8px", borderRadius: "6px" }}>
+                    💡 Partial payment — remaining ₹{dueAmount.toLocaleString("en-IN")} will be recorded as due.
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── Date / Method / Status / Months ── */}
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={lbl}>Payment Date *</label>
+              <input type="date" value={form.payment_date} onChange={e => set("payment_date", e.target.value)} style={inp} />
+            </div>
+            <div>
+              <label style={lbl}>Method</label>
+              <select value={form.payment_method} onChange={e => set("payment_method", e.target.value)} style={inp}>
+                <option value="cash">💵 Cash</option>
+                <option value="card">💳 Card</option>
+                <option value="upi">📱 UPI</option>
+                <option value="bank_transfer">🏦 Bank Transfer</option>
+              </select>
+            </div>
+            <div>
+              <label style={lbl}>Status</label>
+              <select value={isPartial ? "pending" : form.status} onChange={e => set("status", e.target.value)} style={inp} disabled={isPartial}>
+                <option value="paid">✅ Paid</option>
+                <option value="pending">⏳ Pending</option>
+                <option value="failed">❌ Failed</option>
+                <option value="refunded">↩️ Refunded</option>
+              </select>
+            </div>
+            <div>
+              <label style={lbl}>Months Covered</label>
+              <input type="number" min="1" max="12" value={form.months_covered} onChange={e => set("months_covered", e.target.value)} style={inp} />
+            </div>
+          </div>
+
+          {/* ── Plan Start / End ── */}
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "14px" }}>
+            <div>
+              <label style={lbl}>Plan Start</label>
+              <input type="date" value={form.plan_start} onChange={e => set("plan_start", e.target.value)} style={inp} />
+            </div>
+            <div>
+              <label style={lbl}>Plan End</label>
+              <input type="date" value={form.plan_end} onChange={e => set("plan_end", e.target.value)} style={inp} />
+            </div>
+          </div>
+
+          {/* ── Due Date ── */}
+          <div>
+            <label style={lbl}>Due Date <span style={{ fontWeight: 400, color: "var(--text-muted)", textTransform: "none", letterSpacing: 0 }}>(if partial / pending)</span></label>
+            <input type="date" value={form.due_date} onChange={e => set("due_date", e.target.value)} style={{ ...inp, borderColor: form.due_date ? "rgba(234,179,8,0.5)" : "var(--border-default)" }} />
+          </div>
+
+          {/* ── Notes ── */}
+          <div>
+            <label style={lbl}>Notes</label>
+            <textarea value={form.notes} onChange={e => set("notes", e.target.value)} placeholder="Optional notes..." rows={2} style={{ ...inp, resize: "vertical", fontFamily: "var(--font-body)" }} />
           </div>
         </div>
-        <div style={{ padding: "16px 24px", borderTop: "1px solid var(--border-subtle)", display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+
+        {/* Footer */}
+        <div style={{ padding: "16px 24px", borderTop: "1px solid var(--border-subtle)", display: "flex", gap: "10px", justifyContent: "flex-end", position: "sticky", bottom: 0, background: "var(--bg-surface)" }}>
           <button onClick={onClose} style={{ padding: "9px 18px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>Cancel</button>
           <button onClick={handleSubmit} disabled={saving} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: saving ? "var(--bg-elevated)" : "var(--text-primary)", color: saving ? "var(--text-muted)" : "#0a0a0a", border: "none", cursor: saving ? "not-allowed" : "pointer", fontWeight: 700, fontSize: "13px", fontFamily: "var(--font-display)" }}>
             {saving ? "Saving..." : editData ? "Update" : "Record Payment"}
