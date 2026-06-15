@@ -220,17 +220,17 @@ function ViewBillModal({ member, onClose }) {
   }, [member.id]);
 
   const fmtMonth = (d) => d ? new Date(d).toLocaleDateString("en-IN", { month: "long", year: "numeric" }) : "—";
-  const fmtDate  = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+  const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
   const openEdit = (row) => {
     setEditingId(row.id);
     setSaveError("");
     setEditForm({
-      plan_name:   row.plan_name  || "",
-      plan_start:  row.plan_start ? new Date(row.plan_start).toISOString().split("T")[0] : "",
-      plan_end:    row.plan_end   ? new Date(row.plan_end).toISOString().split("T")[0]   : "",
+      plan_name: row.plan_name || "",
+      plan_start: row.plan_start ? new Date(row.plan_start).toISOString().split("T")[0] : "",
+      plan_end: row.plan_end ? new Date(row.plan_end).toISOString().split("T")[0] : "",
       amount_paid: row.amount_paid != null ? String(row.amount_paid) : "",
-      notes:       row.notes || "",
+      notes: row.notes || "",
     });
   };
 
@@ -239,11 +239,11 @@ function ViewBillModal({ member, onClose }) {
     setSaving(true); setSaveError("");
     try {
       await api.put(`/members/${member.id}/plan-history/${editingId}`, {
-        plan_name:   editForm.plan_name,
-        plan_start:  editForm.plan_start,
-        plan_end:    editForm.plan_end || null,
+        plan_name: editForm.plan_name,
+        plan_start: editForm.plan_start,
+        plan_end: editForm.plan_end || null,
         amount_paid: Number(editForm.amount_paid) || 0,
-        notes:       editForm.notes || null,
+        notes: editForm.notes || null,
       });
       // Refresh history
       const r = await api.get(`/members/${member.id}/plan-history`);
@@ -1085,8 +1085,10 @@ export default function Members({ onLogout }) {
               </div>
             ) : (
               members.map(m => (
+                // ✅ Fixed code
                 <MemberCard key={m.id} m={m} plans={plans}
                   onProfile={setProfileMember} onRenew={setRenewMember}
+                  onViewBill={setViewBillMember}   {/* ← yeh line add karo */}
                   onNotify={setNotifyMember} onDelete={setDeleteId}
                   dueInfo={dueMap[m.id]} onMarkPaid={markDuePaid}
                   phoneVisible={phoneVisible}
