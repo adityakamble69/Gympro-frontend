@@ -670,7 +670,7 @@ export default function Inquiries({ onLogout }) {
               People interested in joining your gym
             </p>
           </div>
-          <a href="https://gymro-frontend-git-main-dexterofficialllll-8406s-projects.vercel.app/inquiry" target="_blank"rel="noreferrer"
+          <a href={`${window.location.origin}/inquiry`} target="_blank" rel="noreferrer"
             style={{ display:"flex", alignItems:"center", gap:"6px", padding:"8px 14px", borderRadius:"var(--radius-sm)", background:"var(--bg-elevated)", border:"1px solid var(--border-default)", color:"var(--text-secondary)", textDecoration:"none", fontSize:"12px", fontWeight:600, whiteSpace:"nowrap" }}>
             <FaExternalLinkAlt style={{ fontSize:"10px" }} /> View Public Form
           </a>
