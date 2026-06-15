@@ -5,7 +5,7 @@ import {
   FaPlus, FaSearch, FaTimes,
   FaUsers, FaUser,
   FaWhatsapp, FaEnvelope, FaCheck, FaPaperPlane, FaSyncAlt, FaTrash,
-  FaEye, FaEyeSlash
+  FaEye, FaEyeSlash, FaFileInvoiceDollar, FaEdit, FaSave
 } from "react-icons/fa";
 import MemberProfileDrawer from "../components/MemberProfileDrawer";
 
@@ -192,6 +192,210 @@ function NotifyModal({ member, onClose }) {
               </button>
             </>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── View Bill Modal ───────────────────────────────────────────────────────────
+function ViewBillModal({ member, onClose }) {
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      setLoading(true);
+      try {
+        const r = await api.get(`/members/${member.id}/plan-history`);
+        setHistory(r.data.data || []);
+      } catch (e) { console.error(e); }
+      finally { setLoading(false); }
+    };
+    fetchHistory();
+  }, [member.id]);
+
+  const fmtMonth = (d) => d ? new Date(d).toLocaleDateString("en-IN", { month: "long", year: "numeric" }) : "—";
+  const fmtDate  = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+
+  const openEdit = (row) => {
+    setEditingId(row.id);
+    setSaveError("");
+    setEditForm({
+      plan_name:   row.plan_name  || "",
+      plan_start:  row.plan_start ? new Date(row.plan_start).toISOString().split("T")[0] : "",
+      plan_end:    row.plan_end   ? new Date(row.plan_end).toISOString().split("T")[0]   : "",
+      amount_paid: row.amount_paid != null ? String(row.amount_paid) : "",
+      notes:       row.notes || "",
+    });
+  };
+
+  const handleSave = async () => {
+    if (!editForm.plan_name || !editForm.plan_start) { setSaveError("Plan name aur start date required hai."); return; }
+    setSaving(true); setSaveError("");
+    try {
+      await api.put(`/members/${member.id}/plan-history/${editingId}`, {
+        plan_name:   editForm.plan_name,
+        plan_start:  editForm.plan_start,
+        plan_end:    editForm.plan_end || null,
+        amount_paid: Number(editForm.amount_paid) || 0,
+        notes:       editForm.notes || null,
+      });
+      // Refresh history
+      const r = await api.get(`/members/${member.id}/plan-history`);
+      setHistory(r.data.data || []);
+      setEditingId(null);
+    } catch (e) {
+      setSaveError(e.response?.data?.message || "Save failed.");
+    } finally { setSaving(false); }
+  };
+
+  const setEF = (k, v) => setEditForm(p => ({ ...p, [k]: v }));
+
+  const editInputStyle = {
+    padding: "6px 10px", borderRadius: "var(--radius-sm)",
+    background: "var(--bg-base)", border: "1px solid var(--border-default)",
+    color: "var(--text-primary)", fontSize: "12px", outline: "none",
+    width: "100%", boxSizing: "border-box", fontFamily: "var(--font-body)"
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.82)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200, backdropFilter: "blur(4px)", padding: "16px" }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", width: "100%", maxWidth: "720px", maxHeight: "88vh", overflowY: "auto", boxShadow: "var(--shadow-lg)", display: "flex", flexDirection: "column" }}>
+
+        {/* Header */}
+        <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexShrink: 0 }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div style={{ width: "34px", height: "34px", borderRadius: "50%", background: "rgba(96,165,250,0.12)", border: "1px solid rgba(96,165,250,0.25)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--blue)", flexShrink: 0 }}>
+                <FaFileInvoiceDollar style={{ fontSize: "14px" }} />
+              </div>
+              <div>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Membership Bills</h2>
+                <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "2px" }}>{member.full_name} · {member.membership_type || "—"}</p>
+              </div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <FaTimes style={{ fontSize: "12px" }} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: "20px 24px", flex: 1 }}>
+          {loading ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {[...Array(3)].map((_, i) => (
+                <div key={i} style={{ height: "54px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", animation: "shimmer 1.4s infinite" }} />
+              ))}
+            </div>
+          ) : history.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "48px 20px", color: "var(--text-muted)" }}>
+              <FaFileInvoiceDollar style={{ fontSize: "32px", opacity: 0.25, display: "block", margin: "0 auto 12px" }} />
+              <p style={{ fontSize: "13px" }}>Koi bill history nahi mili.</p>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {history.map((row) => {
+                const isEditing = editingId === row.id;
+                return (
+                  <div key={row.id} style={{ borderRadius: "var(--radius-lg)", border: isEditing ? "1px solid rgba(96,165,250,0.45)" : "1px solid var(--border-default)", background: isEditing ? "rgba(96,165,250,0.04)" : "var(--bg-elevated)", overflow: "hidden", transition: "all 0.2s" }}>
+
+                    {/* Row header — always visible */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", gap: "12px", flexWrap: "wrap" }}>
+                      <div style={{ display: "flex", align: "center", gap: "16px", flexWrap: "wrap", flex: 1 }}>
+                        {/* Month */}
+                        <div style={{ minWidth: "110px" }}>
+                          <div style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Month</div>
+                          <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)" }}>{fmtMonth(row.plan_start)}</div>
+                        </div>
+                        {/* Period */}
+                        <div style={{ minWidth: "180px" }}>
+                          <div style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Period</div>
+                          <div style={{ fontSize: "12px", color: "var(--text-secondary)" }}>{fmtDate(row.plan_start)} <span style={{ color: "var(--text-muted)" }}>→</span> {fmtDate(row.plan_end)}</div>
+                        </div>
+                        {/* Plan */}
+                        <div style={{ minWidth: "120px" }}>
+                          <div style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Plan</div>
+                          <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--blue)", textTransform: "capitalize" }}>{row.plan_name || "—"}</div>
+                        </div>
+                        {/* Amount */}
+                        <div>
+                          <div style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Amount Paid</div>
+                          <div style={{ fontSize: "14px", fontWeight: 800, color: "var(--green)", fontFamily: "var(--font-display)" }}>₹{Number(row.amount_paid || 0).toLocaleString("en-IN")}</div>
+                        </div>
+                      </div>
+                      {/* Edit button */}
+                      {!isEditing && (
+                        <button onClick={() => openEdit(row)}
+                          style={{ padding: "5px 11px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "5px", fontWeight: 600, flexShrink: 0, transition: "all 0.15s" }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(96,165,250,0.5)"; e.currentTarget.style.color = "var(--blue)"; e.currentTarget.style.background = "rgba(96,165,250,0.07)"; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.background = "var(--bg-surface)"; }}>
+                          <FaEdit style={{ fontSize: "10px" }} /> Edit Bill
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Edit form — slides open */}
+                    {isEditing && (
+                      <div style={{ padding: "0 16px 16px", borderTop: "1px solid var(--border-subtle)" }}>
+                        <div style={{ paddingTop: "14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                          <div>
+                            <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Plan Name *</label>
+                            <input style={editInputStyle} value={editForm.plan_name} onChange={e => setEF("plan_name", e.target.value)} placeholder="e.g. Monthly Plan" />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Amount Paid (₹)</label>
+                            <input style={editInputStyle} type="number" min="0" value={editForm.amount_paid} onChange={e => setEF("amount_paid", e.target.value)} placeholder="0" />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Start Date *</label>
+                            <input style={editInputStyle} type="date" value={editForm.plan_start} onChange={e => setEF("plan_start", e.target.value)} />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>End Date</label>
+                            <input style={editInputStyle} type="date" value={editForm.plan_end} onChange={e => setEF("plan_end", e.target.value)} />
+                          </div>
+                          <div style={{ gridColumn: "1 / -1" }}>
+                            <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Notes</label>
+                            <input style={editInputStyle} value={editForm.notes} onChange={e => setEF("notes", e.target.value)} placeholder="Optional note..." />
+                          </div>
+                        </div>
+                        {saveError && <div style={{ marginTop: "10px", padding: "8px 12px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "12px" }}>⚠️ {saveError}</div>}
+                        <div style={{ display: "flex", gap: "8px", marginTop: "12px", justifyContent: "flex-end" }}>
+                          <button onClick={() => { setEditingId(null); setSaveError(""); }}
+                            style={{ padding: "7px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px" }}>
+                            Cancel
+                          </button>
+                          <button onClick={handleSave} disabled={saving}
+                            style={{ padding: "7px 18px", borderRadius: "var(--radius-sm)", background: saving ? "var(--bg-elevated)" : "var(--blue)", border: "none", color: saving ? "var(--text-muted)" : "#fff", cursor: saving ? "not-allowed" : "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-display)", display: "flex", alignItems: "center", gap: "6px" }}>
+                            <FaSave style={{ fontSize: "10px" }} /> {saving ? "Saving..." : "Save Changes"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Notes preview (when not editing) */}
+                    {!isEditing && row.notes && (
+                      <div style={{ padding: "6px 16px 10px", borderTop: "1px solid var(--border-subtle)" }}>
+                        <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>📝 {row.notes}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: "14px 24px", borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "flex-end", flexShrink: 0 }}>
+          <button onClick={onClose} style={{ padding: "8px 22px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>Close</button>
         </div>
       </div>
     </div>
@@ -464,7 +668,7 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
 }
 
 // ─── Mobile Member Card ────────────────────────────────────────────────────────
-const MemberCard = ({ m, plans, onProfile, onRenew, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone }) => {
+const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone }) => {
   const days = daysLeft(m.membership_end);
   const warn = days !== null && days <= 7 && days >= 0;
   return (
@@ -511,6 +715,7 @@ const MemberCard = ({ m, plans, onProfile, onRenew, onNotify, onDelete, dueInfo,
       )}
       <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
         <button onClick={() => onRenew(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.25)", color: "var(--green)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaSyncAlt style={{ fontSize: "10px" }} /> Renew</button>
+        <button onClick={() => onViewBill(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", color: "var(--blue)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaFileInvoiceDollar style={{ fontSize: "10px" }} /> Bill</button>
         <button onClick={() => onNotify(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)", border: warn ? "1px solid rgba(245,158,11,0.35)" : "1px solid var(--border-default)", color: warn ? "#f59e0b" : "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}><FaEnvelope style={{ fontSize: "10px" }} /> Notify</button>
         <button onClick={() => onDelete(m.id)} style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center" }}><FaTrash style={{ fontSize: "10px" }} /></button>
       </div>
@@ -569,6 +774,7 @@ export default function Members({ onLogout }) {
   const [notifyMember, setNotifyMember] = useState(null);
   const [profileMember, setProfileMember] = useState(null);
   const [renewMember, setRenewMember] = useState(null);
+  const [viewBillMember, setViewBillMember] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [phoneVisible, setPhoneVisible] = useState({});
   const [dueMap, setDueMap] = useState({});
@@ -833,6 +1039,12 @@ export default function Members({ onLogout }) {
                           <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
                             <button onClick={() => setRenewMember(m)} title="Renew" style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.25)", color: "var(--green)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>
                               <FaSyncAlt style={{ fontSize: "10px" }} /> Renew
+                            </button>
+                            <button onClick={() => setViewBillMember(m)} title="View Bill"
+                              style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", color: "var(--blue)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, transition: "all 0.15s" }}
+                              onMouseEnter={e => { e.currentTarget.style.background = "rgba(96,165,250,0.16)"; e.currentTarget.style.borderColor = "rgba(96,165,250,0.5)"; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "rgba(96,165,250,0.08)"; e.currentTarget.style.borderColor = "rgba(96,165,250,0.25)"; }}>
+                              <FaFileInvoiceDollar style={{ fontSize: "10px" }} /> Bill
                             </button>
                             <button onClick={() => setNotifyMember(m)} title="Notify"
                               style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)", border: warn ? "1px solid rgba(245,158,11,0.35)" : "1px solid var(--border-default)", color: warn ? "#f59e0b" : "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", transition: "all 0.15s" }}
