@@ -9,10 +9,6 @@ import {
   FaChevronUp, FaCrown, FaRupeeSign, FaIdCard, FaLayerGroup,
   FaWallet, FaRunning, FaCheck, FaExclamationTriangle
 } from "react-icons/fa";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, Cell
-} from "recharts";
 import api from "../services/api";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -412,37 +408,135 @@ function TabPayments({ payments, loading, onRefresh }) {
   );
 }
 
+// ── Attendance Heatmap (GitHub-style) ──────────────────────────────────────────
+const HEATMAP_WEEKS = 26; // ~6 months
+const HM_CELL = 11;
+const HM_GAP  = 3;
+const HM_DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
+
+function AttendanceHeatmap({ attendance, membershipEnd }) {
+  const attendedDates = new Set(
+    attendance.map(a => new Date(a.date).toISOString().slice(0, 10))
+  );
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const totalDays = HEATMAP_WEEKS * 7;
+  const start = new Date(today);
+  start.setDate(start.getDate() - (totalDays - 1));
+  start.setDate(start.getDate() - start.getDay()); // back to Sunday
+
+  const weeks = [];
+  const monthLabels = [];
+  const cursor = new Date(start);
+
+  for (let w = 0; w < HEATMAP_WEEKS; w++) {
+    const days = [];
+    let monthLabel = null;
+    for (let d = 0; d < 7; d++) {
+      const dateStr  = cursor.toISOString().slice(0, 10);
+      const isFuture = cursor > today;
+      const attended = attendedDates.has(dateStr);
+      const isAfterExpiry = membershipEnd && cursor > membershipEnd;
+      let status = "none";
+      if (attended) status = isAfterExpiry ? "expired" : "active";
+      if (cursor.getDate() === 1) monthLabel = cursor.toLocaleDateString("en-IN", { month: "short" });
+      days.push({ date: new Date(cursor), dateStr, status, isFuture });
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    weeks.push(days);
+    monthLabels.push(monthLabel);
+  }
+
+  const colorFor = (status, isFuture) => {
+    if (isFuture)             return "transparent";
+    if (status === "active")  return "var(--green)";
+    if (status === "expired") return "var(--red)";
+    return "var(--bg-surface)";
+  };
+
+  return (
+    <div style={{ overflowX: "auto", paddingBottom: "4px" }}>
+      <div style={{ display: "inline-flex", gap: HM_GAP }}>
+        {/* Day-of-week labels */}
+        <div style={{ display: "flex", flexDirection: "column", gap: HM_GAP, marginRight: "2px", marginTop: "16px" }}>
+          {HM_DAY_LABELS.map((l, i) => (
+            <div key={i} style={{ height: HM_CELL, fontSize: "8px", lineHeight: `${HM_CELL}px`, color: "var(--text-muted)" }}>{l}</div>
+          ))}
+        </div>
+
+        {/* Week columns */}
+        {weeks.map((days, wi) => (
+          <div key={wi} style={{ display: "flex", flexDirection: "column", gap: HM_GAP }}>
+            <div style={{ height: "13px", fontSize: "9px", color: "var(--text-muted)", whiteSpace: "nowrap" }}>
+              {monthLabels[wi] || ""}
+            </div>
+            {days.map((day, di) => (
+              <div
+                key={di}
+                title={
+                  day.isFuture ? "" :
+                  day.status === "none"
+                    ? `${day.date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })} — absent`
+                    : `${day.date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })} — visited${day.status === "expired" ? " (after expiry)" : ""}`
+                }
+                style={{
+                  width: HM_CELL, height: HM_CELL, borderRadius: "2px",
+                  background: colorFor(day.status, day.isFuture),
+                  border: (day.status === "none" && !day.isFuture) ? "1px solid var(--border-subtle)" : "none"
+                }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Tab: Attendance ───────────────────────────────────────────────────────────
-function TabAttendance({ attendance, loading, attChartData, thisMonthAtt }) {
+function TabAttendance({ attendance, loading, membershipEnd, thisMonthAtt, afterExpiryCount }) {
   return (
     <div style={{ padding: "20px 22px 24px" }}>
       {/* Stats Row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "18px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: afterExpiryCount > 0 ? "10px" : "18px" }}>
         <StatCard label="Total Visits" value={attendance.length} color="var(--text-primary)" />
         <StatCard label="This Month"   value={thisMonthAtt}      color="var(--blue)" />
         <StatCard label="Last Visit"   value={attendance.length > 0 ? fmt(attendance[0]?.date) : "—"} color="var(--text-muted)" />
       </div>
 
-      {/* Chart */}
-      {!loading && attendance.length > 0 && (
+      {/* After-expiry warning banner */}
+      {afterExpiryCount > 0 && (
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          padding: "10px 14px", borderRadius: "var(--radius-sm)", marginBottom: "18px",
+          background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.25)"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <FaExclamationTriangle style={{ fontSize: "12px", color: "var(--red)" }} />
+            <span style={{ fontSize: "12px", color: "var(--red)", fontWeight: 600 }}>Visited after membership expired</span>
+          </div>
+          <span style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--red)" }}>{afterExpiryCount}</span>
+        </div>
+      )}
+
+      {/* Heatmap */}
+      {!loading && (
         <div style={{ marginBottom: "20px" }}>
-          <SectionLabel>Last 6 Months</SectionLabel>
-          <div style={{ background: "var(--bg-elevated)", borderRadius: "var(--radius-sm)", padding: "14px 10px 6px", border: "1px solid var(--border-subtle)" }}>
-            <ResponsiveContainer width="100%" height={110}>
-              <BarChart data={attChartData} margin={{ top: 0, right: 0, bottom: 0, left: -28 }}>
-                <XAxis dataKey="label" tick={{ fill: "var(--text-muted)", fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "var(--text-muted)", fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip
-                  contentStyle={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "6px", fontSize: "11px" }}
-                  cursor={{ fill: "rgba(255,255,255,0.04)" }}
-                />
-                <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                  {attChartData.map((_, i) => (
-                    <Cell key={i} fill={i === attChartData.length - 1 ? "var(--text-primary)" : "var(--bg-active)"} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", flexWrap: "wrap", gap: "6px" }}>
+            <SectionLabel>Activity — Last 6 Months</SectionLabel>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "10px", color: "var(--text-muted)" }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "2px", background: "var(--green)" }} /> Active period
+              </span>
+              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "10px", color: "var(--text-muted)" }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "2px", background: "var(--red)" }} /> After expiry
+              </span>
+            </div>
+          </div>
+          <div style={{ background: "var(--bg-elevated)", borderRadius: "var(--radius-sm)", padding: "12px", border: "1px solid var(--border-subtle)" }}>
+            <AttendanceHeatmap attendance={attendance} membershipEnd={membershipEnd} />
           </div>
         </div>
       )}
@@ -578,20 +672,33 @@ export default function MemberProfileDrawer({ member, onClose, onEdit, onRecordP
     return Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
   })();
 
+  // membership_end cutoff — visits on/before this date are "active period",
+  // visits after this date are "after expiry"
+  const membershipEnd = member.membership_end ? new Date(member.membership_end) : null;
+
   const attChartData = (() => {
     const months = [];
     for (let i = 5; i >= 0; i--) {
       const d = new Date();
       d.setMonth(d.getMonth() - i);
       const mo = d.getMonth(), yr = d.getFullYear();
-      const count = attendance.filter(a => {
+      const monthAttendance = attendance.filter(a => {
         const ad = new Date(a.date);
         return ad.getMonth() === mo && ad.getFullYear() === yr;
-      }).length;
-      months.push({ label: d.toLocaleDateString("en-IN", { month: "short" }), count });
+      });
+      const active = membershipEnd
+        ? monthAttendance.filter(a => new Date(a.date) <= membershipEnd).length
+        : monthAttendance.length;
+      const expired = monthAttendance.length - active;
+      months.push({ label: d.toLocaleDateString("en-IN", { month: "short" }), active, expired });
     }
     return months;
   })();
+
+  // Total (all-time) visits that happened after membership expired
+  const afterExpiryCount = membershipEnd
+    ? attendance.filter(a => new Date(a.date) > membershipEnd).length
+    : 0;
 
   const TABS = [
     { key: "profile",  label: "Profile",  icon: FaIdCard,     badge: 0 },
@@ -719,6 +826,7 @@ export default function MemberProfileDrawer({ member, onClose, onEdit, onRecordP
               loading={loading}
               attChartData={attChartData}
               thisMonthAtt={thisMonthAtt}
+              afterExpiryCount={afterExpiryCount}
             />
           )}
         </div>

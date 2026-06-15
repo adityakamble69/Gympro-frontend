@@ -130,15 +130,28 @@ const PaymentRow = ({ p }) => (
 );
 
 const MemberRow = ({ m }) => {
+  const [phoneVis, setPhoneVis] = useState(false);
   const statusColor = m.status === "active" ? "var(--green)" : m.status === "expired" ? "var(--red)" : "var(--yellow)";
   const statusBg    = m.status === "active" ? "var(--green-bg)" : m.status === "expired" ? "var(--red-bg)" : "var(--yellow-bg)";
+  const maskedPhone = m.phone ? "••••••" + m.phone.slice(-4) : "—";
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid var(--border-subtle)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <Avatar name={m.full_name} />
         <div>
           <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{m.full_name}</div>
-          <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.membership_type} · {m.phone}</div>
+          <div style={{ fontSize: "11px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
+            <span>{m.membership_type} · {phoneVis ? m.phone : maskedPhone}</span>
+            {m.phone && (
+              <button
+                onClick={() => setPhoneVis(v => !v)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0, display: "flex", alignItems: "center", opacity: 0.7 }}
+                title={phoneVis ? "Hide number" : "Show number"}
+              >
+                {phoneVis ? <FaEyeSlash style={{ fontSize: "10px" }} /> : <FaEye style={{ fontSize: "10px" }} />}
+              </button>
+            )}
+          </div>
         </div>
       </div>
       <span style={{ padding: "3px 10px", borderRadius: "99px", fontSize: "11px", fontWeight: 600, background: statusBg, color: statusColor, textTransform: "capitalize" }}>{m.status}</span>
@@ -694,7 +707,7 @@ export default function Dashboard({ onLogout }) {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg-base)", fontFamily: "var(--font-body)" }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: "var(--bg-base)", fontFamily: "var(--font-body)" }}>
       <style>{dashStyles}</style>
       <Sidebar onLogout={onLogout} />
 

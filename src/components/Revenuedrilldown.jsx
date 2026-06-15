@@ -679,30 +679,45 @@ function PendingAmountDetail({ onClose }) {
   const [sort,    setSort]    = useState("desc"); // desc = highest first
 
   useEffect(() => {
+    // Primary: backend already returns member-wise aggregated dues
+    // shape: { member_id, full_name, phone, payment_count, total_amount, total_paid, total_due, last_payment_date }
     api.get("/payments/due/list").then(res => {
       setData(res.data.data || []); setLoading(false);
     }).catch(() => {
-      // Fallback to pending filter
+      // Fallback: raw pending payments — aggregate by member ourselves
       api.get("/payments?limit=9999&status=pending").then(res => {
-        setData(res.data.data || []); setLoading(false);
+        const rows = res.data.data || [];
+        const byMember = rows.reduce((acc, p) => {
+          const key = p.member_id;
+          if (!acc[key]) {
+            acc[key] = {
+              member_id: key, full_name: p.full_name, phone: p.phone,
+              payment_count: 0, total_amount: 0, total_paid: 0, total_due: 0,
+              last_payment_date: p.payment_date
+            };
+          }
+          acc[key].payment_count += 1;
+          acc[key].total_amount  += Number(p.amount || 0);
+          acc[key].total_paid    += Number(p.paid_amount || 0);
+          acc[key].total_due     += Number(p.due_amount || 0);
+          if (new Date(p.payment_date) > new Date(acc[key].last_payment_date)) {
+            acc[key].last_payment_date = p.payment_date;
+          }
+          return acc;
+        }, {});
+        setData(Object.values(byMember));
+        setLoading(false);
       }).catch(() => setLoading(false));
     });
   }, []);
 
-  // Aggregate by member
-  const byMember = data.reduce((acc, p) => {
-    const key = p.member_id;
-    if (!acc[key]) acc[key] = { member_id: key, full_name: p.full_name, phone: p.phone, email: p.email, totalDue: 0, entries: [] };
-    acc[key].totalDue += Number(p.due_amount || p.amount || 0);
-    acc[key].entries.push(p);
-    return acc;
-  }, {});
-
-  let memberList = Object.values(byMember)
+  let memberList = data
     .filter(m => !search || m.full_name?.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => sort === "desc" ? b.totalDue - a.totalDue : a.totalDue - b.totalDue);
+    .sort((a, b) => sort === "desc"
+      ? Number(b.total_due) - Number(a.total_due)
+      : Number(a.total_due) - Number(b.total_due));
 
-  const grandTotal = memberList.reduce((s, m) => s + m.totalDue, 0);
+  const grandTotal = memberList.reduce((s, m) => s + Number(m.total_due || 0), 0);
 
   return (
     <Modal title="Pending Amount — Member Wise" onClose={onClose} width="640px">
@@ -774,32 +789,30 @@ function PendingAmountDetail({ onClose }) {
                       </div>
                       <div>
                         <div style={{ fontWeight: 600, fontSize: "13px", color: "var(--text-primary)" }}>{m.full_name}</div>
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.phone || m.email || "—"}</div>
+                        <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.phone || "—"}</div>
                       </div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontWeight: 800, fontSize: "16px", color: "var(--red)" }}>{rupee(m.totalDue)}</div>
-                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.entries.length} entry</div>
+                      <div style={{ fontWeight: 800, fontSize: "16px", color: "var(--red)" }}>{rupee(m.total_due)}</div>
+                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.payment_count} {m.payment_count === 1 ? "entry" : "entries"}</div>
                     </div>
                   </div>
 
-                  {/* Due entries */}
-                  {m.entries.map(p => (
-                    <div key={p.id} style={{
-                      display: "flex", justifyContent: "space-between", alignItems: "center",
-                      padding: "7px 14px 7px 52px",
-                      borderTop: "1px solid var(--border-subtle)",
-                      background: "rgba(0,0,0,0.04)"
-                    }}>
-                      <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-                        {p.payment_for || "membership"} · {fmt(p.payment_date)}
-                      </div>
-                      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                        <span style={{ fontSize: "11px", color: "var(--text-muted)", textDecoration: "line-through" }}>{rupee(p.amount)}</span>
-                        <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--red)" }}>Due: {rupee(p.due_amount || p.amount)}</span>
-                      </div>
+                  {/* Summary row */}
+                  <div style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "7px 14px 7px 52px",
+                    borderTop: "1px solid var(--border-subtle)",
+                    background: "rgba(0,0,0,0.04)"
+                  }}>
+                    <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+                      Total {rupee(m.total_amount)} · Paid {rupee(m.total_paid)}
+                      {m.last_payment_date && <> · Last {fmt(m.last_payment_date)}</>}
                     </div>
-                  ))}
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                      <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--red)" }}>Due: {rupee(m.total_due)}</span>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
