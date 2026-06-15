@@ -310,7 +310,7 @@ export default function Sidebar({ onLogout }) {
       {/* Mobile Drawer + Overlay */}
       {mobileOpen && (
         <>
-          <div className="mobile-overlay" onClick={() => setMobileOpen(false)} />
+          <div className="mobile-overlay" />
           <div className="mobile-drawer">
             <SidebarContent />
           </div>
