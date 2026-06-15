@@ -1169,6 +1169,13 @@ export default function Members({ onLogout }) {
         </div>
       )}
 
+      {viewBillMember && (
+        <ViewBillModal
+          member={viewBillMember}
+          onClose={() => setViewBillMember(null)}
+        />
+      )}
+
       {renewMember && (
         <RenewModal
           member={renewMember} plans={plans} plansByType={plansByType}
