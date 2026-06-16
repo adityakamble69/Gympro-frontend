@@ -416,8 +416,16 @@ const HM_DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
 function AttendanceHeatmap({ attendance, membershipEnd }) {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 600;
   const HEATMAP_WEEKS = isMobile ? 13 : 26; // 3 months on mobile, 6 on desktop
+  const toLocalDate = (d) => {
+    const dt = new Date(d);
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, "0");
+    const day = String(dt.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
   const attendedDates = new Set(
-    attendance.map(a => new Date(a.date).toISOString().slice(0, 10))
+    attendance.map(a => toLocalDate(a.date))
   );
 
   const [selectedDay, setSelectedDay] = useState(null);
@@ -438,7 +446,7 @@ function AttendanceHeatmap({ attendance, membershipEnd }) {
     const days = [];
     let monthLabel = null;
     for (let d = 0; d < 7; d++) {
-      const dateStr  = cursor.toISOString().slice(0, 10);
+      const dateStr  = toLocalDate(cursor);
       const isFuture = cursor > today;
       const attended = attendedDates.has(dateStr);
       const isAfterExpiry = membershipEnd && cursor > membershipEnd;
