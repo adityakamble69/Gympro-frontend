@@ -4,8 +4,9 @@ import api from "../services/api";
 import {
   FaPlus, FaSearch, FaTimes,
   FaUsers, FaUser,
-  FaWhatsapp, FaEnvelope, FaCheck, FaPaperPlane, FaSyncAlt, FaTrash,
-  FaEye, FaEyeSlash, FaFileInvoiceDollar, FaEdit, FaSave
+  FaWhatsapp, FaCheck, FaPaperPlane, FaSyncAlt, FaTrash,
+  FaEye, FaEyeSlash, FaFileInvoiceDollar, FaEdit, FaSave,
+  FaEnvelope
 } from "react-icons/fa";
 import MemberProfileDrawer from "../components/MemberProfileDrawer";
 
@@ -25,7 +26,7 @@ const inputStyle = {
 };
 
 const EMPTY = {
-  full_name: "", email: "", phone: "", address: "",
+  full_name: "", phone: "", address: "",
   gender: "", date_of_birth: "", membership_type: "",
   membership_start: "", membership_end: "", status: "active"
 };
@@ -54,10 +55,10 @@ const StatusBadge = ({ status }) => {
 
 // ─── WhatsApp Templates ────────────────────────────────────────────────────────
 const WA_TEMPLATES = {
-  expiry_warning: (m) => `Hi ${m.full_name}! 👋\n\nYour *GymPro* membership is expiring in *${daysLeft(m.membership_end) ?? "a few"} day(s)* (${fmtLong(m.membership_end)}).\n\nRenew now to continue your fitness journey! 💪\n\n_Team GymPro_ ⚡`,
-  payment_reminder: (m) => `Hi ${m.full_name}! 👋\n\nFriendly reminder — your *GymPro* membership payment is pending.\n\nPlan: *${m.membership_type || "Membership"}*\nExpiry: *${fmtLong(m.membership_end)}*\n\nPlease clear your dues at the earliest. 🙏\n\n_Team GymPro_ ⚡`,
-  renewal_done: (m) => `Hi ${m.full_name}! 🎉\n\nYour *GymPro* membership has been successfully *renewed*!\n\nPlan: *${m.membership_type || "Membership"}*\nValid Till: *${fmtLong(m.membership_end)}*\n\nThank you! See you at the gym! 🏋️‍♂️\n\n_Team GymPro_ ⚡`,
-  welcome: (m) => `Hi ${m.full_name}! 🎉\n\nWelcome to *GymPro*! Your membership is now *active*.\n\nPlan: *${m.membership_type || "Standard"}*\nValid Till: *${fmtLong(m.membership_end)}*\n\nBring a valid ID on your first visit. Let's crush those goals! 💪\n\n_Team GymPro_ ⚡`,
+  expiry_warning: (m) => `Hi ${m.full_name}! 👋\n\nYour *Workout World Gym* membership is expiring in *${daysLeft(m.membership_end) ?? "a few"} day(s)* (${fmtLong(m.membership_end)}).\n\nRenew now to continue your fitness journey! 💪\n\n_Team Workout World Gym_ ⚡`,
+  payment_reminder: (m) => `Hi ${m.full_name}! 👋\n\nFriendly reminder — your *Workout World Gym* membership payment is pending.\n\nPlan: *${m.membership_type || "Membership"}*\nExpiry: *${fmtLong(m.membership_end)}*\n\nPlease clear your dues at the earliest. 🙏\n\n_Team Workout World Gym_ ⚡`,
+  renewal_done: (m) => `Hi ${m.full_name}! 🎉\n\nYour *Workout World Gym* membership has been successfully *renewed*!\n\nPlan: *${m.membership_type || "Membership"}*\nValid Till: *${fmtLong(m.membership_end)}*\n\nThank you! See you at the gym! 🏋️‍♂️\n\n_Team Workout World Gym_ ⚡`,
+  welcome: (m) => `Hi ${m.full_name}! 🎉\n\nWelcome to *Workout World Gym*! Your membership is now *active*.\n\nPlan: *${m.membership_type || "Standard"}*\nValid Till: *${fmtLong(m.membership_end)}*\n\nBring a valid ID on your first visit. Let's crush those goals! 💪\n\n_Team Workout World Gym_ ⚡`,
 };
 
 const NOTIFY_TYPES = [
@@ -69,27 +70,15 @@ const NOTIFY_TYPES = [
 
 // ─── Notify Modal ──────────────────────────────────────────────────────────────
 function NotifyModal({ member, onClose }) {
-  const [tab, setTab] = useState("email");
   const [selType, setSelType] = useState("");
-  const [sending, setSending] = useState(false);
   const [result, setResult] = useState(null);
   const [waPreview, setWaPreview] = useState("");
 
-  useEffect(() => { setSelType(""); setResult(null); setWaPreview(""); }, [tab]);
+  useEffect(() => { setSelType(""); setResult(null); setWaPreview(""); }, []);
   useEffect(() => {
-    if (tab === "whatsapp" && selType) setWaPreview(WA_TEMPLATES[selType]?.(member) || "");
+    if (selType) setWaPreview(WA_TEMPLATES[selType]?.(member) || "");
     else setWaPreview("");
-  }, [selType, tab, member]);
-
-  const sendEmail = async () => {
-    if (!selType) return;
-    setSending(true); setResult(null);
-    try {
-      const res = await api.post(`/members/${member.id}/send-email`, { type: selType });
-      setResult({ ok: true, msg: res.data.message || "Email sent!" });
-    } catch (e) { setResult({ ok: false, msg: e.response?.data?.message || "Email send failed" }); }
-    finally { setSending(false); }
-  };
+  }, [selType, member]);
 
   const openWhatsApp = () => {
     if (!waPreview || !member.phone) return;
@@ -151,47 +140,26 @@ function NotifyModal({ member, onClose }) {
             )}
           </div>
         </div>
-        <div style={{ display: "flex", borderBottom: "1px solid var(--border-subtle)" }}>
-          {[{ key: "email", icon: <FaEnvelope />, label: "Email" }, { key: "whatsapp", icon: <FaWhatsapp />, label: "WhatsApp" }].map(t => (
-            <button key={t.key} onClick={() => setTab(t.key)} style={{ flex: 1, padding: "13px", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", background: tab === t.key ? "var(--bg-elevated)" : "transparent", border: "none", borderBottom: tab === t.key ? "2px solid var(--text-primary)" : "2px solid transparent", color: tab === t.key ? "var(--text-primary)" : "var(--text-muted)", cursor: "pointer", fontWeight: tab === t.key ? 700 : 400, fontSize: "13px", fontFamily: "var(--font-body)", transition: "all 0.15s" }}>
-              {t.icon} {t.label}
-            </button>
-          ))}
-        </div>
         <div style={{ padding: "20px 24px" }}>
-          {tab === "email" && (
-            <>
-              {!member.email && <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", color: "var(--red)", fontSize: "13px", marginBottom: "14px", border: "1px solid rgba(248,113,113,0.2)" }}>⚠️ No email address registered for this member.</div>}
-              <p style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "12px" }}>Select email type:</p>
-              <TypeSelector value={selType} onChange={setSelType} />
-              <ResultBanner />
-              <button onClick={sendEmail} disabled={!selType || !member.email || sending} style={{ width: "100%", padding: "11px", borderRadius: "var(--radius-sm)", background: (!selType || !member.email || sending) ? "var(--bg-elevated)" : "var(--text-primary)", color: (!selType || !member.email || sending) ? "var(--text-muted)" : "#0a0a0a", border: "none", cursor: (!selType || !member.email || sending) ? "not-allowed" : "pointer", fontWeight: 700, fontSize: "13px", fontFamily: "var(--font-display)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-                <FaPaperPlane style={{ fontSize: "12px" }} />
-                {sending ? "Sending..." : `Send to ${member.email || "—"}`}
-              </button>
-            </>
-          )}
-          {tab === "whatsapp" && (
-            <>
-              {!member.phone && <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", color: "var(--red)", fontSize: "13px", marginBottom: "14px", border: "1px solid rgba(248,113,113,0.2)" }}>⚠️ No phone number registered for this member.</div>}
-              <p style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "12px" }}>Select message type:</p>
-              <TypeSelector value={selType} onChange={setSelType} />
-              {waPreview && (
-                <div style={{ marginBottom: "16px" }}>
-                  <p style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Message Preview</p>
-                  <div style={{ background: "#1a2e1a", border: "1px solid rgba(74,222,128,0.2)", borderRadius: "var(--radius-sm)", padding: "14px 16px", fontSize: "12px", color: "#dcfce7", lineHeight: 1.75, whiteSpace: "pre-wrap", fontFamily: "monospace", maxHeight: "160px", overflowY: "auto" }}>
-                    {waPreview}
-                  </div>
-                  <p style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "6px" }}>💡 Message will be pre-filled in WhatsApp — send from there</p>
+          <>
+            {!member.phone && <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", color: "var(--red)", fontSize: "13px", marginBottom: "14px", border: "1px solid rgba(248,113,113,0.2)" }}>⚠️ No phone number registered for this member.</div>}
+            <p style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "12px" }}>Select message type:</p>
+            <TypeSelector value={selType} onChange={setSelType} />
+            {waPreview && (
+              <div style={{ marginBottom: "16px" }}>
+                <p style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Message Preview</p>
+                <div style={{ background: "#1a2e1a", border: "1px solid rgba(74,222,128,0.2)", borderRadius: "var(--radius-sm)", padding: "14px 16px", fontSize: "12px", color: "#dcfce7", lineHeight: 1.75, whiteSpace: "pre-wrap", fontFamily: "monospace", maxHeight: "160px", overflowY: "auto" }}>
+                  {waPreview}
                 </div>
-              )}
-              <ResultBanner />
-              <button onClick={openWhatsApp} disabled={!selType || !member.phone} style={{ width: "100%", padding: "11px", borderRadius: "var(--radius-sm)", background: (!selType || !member.phone) ? "var(--bg-elevated)" : "#25d366", color: (!selType || !member.phone) ? "var(--text-muted)" : "#fff", border: "none", cursor: (!selType || !member.phone) ? "not-allowed" : "pointer", fontWeight: 700, fontSize: "13px", fontFamily: "var(--font-display)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-                <FaWhatsapp style={{ fontSize: "15px" }} />
-                Open WhatsApp — {member.phone || "No phone"}
-              </button>
-            </>
-          )}
+                <p style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "6px" }}>💡 Message will be pre-filled in WhatsApp — send from there</p>
+              </div>
+            )}
+            <ResultBanner />
+            <button onClick={openWhatsApp} disabled={!selType || !member.phone} style={{ width: "100%", padding: "11px", borderRadius: "var(--radius-sm)", background: (!selType || !member.phone) ? "var(--bg-elevated)" : "#25d366", color: (!selType || !member.phone) ? "var(--text-muted)" : "#fff", border: "none", cursor: (!selType || !member.phone) ? "not-allowed" : "pointer", fontWeight: 700, fontSize: "13px", fontFamily: "var(--font-display)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+              <FaWhatsapp style={{ fontSize: "15px" }} />
+              Open WhatsApp — {member.phone || "No phone"}
+            </button>
+          </>
         </div>
       </div>
     </div>
@@ -1087,7 +1055,7 @@ export default function Members({ onLogout }) {
               members.map(m => (
                 <MemberCard key={m.id} m={m} plans={plans}
                   onProfile={setProfileMember} onRenew={setRenewMember}
-                  onViewBill={setViewBillMember}   
+                  onViewBill={setViewBillMember}
                   onNotify={setNotifyMember} onDelete={setDeleteId}
                   dueInfo={dueMap[m.id]} onMarkPaid={markDuePaid}
                   phoneVisible={phoneVisible}
@@ -1135,8 +1103,7 @@ export default function Members({ onLogout }) {
             <div style={{ height: "1px", background: "var(--border-subtle)", marginBottom: "22px" }} />
             <div className="modal-form-grid">
               <div style={{ gridColumn: "1 / -1" }}><Field label="Full Name *"><input style={inputStyle} value={form.full_name} onChange={e => setF("full_name", e.target.value)} placeholder="Enter full name" onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field></div>
-              <Field label="Email Address *"><input style={inputStyle} type="email" value={form.email} onChange={e => setF("email", e.target.value)} placeholder="email@example.com" onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field>
-              <Field label="Phone Number *"><input style={inputStyle} value={form.phone} onChange={e => setF("phone", e.target.value)} placeholder="9876543210" onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field>
+              <div style={{ gridColumn: "1 / -1" }}><Field label="Phone Number *"><input style={inputStyle} value={form.phone} onChange={e => setF("phone", e.target.value)} placeholder="9876543210" onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field></div>
               <Field label="Gender"><select style={inputStyle} value={form.gender} onChange={e => setF("gender", e.target.value)}><option value="">Select gender</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></Field>
               <Field label="Date of Birth"><input style={inputStyle} type="date" value={form.date_of_birth} onChange={e => setF("date_of_birth", e.target.value)} onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field>
               <div style={{ gridColumn: "1 / -1" }}><Field label="Address"><input style={inputStyle} value={form.address} onChange={e => setF("address", e.target.value)} placeholder="Enter address" onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field></div>

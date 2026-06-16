@@ -4,7 +4,7 @@ import api from "../services/api";
 import { useAuth } from "../hooks/useAuth";
 import {
   FaSearch, FaTimes, FaTrash, FaChevronLeft, FaChevronRight,
-  FaEnvelope, FaPhone, FaClock, FaCheckCircle,
+  FaPhone, FaClock, FaCheckCircle,
   FaTimesCircle, FaExternalLinkAlt, FaSync,
   FaUserPlus, FaCheck, FaRupeeSign, FaIdCard
 } from "react-icons/fa";
@@ -738,7 +738,7 @@ export default function Inquiries({ onLogout }) {
                   <tr><td colSpan={7} style={{ padding:"48px", textAlign:"center", color:"var(--text-muted)" }}>Loading...</td></tr>
                 ) : inquiries.length === 0 ? (
                   <tr><td colSpan={7} style={{ padding:"48px", textAlign:"center", color:"var(--text-muted)" }}>
-                    <FaEnvelope style={{ fontSize:"28px", display:"block", margin:"0 auto 10px", opacity:0.25 }} />
+                    <FaSearch style={{ fontSize:"28px", display:"block", margin:"0 auto 10px", opacity:0.25 }} />
                     {search || filterStatus ? "No inquiries match your filter" : "No inquiries yet"}
                   </td></tr>
                 ) : inquiries.map((inq,i) => {

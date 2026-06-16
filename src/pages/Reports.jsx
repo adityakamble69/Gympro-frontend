@@ -132,7 +132,7 @@ export default function Reports({ onLogout }) {
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(18); doc.setTextColor(40);
-    doc.text(`GymPro — ${TABS.find(t => t.key === activeTab)?.label} Report ${year}`, 14, 22);
+    doc.text(`Workout World Gym — ${TABS.find(t => t.key === activeTab)?.label} Report ${year}`, 14, 22);
     doc.setFontSize(10); doc.setTextColor(120);
     doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
     if (activeTab === "revenue" && data?.monthly) {
