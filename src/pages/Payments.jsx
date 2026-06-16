@@ -3,25 +3,25 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 import Sidebar from "../components/Sidebar";
 import api from "../services/api";
 import {
-  FaMoneyBill, FaPlus, FaSearch, FaEdit, FaTrash,
+  FaMoneyBill, FaPlus, FaSearch, FaEdit, FaTrash, FaFilePdf,
   FaChevronLeft, FaChevronRight, FaTimes, FaCheck,
   FaClock, FaArrowUp, FaArrowDown, FaCalendarAlt,
   FaFilter, FaRupeeSign, FaHistory, FaExclamationTriangle,
   FaChevronDown, FaUsers, FaLayerGroup
 } from "react-icons/fa";
 
-const fmt     = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
+const fmt = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 const fmtTime = (d) => d ? new Date(d).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "—";
 
 const STATUS_COLOR = {
-  paid:     { color: "var(--green)",  bg: "var(--green-bg)"  },
-  pending:  { color: "var(--yellow)", bg: "var(--yellow-bg)" },
-  failed:   { color: "var(--red)",    bg: "var(--red-bg)"    },
-  refunded: { color: "#888",          bg: "rgba(136,136,136,0.1)" },
+  paid: { color: "var(--green)", bg: "var(--green-bg)" },
+  pending: { color: "var(--yellow)", bg: "var(--yellow-bg)" },
+  failed: { color: "var(--red)", bg: "var(--red-bg)" },
+  refunded: { color: "#888", bg: "rgba(136,136,136,0.1)" },
 };
 const METHOD_ICON = { cash: "💵", card: "💳", upi: "📱", bank_transfer: "🏦" };
-const TYPE_LABEL  = { monthly: "Monthly Plans", quarterly: "Quarterly Plans", yearly: "Yearly Plans" };
+const TYPE_LABEL = { monthly: "Monthly Plans", quarterly: "Quarterly Plans", yearly: "Yearly Plans" };
 
 // ── useMobile hook ────────────────────────────────────────────────────────────
 function useMobile() {
@@ -93,14 +93,14 @@ function OverlayModal({ open, onClose, title, subtitle, children, width = "640px
 
 // ─── Drill Down Modal (Total Revenue: Year→Month→Members) ──────────────────────
 function DrillDownModal({ open, onClose }) {
-  const [level,      setLevel]   = useState("years"); // years | months | members
-  const [years,      setYears]   = useState([]);
-  const [months,     setMonths]  = useState([]);
-  const [members,    setMembers] = useState([]);
-  const [selYear,    setSelYear] = useState(null);
-  const [selMonth,   setSelMonth]= useState(null);
-  const [loading,    setLoading] = useState(false);
-  const [search,     setSearch]  = useState("");
+  const [level, setLevel] = useState("years"); // years | months | members
+  const [years, setYears] = useState([]);
+  const [months, setMonths] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [selYear, setSelYear] = useState(null);
+  const [selMonth, setSelMonth] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (!open) return;
@@ -126,7 +126,7 @@ function DrillDownModal({ open, onClose }) {
     catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
-  const monthNames = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const monthNames = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   const filteredMembers = members.filter(m =>
     m.full_name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -160,59 +160,59 @@ function DrillDownModal({ open, onClose }) {
       ) : level === "years" ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {years.length === 0 ? <div style={{ color: "var(--text-muted)", textAlign: "center", padding: "24px" }}>No data</div> :
-          years.map(y => (
-            <div key={y.year} onClick={() => goMonths(y.year)}
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 18px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", cursor: "pointer", transition: "all 0.15s" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.background = "var(--bg-active)"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.background = "var(--bg-elevated)"; }}
-            >
-              <div>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)" }}>{y.year}</div>
-                <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{y.count} payments</div>
+            years.map(y => (
+              <div key={y.year} onClick={() => goMonths(y.year)}
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 18px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", cursor: "pointer", transition: "all 0.15s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.background = "var(--bg-active)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.background = "var(--bg-elevated)"; }}
+              >
+                <div>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)" }}>{y.year}</div>
+                  <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{y.count} payments</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--green)" }}>{fmt(y.total)}</span>
+                  <FaChevronRight style={{ fontSize: "11px", color: "var(--text-muted)" }} />
+                </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--green)" }}>{fmt(y.total)}</span>
-                <FaChevronRight style={{ fontSize: "11px", color: "var(--text-muted)" }} />
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       ) : level === "months" ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {months.length === 0 ? <div style={{ color: "var(--text-muted)", textAlign: "center", padding: "24px" }}>No data</div> :
-          months.map(m => (
-            <div key={m.month} onClick={() => goMembers(m.month)}
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", cursor: "pointer", transition: "all 0.15s" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.background = "var(--bg-active)"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.background = "var(--bg-elevated)"; }}
-            >
-              <div>
-                <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>{m.month_name} {selYear}</div>
-                <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.count} payments</div>
+            months.map(m => (
+              <div key={m.month} onClick={() => goMembers(m.month)}
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", cursor: "pointer", transition: "all 0.15s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.background = "var(--bg-active)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.background = "var(--bg-elevated)"; }}
+              >
+                <div>
+                  <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>{m.month_name} {selYear}</div>
+                  <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.count} payments</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--green)" }}>{fmt(m.total)}</span>
+                  <FaChevronRight style={{ fontSize: "10px", color: "var(--text-muted)" }} />
+                </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--green)" }}>{fmt(m.total)}</span>
-                <FaChevronRight style={{ fontSize: "10px", color: "var(--text-muted)" }} />
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       ) : (
         <>
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
             {filteredMembers.length === 0 ? <div style={{ color: "var(--text-muted)", textAlign: "center", padding: "24px" }}>No results</div> :
-            filteredMembers.map(p => (
-              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)" }}>
-                <div>
-                  <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
-                  <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
-                    {METHOD_ICON[p.payment_method]} {p.payment_method} · {fmtDate(p.payment_date)}
-                    {p.plan_name && ` · ${p.plan_name}`}
+              filteredMembers.map(p => (
+                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)" }}>
+                  <div>
+                    <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
+                    <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+                      {METHOD_ICON[p.payment_method]} {p.payment_method} · {fmtDate(p.payment_date)}
+                      {p.plan_name && ` · ${p.plan_name}`}
+                    </div>
                   </div>
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 800, color: "var(--green)" }}>{fmt(p.amount)}</span>
                 </div>
-                <span style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 800, color: "var(--green)" }}>{fmt(p.amount)}</span>
-              </div>
-            ))}
+              ))}
           </div>
           <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-strong)", display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Total — {filteredMembers.length} payments</span>
@@ -228,9 +228,9 @@ function DrillDownModal({ open, onClose }) {
 
 // ─── Today / ThisMonth Modal ───────────────────────────────────────────────────
 function PaymentListModal({ open, onClose, endpoint, title }) {
-  const [data,    setData]    = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [search,  setSearch]  = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (!open) return;
@@ -239,7 +239,7 @@ function PaymentListModal({ open, onClose, endpoint, title }) {
   }, [open, endpoint]);
 
   const filtered = data.filter(p => p.full_name?.toLowerCase().includes(search.toLowerCase()));
-  const total    = filtered.reduce((s, p) => s + Number(p.amount), 0);
+  const total = filtered.reduce((s, p) => s + Number(p.amount), 0);
 
   return (
     <OverlayModal open={open} onClose={onClose} title={title} subtitle={`${filtered.length} payments`}>
@@ -249,49 +249,49 @@ function PaymentListModal({ open, onClose, endpoint, title }) {
           style={{ width: "100%", padding: "8px 12px 8px 30px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "12px", outline: "none" }} />
       </div>
       {loading ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>Loading...</div> :
-      filtered.length === 0 ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>No payments found</div> : (
-        <>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
-            <thead>
-              <tr style={{ background: "var(--bg-elevated)" }}>
-                {["Member", "Amount", "Method", "Plan", "Time"].map(h => (
-                  <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", borderBottom: "1px solid var(--border-subtle)" }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(p => (
-                <tr key={p.id} style={{ borderBottom: "1px solid var(--border-subtle)" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                >
-                  <td style={{ padding: "10px 12px" }}>
-                    <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
-                    <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>{p.phone}</div>
-                  </td>
-                  <td style={{ padding: "10px 12px", fontFamily: "var(--font-display)", fontWeight: 700, color: "var(--green)" }}>{fmt(p.amount)}</td>
-                  <td style={{ padding: "10px 12px", color: "var(--text-secondary)" }}>{METHOD_ICON[p.payment_method]} {p.payment_method}</td>
-                  <td style={{ padding: "10px 12px", color: "var(--text-muted)", fontSize: "11px" }}>{p.plan_name || p.payment_for || "—"}</td>
-                  <td style={{ padding: "10px 12px", color: "var(--text-muted)" }}>{fmtDate(p.payment_date)}</td>
+        filtered.length === 0 ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>No payments found</div> : (
+          <>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
+              <thead>
+                <tr style={{ background: "var(--bg-elevated)" }}>
+                  {["Member", "Amount", "Method", "Plan", "Time"].map(h => (
+                    <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", borderBottom: "1px solid var(--border-subtle)" }}>{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-strong)", display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Total</span>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--green)" }}>{fmt(total)}</span>
-          </div>
-        </>
-      )}
+              </thead>
+              <tbody>
+                {filtered.map(p => (
+                  <tr key={p.id} style={{ borderBottom: "1px solid var(--border-subtle)" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    <td style={{ padding: "10px 12px" }}>
+                      <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
+                      <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>{p.phone}</div>
+                    </td>
+                    <td style={{ padding: "10px 12px", fontFamily: "var(--font-display)", fontWeight: 700, color: "var(--green)" }}>{fmt(p.amount)}</td>
+                    <td style={{ padding: "10px 12px", color: "var(--text-secondary)" }}>{METHOD_ICON[p.payment_method]} {p.payment_method}</td>
+                    <td style={{ padding: "10px 12px", color: "var(--text-muted)", fontSize: "11px" }}>{p.plan_name || p.payment_for || "—"}</td>
+                    <td style={{ padding: "10px 12px", color: "var(--text-muted)" }}>{fmtDate(p.payment_date)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-strong)", display: "flex", justifyContent: "space-between" }}>
+              <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Total</span>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--green)" }}>{fmt(total)}</span>
+            </div>
+          </>
+        )}
     </OverlayModal>
   );
 }
 
 // ─── Pending Count Modal ───────────────────────────────────────────────────────
 function PendingCountModal({ open, onClose, onStatsRefresh }) {
-  const [data,      setData]      = useState([]);
-  const [loading,   setLoading]   = useState(false);
-  const [search,    setSearch]    = useState("");
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
   const [markingId, setMarkingId] = useState(null);
 
   const load = () => {
@@ -301,35 +301,35 @@ function PendingCountModal({ open, onClose, onStatsRefresh }) {
 
   useEffect(() => { if (!open) return; setSearch(""); load(); }, [open]);
 
-  const VALID_FOR = ["monthly","quarterly","half_yearly","yearly","registration","other"];
+  const VALID_FOR = ["monthly", "quarterly", "half_yearly", "yearly", "registration", "other"];
 
   const markPaid = async (p) => {
     setMarkingId(p.id);
     try {
       const paymentFor = VALID_FOR.includes(p.payment_for) ? p.payment_for : "other";
       await api.put(`/payments/${p.id}`, {
-        member_id:      p.member_id,
-        amount:         p.amount,
-        paid_amount:    p.amount,
-        due_amount:     0,
-        payment_date:   p.payment_date?.split("T")[0] || new Date().toISOString().split("T")[0],
+        member_id: p.member_id,
+        amount: p.amount,
+        paid_amount: p.amount,
+        due_amount: 0,
+        payment_date: p.payment_date?.split("T")[0] || new Date().toISOString().split("T")[0],
         payment_method: p.payment_method || "cash",
-        payment_for:    paymentFor,
-        status:         "paid",
+        payment_for: paymentFor,
+        status: "paid",
         months_covered: p.months_covered || 1,
-        notes:          p.notes          || null,
-        plan_name:      p.plan_name      || null,
-        plan_start:     p.plan_start ? p.plan_start.split("T")[0] : null,
-        plan_end:       p.plan_end   ? p.plan_end.split("T")[0]   : null,
+        notes: p.notes || null,
+        plan_name: p.plan_name || null,
+        plan_start: p.plan_start ? p.plan_start.split("T")[0] : null,
+        plan_end: p.plan_end ? p.plan_end.split("T")[0] : null,
       });
       load();
       if (onStatsRefresh) onStatsRefresh();
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
     finally { setMarkingId(null); }
   };
 
-  const filtered   = data.filter(p => p.full_name?.toLowerCase().includes(search.toLowerCase()));
-  const totalPend  = filtered.reduce((s, p) => s + Number(p.amount || 0), 0);
+  const filtered = data.filter(p => p.full_name?.toLowerCase().includes(search.toLowerCase()));
+  const totalPend = filtered.reduce((s, p) => s + Number(p.amount || 0), 0);
 
   return (
     <OverlayModal open={open} onClose={onClose} title="⏳ Pending Payments" subtitle={`${filtered.length} pending records`} width="660px">
@@ -339,56 +339,56 @@ function PendingCountModal({ open, onClose, onStatsRefresh }) {
           style={{ width: "100%", padding: "8px 12px 8px 30px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "12px", outline: "none" }} />
       </div>
       {loading ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>Loading...</div> :
-      filtered.length === 0 ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>No pending payments 🎉</div> : (
-        <>
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            {filtered.map(p => (
-              <div key={p.id} style={{ borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid rgba(251,191,36,0.2)", borderLeft: "3px solid var(--yellow)", overflow: "hidden" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "10px 14px" }}>
-                  <div>
-                    <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
-                    <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
-                      <span style={{ textTransform: "capitalize" }}>{p.plan_name || p.payment_for?.replace(/_/g," ")}</span>
-                      {" · "}Due since {fmtDate(p.payment_date)}
+        filtered.length === 0 ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>No pending payments 🎉</div> : (
+          <>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              {filtered.map(p => (
+                <div key={p.id} style={{ borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid rgba(251,191,36,0.2)", borderLeft: "3px solid var(--yellow)", overflow: "hidden" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "10px 14px" }}>
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
+                      <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+                        <span style={{ textTransform: "capitalize" }}>{p.plan_name || p.payment_for?.replace(/_/g, " ")}</span>
+                        {" · "}Due since {fmtDate(p.payment_date)}
+                      </div>
+                      <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>{p.phone}</div>
                     </div>
-                    <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>{p.phone}</div>
+                    <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "12px" }}>
+                      <div style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 800, color: "var(--yellow)" }}>{fmt(p.amount)}</div>
+                      {Number(p.paid_amount) > 0 && <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>Paid: {fmt(p.paid_amount)}</div>}
+                    </div>
                   </div>
-                  <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "12px" }}>
-                    <div style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 800, color: "var(--yellow)" }}>{fmt(p.amount)}</div>
-                    {Number(p.paid_amount) > 0 && <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>Paid: {fmt(p.paid_amount)}</div>}
+                  {/* Mark Complete */}
+                  <div style={{ padding: "0 14px 10px" }}>
+                    <button onClick={() => markPaid(p)} disabled={markingId === p.id} style={{
+                      width: "100%", padding: "6px", borderRadius: "var(--radius-sm)",
+                      background: markingId === p.id ? "var(--bg-surface)" : "rgba(74,222,128,0.08)",
+                      border: "1px solid rgba(74,222,128,0.3)", color: markingId === p.id ? "var(--text-muted)" : "var(--green)",
+                      cursor: markingId === p.id ? "not-allowed" : "pointer",
+                      fontSize: "11px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px"
+                    }}>
+                      <FaCheck style={{ fontSize: "9px" }} />
+                      {markingId === p.id ? "Marking..." : `Mark Complete — ${fmt(p.amount)}`}
+                    </button>
                   </div>
                 </div>
-                {/* Mark Complete */}
-                <div style={{ padding: "0 14px 10px" }}>
-                  <button onClick={() => markPaid(p)} disabled={markingId === p.id} style={{
-                    width: "100%", padding: "6px", borderRadius: "var(--radius-sm)",
-                    background: markingId === p.id ? "var(--bg-surface)" : "rgba(74,222,128,0.08)",
-                    border: "1px solid rgba(74,222,128,0.3)", color: markingId === p.id ? "var(--text-muted)" : "var(--green)",
-                    cursor: markingId === p.id ? "not-allowed" : "pointer",
-                    fontSize: "11px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px"
-                  }}>
-                    <FaCheck style={{ fontSize: "9px" }} />
-                    {markingId === p.id ? "Marking..." : `Mark Complete — ${fmt(p.amount)}`}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--yellow-bg)", border: "1px solid rgba(234,179,8,0.2)", display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "12px", color: "var(--yellow)" }}>Total Pending — {filtered.length} records</span>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--yellow)" }}>{fmt(totalPend)}</span>
-          </div>
-        </>
-      )}
+              ))}
+            </div>
+            <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--yellow-bg)", border: "1px solid rgba(234,179,8,0.2)", display: "flex", justifyContent: "space-between" }}>
+              <span style={{ fontSize: "12px", color: "var(--yellow)" }}>Total Pending — {filtered.length} records</span>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--yellow)" }}>{fmt(totalPend)}</span>
+            </div>
+          </>
+        )}
     </OverlayModal>
   );
 }
 
 // ─── Due Amount Modal (member-wise) ───────────────────────────────────────────
 function DueAmountModal({ open, onClose }) {
-  const [data,    setData]    = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [search,  setSearch]  = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (!open) return;
@@ -407,51 +407,51 @@ function DueAmountModal({ open, onClose }) {
           style={{ width: "100%", padding: "8px 12px 8px 30px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "12px", outline: "none" }} />
       </div>
       {loading ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>Loading...</div> :
-      filtered.length === 0 ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>No due amounts 🎉</div> : (
-        <>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
-            <thead>
-              <tr style={{ background: "var(--bg-elevated)" }}>
-                {["Member", "Total Amount", "Paid", "Balance Due"].map(h => (
-                  <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", borderBottom: "1px solid var(--border-subtle)" }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(m => (
-                <tr key={m.member_id} style={{ borderBottom: "1px solid var(--border-subtle)" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                >
-                  <td style={{ padding: "10px 12px" }}>
-                    <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>{m.full_name}</div>
-                    <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>{m.phone} · {m.payment_count} payment{m.payment_count !== 1 ? "s" : ""}</div>
-                  </td>
-                  <td style={{ padding: "10px 12px", color: "var(--text-secondary)", fontWeight: 600 }}>{fmt(m.total_amount)}</td>
-                  <td style={{ padding: "10px 12px", color: "var(--green)", fontWeight: 600 }}>{fmt(m.total_paid)}</td>
-                  <td style={{ padding: "10px 12px" }}>
-                    <span style={{ fontFamily: "var(--font-display)", fontSize: "13px", fontWeight: 800, color: "var(--red)" }}>{fmt(m.total_due)}</span>
-                  </td>
+        filtered.length === 0 ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>No due amounts 🎉</div> : (
+          <>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
+              <thead>
+                <tr style={{ background: "var(--bg-elevated)" }}>
+                  {["Member", "Total Amount", "Paid", "Balance Due"].map(h => (
+                    <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", borderBottom: "1px solid var(--border-subtle)" }}>{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "12px", color: "var(--red)" }}>Grand Total Due</span>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--red)" }}>{fmt(grandTotal)}</span>
-          </div>
-        </>
-      )}
+              </thead>
+              <tbody>
+                {filtered.map(m => (
+                  <tr key={m.member_id} style={{ borderBottom: "1px solid var(--border-subtle)" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    <td style={{ padding: "10px 12px" }}>
+                      <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>{m.full_name}</div>
+                      <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>{m.phone} · {m.payment_count} payment{m.payment_count !== 1 ? "s" : ""}</div>
+                    </td>
+                    <td style={{ padding: "10px 12px", color: "var(--text-secondary)", fontWeight: 600 }}>{fmt(m.total_amount)}</td>
+                    <td style={{ padding: "10px 12px", color: "var(--green)", fontWeight: 600 }}>{fmt(m.total_paid)}</td>
+                    <td style={{ padding: "10px 12px" }}>
+                      <span style={{ fontFamily: "var(--font-display)", fontSize: "13px", fontWeight: 800, color: "var(--red)" }}>{fmt(m.total_due)}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", display: "flex", justifyContent: "space-between" }}>
+              <span style={{ fontSize: "12px", color: "var(--red)" }}>Grand Total Due</span>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--red)" }}>{fmt(grandTotal)}</span>
+            </div>
+          </>
+        )}
     </OverlayModal>
   );
 }
 
 // ─── Chart Month Detail Modal ──────────────────────────────────────────────────
 function ChartMonthModal({ open, onClose, year, month, label }) {
-  const [data,       setData]      = useState([]);
-  const [loading,    setLoading]   = useState(false);
-  const [tab,        setTab]       = useState("paid");   // "paid" | "pending" | "plans"
-  const [markingId,  setMarkingId] = useState(null);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState("paid");   // "paid" | "pending" | "plans"
+  const [markingId, setMarkingId] = useState(null);
 
   useEffect(() => {
     if (!open || !year || !month) return;
@@ -462,8 +462,8 @@ function ChartMonthModal({ open, onClose, year, month, label }) {
       .finally(() => setLoading(false));
   }, [open, year, month]);
 
-  const paid     = data.filter(p => p.status === "paid");
-  const pending  = data.filter(p => p.status === "pending");
+  const paid = data.filter(p => p.status === "paid");
+  const pending = data.filter(p => p.status === "pending");
 
   // Plan summary for "plans" tab — group by plan_name
   const planGroups = data.reduce((acc, p) => {
@@ -485,7 +485,7 @@ function ChartMonthModal({ open, onClose, year, month, label }) {
       // refresh
       const r = await api.get(`/payments/chart-month/${year}/${month}`);
       setData(r.data.data);
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
     finally { setMarkingId(null); }
   };
 
@@ -499,9 +499,9 @@ function ChartMonthModal({ open, onClose, year, month, label }) {
       {/* 3-Tab Toggle */}
       <div style={{ display: "flex", gap: "6px", marginBottom: "16px" }}>
         {[
-          { key: "paid",    label: `✅ Paid (${paid.length})`,         color: "var(--green)",  bg: "var(--green-bg)",  border: "rgba(74,222,128,0.3)" },
-          { key: "pending", label: `⏳ Pending (${pending.length})`,   color: "var(--yellow)", bg: "var(--yellow-bg)", border: "rgba(234,179,8,0.3)" },
-          { key: "plans",   label: `📋 Plans (${Object.keys(planGroups).length})`, color: "var(--blue)", bg: "var(--blue-bg)", border: "rgba(96,165,250,0.3)" },
+          { key: "paid", label: `✅ Paid (${paid.length})`, color: "var(--green)", bg: "var(--green-bg)", border: "rgba(74,222,128,0.3)" },
+          { key: "pending", label: `⏳ Pending (${pending.length})`, color: "var(--yellow)", bg: "var(--yellow-bg)", border: "rgba(234,179,8,0.3)" },
+          { key: "plans", label: `📋 Plans (${Object.keys(planGroups).length})`, color: "var(--blue)", bg: "var(--blue-bg)", border: "rgba(96,165,250,0.3)" },
         ].map(t => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{
             padding: "6px 14px", borderRadius: "99px", fontSize: "11px", fontWeight: 600, cursor: "pointer",
@@ -520,42 +520,42 @@ function ChartMonthModal({ open, onClose, year, month, label }) {
           Object.values(planGroups).length === 0
             ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>No data</div>
             : <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                {Object.values(planGroups).map(g => (
-                  <div key={g.plan} style={{ borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", overflow: "hidden" }}>
-                    {/* Plan header */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-surface)" }}>
-                      <div>
-                        <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)", textTransform: "capitalize" }}>{g.plan}</div>
-                        <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "2px" }}>{g.members.length} member{g.members.length !== 1 ? "s" : ""}</div>
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        {g.total > 0 && <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--green)" }}>{fmt(g.total)} paid</div>}
-                        {g.pendingAmt > 0 && <div style={{ fontSize: "11px", color: "var(--yellow)", marginTop: "2px" }}>⏳ {fmt(g.pendingAmt)} pending</div>}
-                      </div>
+              {Object.values(planGroups).map(g => (
+                <div key={g.plan} style={{ borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", overflow: "hidden" }}>
+                  {/* Plan header */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-surface)" }}>
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)", textTransform: "capitalize" }}>{g.plan}</div>
+                      <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "2px" }}>{g.members.length} member{g.members.length !== 1 ? "s" : ""}</div>
                     </div>
-                    {/* Member list */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-                      {g.members.map(p => (
-                        <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 16px", borderBottom: "1px solid var(--border-subtle)", borderLeft: `3px solid ${p.status === "paid" ? "var(--green)" : "var(--yellow)"}` }}>
-                          <div>
-                            <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
-                            <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>
-                              {METHOD_ICON[p.payment_method]} {p.payment_method} · {fmtDate(p.payment_date)}
-                              {p.status === "pending" && Number(p.due_amount) > 0 && ` · Due: ${fmt(p.due_amount)}`}
-                            </div>
-                          </div>
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <span style={{ fontFamily: "var(--font-display)", fontSize: "13px", fontWeight: 700, color: p.status === "paid" ? "var(--green)" : "var(--yellow)" }}>{fmt(p.amount)}</span>
-                            <span style={{ fontSize: "9px", padding: "2px 6px", borderRadius: "99px", background: p.status === "paid" ? "var(--green-bg)" : "var(--yellow-bg)", color: p.status === "paid" ? "var(--green)" : "var(--yellow)", fontWeight: 600 }}>{p.status}</span>
-                          </div>
-                        </div>
-                      ))}
+                    <div style={{ textAlign: "right" }}>
+                      {g.total > 0 && <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--green)" }}>{fmt(g.total)} paid</div>}
+                      {g.pendingAmt > 0 && <div style={{ fontSize: "11px", color: "var(--yellow)", marginTop: "2px" }}>⏳ {fmt(g.pendingAmt)} pending</div>}
                     </div>
                   </div>
-                ))}
-              </div>
+                  {/* Member list */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+                    {g.members.map(p => (
+                      <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 16px", borderBottom: "1px solid var(--border-subtle)", borderLeft: `3px solid ${p.status === "paid" ? "var(--green)" : "var(--yellow)"}` }}>
+                        <div>
+                          <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
+                          <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>
+                            {METHOD_ICON[p.payment_method]} {p.payment_method} · {fmtDate(p.payment_date)}
+                            {p.status === "pending" && Number(p.due_amount) > 0 && ` · Due: ${fmt(p.due_amount)}`}
+                          </div>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <span style={{ fontFamily: "var(--font-display)", fontSize: "13px", fontWeight: 700, color: p.status === "paid" ? "var(--green)" : "var(--yellow)" }}>{fmt(p.amount)}</span>
+                          <span style={{ fontSize: "9px", padding: "2px 6px", borderRadius: "99px", background: p.status === "paid" ? "var(--green-bg)" : "var(--yellow-bg)", color: p.status === "paid" ? "var(--green)" : "var(--yellow)", fontWeight: 600 }}>{p.status}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
 
-        // ── Paid / Pending Tab ──
+          // ── Paid / Pending Tab ──
         ) : displayed.length === 0
           ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>No {tab} payments</div>
           : (
@@ -567,7 +567,7 @@ function ChartMonthModal({ open, onClose, year, month, label }) {
                       <div>
                         <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
                         <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
-                          <span style={{ textTransform: "capitalize" }}>{p.plan_name || p.payment_for?.replace(/_/g," ")}</span>
+                          <span style={{ textTransform: "capitalize" }}>{p.plan_name || p.payment_for?.replace(/_/g, " ")}</span>
                           {" · "}{METHOD_ICON[p.payment_method]} {p.payment_method}
                           {" · "}{fmtDate(p.payment_date)}
                         </div>
@@ -667,8 +667,8 @@ function PlanSelect({ value, onChange, plans, style, includeOther = true }) {
 
 // ─── Searchable Member Input ───────────────────────────────────────────────────
 function MemberSearchInput({ value, onChange, members, style }) {
-  const [query,   setQuery]   = useState("");
-  const [open,    setOpen]    = useState(false);
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
   const [focused, setFocused] = useState(false);
   const wrapRef = useRef(null);
 
@@ -692,10 +692,10 @@ function MemberSearchInput({ value, onChange, members, style }) {
   const filtered = query.trim().length === 0
     ? members.slice(0, 8)
     : members.filter(m =>
-        m.full_name?.toLowerCase().includes(query.toLowerCase()) ||
-        m.phone?.includes(query) ||
-        m.email?.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 10);
+      m.full_name?.toLowerCase().includes(query.toLowerCase()) ||
+      m.phone?.includes(query) ||
+      m.email?.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 10);
 
   const handleSelect = (m) => {
     setQuery(`${m.full_name} (${m.phone})`);
@@ -782,19 +782,19 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
   useEffect(() => {
     if (editData) {
       setForm({
-        member_id:      editData.member_id || "",
-        amount:         editData.amount || "",
-        paid_amount:    editData.paid_amount || "",
-        payment_date:   editData.payment_date?.split("T")[0] || today,
+        member_id: editData.member_id || "",
+        amount: editData.amount || "",
+        paid_amount: editData.paid_amount || "",
+        payment_date: editData.payment_date?.split("T")[0] || today,
         payment_method: editData.payment_method || "cash",
-        payment_for:    editData.plan_name || editData.payment_for || "",
-        status:         editData.status || "paid",
+        payment_for: editData.plan_name || editData.payment_for || "",
+        status: editData.status || "paid",
         months_covered: editData.months_covered || 1,
-        notes:          editData.notes || "",
-        plan_start:     editData.plan_start?.split("T")[0] || "",
-        plan_end:       editData.plan_end?.split("T")[0] || "",
-        due_date:       editData.due_date?.split("T")[0] || "",
-        discount_type:  editData.discount_type || "flat",
+        notes: editData.notes || "",
+        plan_start: editData.plan_start?.split("T")[0] || "",
+        plan_end: editData.plan_end?.split("T")[0] || "",
+        due_date: editData.due_date?.split("T")[0] || "",
+        discount_type: editData.discount_type || "flat",
         discount_value: editData.discount_amount || "",
       });
     } else { setForm(empty); }
@@ -809,7 +809,7 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
     if (plan) {
       // Apply discount to auto-filled amount
       const raw = Number(plan.price);
-      const dv  = Number(form.discount_value) || 0;
+      const dv = Number(form.discount_value) || 0;
       const disc = form.discount_type === "percent"
         ? Math.min(raw, Math.round(raw * dv / 100))
         : Math.min(raw, dv);
@@ -821,7 +821,7 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
       const start = new Date(), end = new Date();
       end.setDate(end.getDate() + plan.duration_days);
       set("plan_start", start.toISOString().split("T")[0]);
-      set("plan_end",   end.toISOString().split("T")[0]);
+      set("plan_end", end.toISOString().split("T")[0]);
     } else { set("plan_start", ""); set("plan_end", ""); }
   };
 
@@ -832,7 +832,7 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
     const plan = plans.find(p => p.name === form.payment_for);
     if (plan) {
       const raw = Number(plan.price);
-      const dv  = Number(value) || 0;
+      const dv = Number(value) || 0;
       const disc = type === "percent"
         ? Math.min(raw, Math.round(raw * dv / 100))
         : Math.min(raw, dv);
@@ -848,27 +848,27 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
     setSaving(true); setError("");
     try {
       const selectedPlan = plans.find(p => p.name === form.payment_for);
-      const planPrice    = selectedPlan ? Number(selectedPlan.price) : Number(form.amount);
-      const dv           = Number(form.discount_value) || 0;
-      const discAmt      = form.discount_value
+      const planPrice = selectedPlan ? Number(selectedPlan.price) : Number(form.amount);
+      const dv = Number(form.discount_value) || 0;
+      const discAmt = form.discount_value
         ? (form.discount_type === "percent"
-            ? Math.min(planPrice, Math.round(planPrice * dv / 100))
-            : Math.min(planPrice, dv))
+          ? Math.min(planPrice, Math.round(planPrice * dv / 100))
+          : Math.min(planPrice, dv))
         : 0;
       const paidAmt = Number(form.paid_amount) || Number(form.amount);
-      const dueAmt  = Math.max(0, Number(form.amount) - paidAmt);
+      const dueAmt = Math.max(0, Number(form.amount) - paidAmt);
       const payload = {
         ...form,
-        paid_amount:     paidAmt,
-        due_amount:      dueAmt,
+        paid_amount: paidAmt,
+        due_amount: dueAmt,
         discount_amount: discAmt || null,
-        discount_type:   discAmt > 0 ? form.discount_type : null,
-        payment_for:     selectedPlan ? selectedPlan.duration_type : (form.payment_for || "other"),
-        plan_name:       selectedPlan ? selectedPlan.name : null,
-        plan_start:      form.plan_start || null,
-        plan_end:        form.plan_end   || null,
-        due_date:        form.due_date   || null,
-        status:          dueAmt > 0 ? "pending" : form.status,
+        discount_type: discAmt > 0 ? form.discount_type : null,
+        payment_for: selectedPlan ? selectedPlan.duration_type : (form.payment_for || "other"),
+        plan_name: selectedPlan ? selectedPlan.name : null,
+        plan_start: form.plan_start || null,
+        plan_end: form.plan_end || null,
+        due_date: form.due_date || null,
+        status: dueAmt > 0 ? "pending" : form.status,
       };
       delete payload.discount_value;
       await onSave(payload); onClose();
@@ -882,17 +882,17 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
   const lbl = { display: "block", marginBottom: "5px", fontSize: "11px", fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.08em" };
 
   const selectedPlan = plans.find(p => p.name === form.payment_for);
-  const planPrice    = selectedPlan ? Number(selectedPlan.price) : 0;
-  const dv           = Number(form.discount_value) || 0;
-  const discountAmt  = form.discount_value
+  const planPrice = selectedPlan ? Number(selectedPlan.price) : 0;
+  const dv = Number(form.discount_value) || 0;
+  const discountAmt = form.discount_value
     ? (form.discount_type === "percent"
-        ? Math.min(planPrice, Math.round(planPrice * dv / 100))
-        : Math.min(planPrice, dv))
+      ? Math.min(planPrice, Math.round(planPrice * dv / 100))
+      : Math.min(planPrice, dv))
     : 0;
   const afterDiscount = Math.max(0, planPrice - discountAmt);
-  const paidAmt       = Number(form.paid_amount) || 0;
-  const dueAmount     = form.amount && form.paid_amount ? Math.max(0, Number(form.amount) - paidAmt) : 0;
-  const isPartial     = dueAmount > 0;
+  const paidAmt = Number(form.paid_amount) || 0;
+  const dueAmount = form.amount && form.paid_amount ? Math.max(0, Number(form.amount) - paidAmt) : 0;
+  const isPartial = dueAmount > 0;
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: isMobile ? "flex-end" : "center", justifyContent: "center", zIndex: 1000, padding: isMobile ? 0 : "20px" }}>
@@ -1090,29 +1090,29 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function Payments({ onLogout }) {
-  const isMobile  = useMobile();
-  const [payments, setPayments]   = useState([]);
-  const [members,  setMembers]    = useState([]);
-  const [plans,    setPlans]      = useState([]);
-  const [stats,    setStats]      = useState(null);
-  const [loading,  setLoading]    = useState(true);
-  const [search,   setSearch]     = useState("");
+  const isMobile = useMobile();
+  const [payments, setPayments] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [plans, setPlans] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [statusFilter, setStatus] = useState("");
   const [methodFilter, setMethod] = useState("");
-  const [page,     setPage]       = useState(1);
-  const [totalPages, setTotal]    = useState(1);
-  const [totalCount, setCount]    = useState(0);
-  const [showModal,  setModal]    = useState(false);
-  const [editData,   setEditData] = useState(null);
-  const [deleting,   setDeleting] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotal] = useState(1);
+  const [totalCount, setCount] = useState(0);
+  const [showModal, setModal] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [deleting, setDeleting] = useState(null);
 
   // Drill-down modal states
-  const [showDrillDown,   setDrillDown]   = useState(false);
-  const [showToday,       setShowToday]   = useState(false);
-  const [showThisMonth,   setShowMonth]   = useState(false);
-  const [showPending,     setShowPending] = useState(false);
-  const [showDue,         setShowDue]     = useState(false);
-  const [chartMonth,      setChartMonth]  = useState(null); // { year, month, label }
+  const [showDrillDown, setDrillDown] = useState(false);
+  const [showToday, setShowToday] = useState(false);
+  const [showThisMonth, setShowMonth] = useState(false);
+  const [showPending, setShowPending] = useState(false);
+  const [showDue, setShowDue] = useState(false);
+  const [chartMonth, setChartMonth] = useState(null); // { year, month, label }
 
   const admin = JSON.parse(localStorage.getItem("gym_admin") || "{}");
 
@@ -1127,9 +1127,9 @@ export default function Payments({ onLogout }) {
     finally { setLoading(false); }
   }, [page, search, statusFilter, methodFilter]);
 
-  const fetchStats   = async () => { try { const r = await api.get("/payments/stats/summary"); setStats(r.data.data); } catch (e) {} };
-  const fetchMembers = async () => { try { const r = await api.get("/members", { params: { limit: 500 } }); setMembers(r.data.data); } catch (e) {} };
-  const fetchPlans   = async () => { try { const r = await api.get("/membership-plans?status=active"); setPlans(r.data.data || []); } catch (e) {} };
+  const fetchStats = async () => { try { const r = await api.get("/payments/stats/summary"); setStats(r.data.data); } catch (e) { } };
+  const fetchMembers = async () => { try { const r = await api.get("/members", { params: { limit: 500 } }); setMembers(r.data.data); } catch (e) { } };
+  const fetchPlans = async () => { try { const r = await api.get("/membership-plans?status=active"); setPlans(r.data.data || []); } catch (e) { } };
 
   useEffect(() => { fetchStats(); fetchMembers(); fetchPlans(); }, []);
   useEffect(() => { fetchPayments(); }, [fetchPayments]);
@@ -1137,8 +1137,24 @@ export default function Payments({ onLogout }) {
 
   const handleSave = async (form) => {
     if (editData) await api.put(`/payments/${editData.id}`, form);
-    else          await api.post("/payments", form);
+    else await api.post("/payments", form);
     fetchPayments(); fetchStats();
+  };
+
+
+  const downloadInvoice = async (paymentId) => {
+    try {
+      const res = await api.get(`/payments/${paymentId}/invoice`, { responseType: "blob" });
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `Receipt-PAY-${String(paymentId).padStart(5, "0")}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      alert("Invoice download failed");
+    }
   };
 
   const handleDelete = async (id) => {
@@ -1149,13 +1165,13 @@ export default function Payments({ onLogout }) {
     finally { setDeleting(null); }
   };
 
-  const trend     = stats ? (Number(stats.thisMonth) - Number(stats.lastMonth)) : undefined;
+  const trend = stats ? (Number(stats.thisMonth) - Number(stats.lastMonth)) : undefined;
   const chartData = stats?.monthly6 || [];
 
   // Chart click handler
   const handleBarClick = (data) => {
     if (!data?.activePayload?.length) return;
-    const bar  = data.activePayload[0].payload;
+    const bar = data.activePayload[0].payload;
     const date = new Date(`${bar.label} 1`);
     setChartMonth({ year: date.getFullYear(), month: date.getMonth() + 1, label: bar.label });
   };
@@ -1178,11 +1194,11 @@ export default function Payments({ onLogout }) {
 
         {/* ── Stats Cards ── */}
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(auto-fill,minmax(175px,1fr))", gap: isMobile ? "10px" : "14px", marginBottom: isMobile ? "16px" : "24px" }}>
-          <StatCard icon={FaRupeeSign}          color="var(--green)"  bg="var(--green-bg)"        label="Total Revenue"    value={fmt(stats?.totalRevenue)} onClick={() => setDrillDown(true)} />
-          <StatCard icon={FaCalendarAlt}         color="var(--blue)"   bg="var(--blue-bg)"         label="Today's Revenue"  value={fmt(stats?.todayRevenue)} onClick={() => setShowToday(true)} />
-          <StatCard icon={FaArrowUp}             color="var(--accent)" bg="rgba(255,255,255,0.06)" label="This Month"       value={fmt(stats?.thisMonth)} trend={trend} onClick={() => setShowMonth(true)} />
-          <StatCard icon={FaClock}               color="var(--yellow)" bg="var(--yellow-bg)"       label="Pending Count"    value={stats?.pendingCount || 0} sub="payments" onClick={() => setShowPending(true)} />
-          <StatCard icon={FaExclamationTriangle} color="var(--red)"    bg="var(--red-bg)"          label="Pending Amount"   value={fmt(stats?.pendingAmount)} onClick={() => setShowDue(true)} />
+          <StatCard icon={FaRupeeSign} color="var(--green)" bg="var(--green-bg)" label="Total Revenue" value={fmt(stats?.totalRevenue)} onClick={() => setDrillDown(true)} />
+          <StatCard icon={FaCalendarAlt} color="var(--blue)" bg="var(--blue-bg)" label="Today's Revenue" value={fmt(stats?.todayRevenue)} onClick={() => setShowToday(true)} />
+          <StatCard icon={FaArrowUp} color="var(--accent)" bg="rgba(255,255,255,0.06)" label="This Month" value={fmt(stats?.thisMonth)} trend={trend} onClick={() => setShowMonth(true)} />
+          <StatCard icon={FaClock} color="var(--yellow)" bg="var(--yellow-bg)" label="Pending Count" value={stats?.pendingCount || 0} sub="payments" onClick={() => setShowPending(true)} />
+          <StatCard icon={FaExclamationTriangle} color="var(--red)" bg="var(--red-bg)" label="Pending Amount" value={fmt(stats?.pendingAmount)} onClick={() => setShowDue(true)} />
         </div>
 
         {/* ── Chart ── */}
@@ -1197,7 +1213,7 @@ export default function Payments({ onLogout }) {
               <BarChart data={chartData} margin={{ top: 5, right: 5, bottom: 0, left: isMobile ? -20 : 0 }} onClick={handleBarClick} style={{ cursor: "pointer" }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
                 <XAxis dataKey="label" tick={{ fill: "var(--text-muted)", fontSize: isMobile ? 10 : 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "var(--text-muted)", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => "₹" + (v/1000).toFixed(0) + "k"} width={isMobile ? 40 : 50} />
+                <YAxis tick={{ fill: "var(--text-muted)", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => "₹" + (v / 1000).toFixed(0) + "k"} width={isMobile ? 40 : 50} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="total" radius={[4, 4, 0, 0]}>
                   {chartData.map((_, i) => <Cell key={i} fill={i === chartData.length - 1 ? "#f0f0f0" : "#333333"} />)}
@@ -1243,7 +1259,7 @@ export default function Payments({ onLogout }) {
                   No payments found
                 </div>
               ) : payments.map(p => {
-                const sc     = STATUS_COLOR[p.status] || STATUS_COLOR.paid;
+                const sc = STATUS_COLOR[p.status] || STATUS_COLOR.paid;
                 const hasDue = p.due_amount > 0;
                 return (
                   <div key={p.id} style={{
@@ -1256,7 +1272,7 @@ export default function Payments({ onLogout }) {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "14px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.full_name}</div>
                         <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "3px" }}>
-                          {fmtDate(p.payment_date)} · {METHOD_ICON[p.payment_method]} {p.payment_method?.replace("_"," ")}
+                          {fmtDate(p.payment_date)} · {METHOD_ICON[p.payment_method]} {p.payment_method?.replace("_", " ")}
                         </div>
                       </div>
                       <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "10px" }}>
@@ -1267,10 +1283,13 @@ export default function Payments({ onLogout }) {
                     {/* Bottom: plan + due + actions */}
                     <div style={{ padding: "8px 14px 10px", borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
                       <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
-                        {p.plan_name || p.payment_for?.replace("_"," ")}
+                        {p.plan_name || p.payment_for?.replace("_", " ")}
                         {hasDue && <span style={{ color: "var(--yellow)", marginLeft: "8px", fontWeight: 600 }}>Due: {fmt(p.due_amount)}</span>}
                       </div>
                       <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+                        <button onClick={() => downloadInvoice(p.id)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
+                          <FaFilePdf /> Invoice
+                        </button>
                         <button onClick={() => { setEditData(p); setModal(true); }} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
                           <FaEdit /> Edit
                         </button>
@@ -1303,7 +1322,7 @@ export default function Payments({ onLogout }) {
                     <tr><td colSpan={8} style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)" }}><FaMoneyBill style={{ fontSize: "32px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />No payments found</td></tr>
                   ) : (
                     payments.map(p => {
-                      const sc     = STATUS_COLOR[p.status] || STATUS_COLOR.paid;
+                      const sc = STATUS_COLOR[p.status] || STATUS_COLOR.paid;
                       const hasDue = p.due_amount > 0;
                       return (
                         <tr key={p.id} style={{ borderBottom: "1px solid var(--border-subtle)", transition: "background 0.1s" }}
@@ -1324,7 +1343,7 @@ export default function Payments({ onLogout }) {
                                 </span>
                                 <button onClick={async () => {
                                   if (!window.confirm(`Mark ₹${Number(p.due_amount).toLocaleString("en-IN")} as paid for ${p.full_name}?`)) return;
-                                  try { await api.put(`/payments/${p.id}`, { ...p, paid_amount: Number(p.amount), due_amount: 0, status: "paid", payment_date: p.payment_date?.split("T")[0] || new Date().toISOString().split("T")[0] }); fetchPayments(); fetchStats(); } catch(e) { alert("Failed: " + (e.response?.data?.message || e.message)); }
+                                  try { await api.put(`/payments/${p.id}`, { ...p, paid_amount: Number(p.amount), due_amount: 0, status: "paid", payment_date: p.payment_date?.split("T")[0] || new Date().toISOString().split("T")[0] }); fetchPayments(); fetchStats(); } catch (e) { alert("Failed: " + (e.response?.data?.message || e.message)); }
                                 }} style={{ marginTop: "2px", padding: "3px 10px", borderRadius: "99px", cursor: "pointer", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.3)", color: "var(--green)", fontSize: "10px", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "4px" }}>
                                   ✓ Pay Due {fmt(p.due_amount)}
                                 </button>
@@ -1332,12 +1351,15 @@ export default function Payments({ onLogout }) {
                             ) : <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "2px" }}>Fully paid ✓</div>}
                           </td>
                           <td style={{ padding: "14px 16px", color: "var(--text-secondary)", whiteSpace: "nowrap" }}>{fmtDate(p.payment_date)}</td>
-                          <td style={{ padding: "14px 16px" }}><span style={{ display: "flex", alignItems: "center", gap: "5px", color: "var(--text-secondary)" }}>{METHOD_ICON[p.payment_method]} {p.payment_method?.replace("_"," ")}</span></td>
-                          <td style={{ padding: "14px 16px" }}><span style={{ padding: "3px 8px", borderRadius: "99px", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", fontSize: "11px", color: "var(--text-secondary)", textTransform: "capitalize", whiteSpace: "nowrap" }}>{p.plan_name || p.payment_for?.replace("_"," ")}</span></td>
+                          <td style={{ padding: "14px 16px" }}><span style={{ display: "flex", alignItems: "center", gap: "5px", color: "var(--text-secondary)" }}>{METHOD_ICON[p.payment_method]} {p.payment_method?.replace("_", " ")}</span></td>
+                          <td style={{ padding: "14px 16px" }}><span style={{ padding: "3px 8px", borderRadius: "99px", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", fontSize: "11px", color: "var(--text-secondary)", textTransform: "capitalize", whiteSpace: "nowrap" }}>{p.plan_name || p.payment_for?.replace("_", " ")}</span></td>
                           <td style={{ padding: "14px 16px", color: "var(--text-secondary)", textAlign: "center" }}>{p.months_covered}</td>
                           <td style={{ padding: "14px 16px" }}><span style={{ padding: "4px 10px", borderRadius: "99px", background: sc.bg, color: sc.color, fontSize: "11px", fontWeight: 600, textTransform: "capitalize", whiteSpace: "nowrap" }}>{p.status}</span></td>
                           <td style={{ padding: "14px 16px" }}>
                             <div style={{ display: "flex", gap: "6px" }}>
+                              <button onClick={() => downloadInvoice(p.id)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
+                                <FaFilePdf /> Invoice
+                              </button>
                               <button onClick={() => { setEditData(p); setModal(true); }} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
                                 <FaEdit /> Edit
                               </button>
@@ -1361,8 +1383,8 @@ export default function Payments({ onLogout }) {
             <div style={{ padding: "14px 20px", borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Page {page} of {totalPages} — {totalCount} total</span>
               <div style={{ display: "flex", gap: "6px" }}>
-                <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page===1} style={{ padding: "6px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page===1?"var(--text-muted)":"var(--text-secondary)", cursor: page===1?"not-allowed":"pointer" }}><FaChevronLeft /></button>
-                <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page===totalPages} style={{ padding: "6px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page===totalPages?"var(--text-muted)":"var(--text-secondary)", cursor: page===totalPages?"not-allowed":"pointer" }}><FaChevronRight /></button>
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={{ padding: "6px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page === 1 ? "var(--text-muted)" : "var(--text-secondary)", cursor: page === 1 ? "not-allowed" : "pointer" }}><FaChevronLeft /></button>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} style={{ padding: "6px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page === totalPages ? "var(--text-muted)" : "var(--text-secondary)", cursor: page === totalPages ? "not-allowed" : "pointer" }}><FaChevronRight /></button>
               </div>
             </div>
           )}
