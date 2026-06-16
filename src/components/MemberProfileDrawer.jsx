@@ -420,6 +420,8 @@ function AttendanceHeatmap({ attendance, membershipEnd }) {
     attendance.map(a => new Date(a.date).toISOString().slice(0, 10))
   );
 
+  const [selectedDay, setSelectedDay] = useState(null);
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -457,40 +459,79 @@ function AttendanceHeatmap({ attendance, membershipEnd }) {
     return "var(--bg-surface)";
   };
 
-  return (
-    <div style={{ overflowX: "auto", paddingBottom: "4px" }}>
-      <div style={{ display: "inline-flex", gap: HM_GAP }}>
-        {/* Day-of-week labels */}
-        <div style={{ display: "flex", flexDirection: "column", gap: HM_GAP, marginRight: "2px", marginTop: "16px" }}>
-          {HM_DAY_LABELS.map((l, i) => (
-            <div key={i} style={{ height: HM_CELL, fontSize: "8px", lineHeight: `${HM_CELL}px`, color: "var(--text-muted)" }}>{l}</div>
-          ))}
-        </div>
+  const STATUS_INFO = {
+    active:  { text: "Visited",               color: "var(--green)",      bg: "var(--green-bg)" },
+    expired: { text: "Visited (after expiry)", color: "var(--red)",        bg: "var(--red-bg)" },
+    none:    { text: "Absent",                 color: "var(--text-muted)", bg: "rgba(80,80,80,0.12)" },
+  };
+  const selInfo = selectedDay ? STATUS_INFO[selectedDay.status] : null;
 
-        {/* Week columns */}
-        {weeks.map((days, wi) => (
-          <div key={wi} style={{ display: "flex", flexDirection: "column", gap: HM_GAP }}>
-            <div style={{ height: "13px", fontSize: "9px", color: "var(--text-muted)", whiteSpace: "nowrap" }}>
-              {monthLabels[wi] || ""}
-            </div>
-            {days.map((day, di) => (
-              <div
-                key={di}
-                title={
-                  day.isFuture ? "" :
-                  day.status === "none"
-                    ? `${day.date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })} — absent`
-                    : `${day.date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })} — visited${day.status === "expired" ? " (after expiry)" : ""}`
-                }
-                style={{
-                  width: HM_CELL, height: HM_CELL, borderRadius: "2px",
-                  background: colorFor(day.status, day.isFuture),
-                  border: (day.status === "none" && !day.isFuture) ? "1px solid var(--border-subtle)" : "none"
-                }}
-              />
+  return (
+    <div>
+      {/* Selected day info strip */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "8px 12px", borderRadius: "var(--radius-sm)", marginBottom: "10px",
+        background: "var(--bg-surface)", border: "1px solid var(--border-subtle)",
+        minHeight: "32px"
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
+          <span style={{
+            width: "8px", height: "8px", borderRadius: "2px", flexShrink: 0,
+            background: selInfo ? selInfo.color : "var(--border-strong)"
+          }} />
+          <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {selectedDay
+              ? selectedDay.date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
+              : "Tap a day to see details"}
+          </span>
+        </div>
+        {selInfo && (
+          <span style={{
+            fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "99px",
+            background: selInfo.bg, color: selInfo.color, flexShrink: 0
+          }}>
+            {selInfo.text}
+          </span>
+        )}
+      </div>
+
+      <div style={{ overflowX: "auto", paddingBottom: "4px" }}>
+        <div style={{ display: "inline-flex", gap: HM_GAP }}>
+          {/* Day-of-week labels */}
+          <div style={{ display: "flex", flexDirection: "column", gap: HM_GAP, marginRight: "2px", marginTop: "16px" }}>
+            {HM_DAY_LABELS.map((l, i) => (
+              <div key={i} style={{ height: HM_CELL, fontSize: "8px", lineHeight: `${HM_CELL}px`, color: "var(--text-muted)" }}>{l}</div>
             ))}
           </div>
-        ))}
+
+          {/* Week columns */}
+          {weeks.map((days, wi) => (
+            <div key={wi} style={{ display: "flex", flexDirection: "column", gap: HM_GAP }}>
+              <div style={{ height: "13px", fontSize: "9px", color: "var(--text-muted)", whiteSpace: "nowrap" }}>
+                {monthLabels[wi] || ""}
+              </div>
+              {days.map((day, di) => {
+                const isSelected = selectedDay && selectedDay.dateStr === day.dateStr;
+                return (
+                  <div
+                    key={di}
+                    onClick={() => !day.isFuture && setSelectedDay(day)}
+                    style={{
+                      width: HM_CELL, height: HM_CELL, borderRadius: "2px",
+                      background: colorFor(day.status, day.isFuture),
+                      border: isSelected
+                        ? "1.5px solid var(--text-primary)"
+                        : (day.status === "none" && !day.isFuture) ? "1px solid var(--border-subtle)" : "none",
+                      boxSizing: "border-box",
+                      cursor: day.isFuture ? "default" : "pointer"
+                    }}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
