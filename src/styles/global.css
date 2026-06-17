@@ -201,3 +201,29 @@ input:-webkit-autofill:focus {
   display: inline-block;
   box-shadow: 0 0 6px var(--accent);
 }
+
+/* ── Global Floating Particles Background ── */
+.global-particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.global-particle {
+  position: absolute;
+  bottom: -10px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent-bright);
+  opacity: 0;
+  animation: globalFloatUp linear infinite;
+}
+@keyframes globalFloatUp {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: 0.55; }
+  50%  { transform: translateY(-50vh) translateX(var(--drift, 20px)); }
+  90%  { opacity: 0.25; }
+  100% { transform: translateY(-100vh) translateX(0); opacity: 0; }
+}
