@@ -6,7 +6,7 @@ import {
   FaSearch, FaTimes, FaTrash, FaChevronLeft, FaChevronRight,
   FaPhone, FaClock, FaCheckCircle,
   FaTimesCircle, FaExternalLinkAlt, FaSync,
-  FaUserPlus, FaCheck, FaRupeeSign, FaIdCard
+  FaUserPlus, FaCheck, FaRupeeSign, FaIdCard, FaEnvelope
 } from "react-icons/fa";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
