@@ -14,7 +14,6 @@ import MembershipPlans from "./pages/MembershipPlans";
 import Inquiries       from "./pages/Inquiries";
 import InquiryForm     from "./pages/InquiryForm";
 import NotFound        from "./pages/NotFound";
-import ParticlesBackground from "./components/ParticlesBackground";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
@@ -34,8 +33,6 @@ function App() {
 
   return (
     <>
-      <ParticlesBackground />
-      <div style={{ position: "relative", zIndex: 1 }}>
       <BrowserRouter>
         <Routes>
 
@@ -68,7 +65,6 @@ function App() {
 
         </Routes>
       </BrowserRouter>
-      </div>
     </>
   );
 }

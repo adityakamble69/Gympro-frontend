@@ -192,29 +192,29 @@ export default function Notifications({ onLogout }) {
         {/* Header */}
         <div className="notif-header fade-up">
           <div>
-            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>
+            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "31px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>
               Notifications
             </h1>
-            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "15px", marginTop: "4px" }}>
               {unreadCount > 0 ? <span style={{ color: "var(--red)" }}>{unreadCount} unread</span> : "All caught up"} — {totalCount} total
             </p>
           </div>
 
           <div className="notif-actions">
             <button onClick={syncNotifs} disabled={syncing} className="notif-action-btn" style={{ opacity: syncing ? 0.6 : 1 }}>
-              <FaSync style={{ fontSize: "11px", animation: syncing ? "spin 1s linear infinite" : "none" }} />
+              <FaSync style={{ fontSize: "12px", animation: syncing ? "spin 1s linear infinite" : "none" }} />
               <span className="btn-label">{syncing ? "Syncing..." : "Sync Alerts"}</span>
             </button>
 
             {unreadCount > 0 && (
               <button onClick={markAllRead} className="notif-action-btn">
-                <FaCheckDouble style={{ fontSize: "11px" }} />
+                <FaCheckDouble style={{ fontSize: "12px" }} />
                 <span className="btn-label">Mark All Read</span>
               </button>
             )}
 
             <button onClick={clearRead} className="notif-action-btn notif-action-btn-red">
-              <FaTrash style={{ fontSize: "11px" }} />
+              <FaTrash style={{ fontSize: "12px" }} />
               <span className="btn-label">Clear Read</span>
             </button>
           </div>
@@ -237,10 +237,10 @@ export default function Notifications({ onLogout }) {
                   color: active ? "#0a0a0a" : "var(--text-muted)",
                 }}
               >
-                <Icon style={{ fontSize: "10px" }} />
+                <Icon style={{ fontSize: "11px" }} />
                 {meta.label}
                 <span style={{
-                  padding: "1px 6px", borderRadius: "99px", fontSize: "10px", fontWeight: 700,
+                  padding: "1px 6px", borderRadius: "99px", fontSize: "11px", fontWeight: 700,
                   background: active ? meta.color : "var(--bg-surface)",
                   color: active ? "#0a0a0a" : "var(--text-muted)"
                 }}>{count}</span>
@@ -256,7 +256,7 @@ export default function Notifications({ onLogout }) {
               color: showUnread ? "var(--red)" : "var(--text-muted)",
             }}
           >
-            <FaFilter style={{ fontSize: "10px" }} /> Unread only
+            <FaFilter style={{ fontSize: "11px" }} /> Unread only
           </button>
         </div>
 
@@ -277,9 +277,9 @@ export default function Notifications({ onLogout }) {
             ))
           ) : notifications.length === 0 ? (
             <div style={{ padding: "60px 20px", textAlign: "center" }}>
-              <FaBell style={{ fontSize: "40px", color: "var(--text-muted)", opacity: 0.2, display: "block", margin: "0 auto 14px" }} />
-              <p style={{ color: "var(--text-secondary)", fontSize: "14px", margin: "0 0 6px", fontWeight: 600 }}>No notifications</p>
-              <p style={{ color: "var(--text-muted)", fontSize: "12px", margin: 0 }}>Click "Sync Alerts" to check for new alerts</p>
+              <FaBell style={{ fontSize: "45px", color: "var(--text-muted)", opacity: 0.2, display: "block", margin: "0 auto 14px" }} />
+              <p style={{ color: "var(--text-secondary)", fontSize: "16px", margin: "0 0 6px", fontWeight: 600 }}>No notifications</p>
+              <p style={{ color: "var(--text-muted)", fontSize: "13px", margin: 0 }}>Click "Sync Alerts" to check for new alerts</p>
             </div>
           ) : (
             Object.entries(grouped).map(([date, items]) => (
@@ -288,7 +288,7 @@ export default function Notifications({ onLogout }) {
                 <div style={{
                   padding: "8px 16px", background: "var(--bg-elevated)",
                   borderBottom: "1px solid var(--border-subtle)",
-                  fontSize: "11px", fontWeight: 600, color: "var(--text-muted)",
+                  fontSize: "12px", fontWeight: 600, color: "var(--text-muted)",
                   textTransform: "uppercase", letterSpacing: "0.08em"
                 }}>{date}</div>
 
@@ -312,14 +312,14 @@ export default function Notifications({ onLogout }) {
                         background: meta.bg, display: "flex", alignItems: "center",
                         justifyContent: "center", color: meta.color
                       }}>
-                        <Icon style={{ fontSize: "14px" }} />
+                        <Icon style={{ fontSize: "16px" }} />
                       </div>
 
                       {/* Content */}
                       <div className="notif-item-content">
                         <div className="notif-item-top">
                           <span style={{
-                            fontSize: "13px", fontWeight: n.is_read ? 500 : 700,
+                            fontSize: "15px", fontWeight: n.is_read ? 500 : 700,
                             color: n.is_read ? "var(--text-secondary)" : "var(--text-primary)",
                             lineHeight: 1.4
                           }}>{n.title}</span>
@@ -327,11 +327,11 @@ export default function Notifications({ onLogout }) {
                             {!n.is_read && (
                               <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: meta.color, display: "inline-block", flexShrink: 0 }} />
                             )}
-                            <span style={{ fontSize: "11px", color: "var(--text-muted)", whiteSpace: "nowrap" }}>{timeAgo(n.created_at)}</span>
+                            <span style={{ fontSize: "12px", color: "var(--text-muted)", whiteSpace: "nowrap" }}>{timeAgo(n.created_at)}</span>
                           </div>
                         </div>
 
-                        <p style={{ fontSize: "12px", color: "var(--text-muted)", margin: "0 0 8px", lineHeight: 1.6 }}>
+                        <p style={{ fontSize: "13px", color: "var(--text-muted)", margin: "0 0 8px", lineHeight: 1.6 }}>
                           {n.message}
                         </p>
 
@@ -341,26 +341,26 @@ export default function Notifications({ onLogout }) {
                               onClick={() => markRead(n.id)}
                               style={{
                                 background: "none", border: "none", cursor: "pointer", padding: 0,
-                                color: "var(--text-muted)", fontSize: "11px",
+                                color: "var(--text-muted)", fontSize: "12px",
                                 display: "flex", alignItems: "center", gap: "4px"
                               }}
                               onMouseEnter={e => e.currentTarget.style.color = "var(--green)"}
                               onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
                             >
-                              <FaCheckDouble style={{ fontSize: "10px" }} /> Mark as read
+                              <FaCheckDouble style={{ fontSize: "11px" }} /> Mark as read
                             </button>
                           )}
                           <button
                             onClick={() => deleteOne(n.id)}
                             style={{
                               background: "none", border: "none", cursor: "pointer", padding: 0,
-                              color: "var(--text-muted)", fontSize: "11px",
+                              color: "var(--text-muted)", fontSize: "12px",
                               display: "flex", alignItems: "center", gap: "4px"
                             }}
                             onMouseEnter={e => e.currentTarget.style.color = "var(--red)"}
                             onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
                           >
-                            <FaTrash style={{ fontSize: "10px" }} /> Remove
+                            <FaTrash style={{ fontSize: "11px" }} /> Remove
                           </button>
                         </div>
                       </div>
@@ -374,7 +374,7 @@ export default function Notifications({ onLogout }) {
           {/* Pagination */}
           {totalPages > 1 && (
             <div style={{ padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Page {page} of {totalPages}</span>
+              <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Page {page} of {totalPages}</span>
               <div style={{ display: "flex", gap: "6px" }}>
                 <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page===1} style={{
                   padding: "6px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)",

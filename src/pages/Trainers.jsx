@@ -26,7 +26,7 @@ const EMPTY = {
 // ─── Field wrapper ─────────────────────────────────────────────────────────────
 const Field = ({ label, span, children }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "6px", gridColumn: span ? "1 / -1" : undefined }}>
-    <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</label>
+    <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</label>
     {children}
   </div>
 );
@@ -34,7 +34,7 @@ const Field = ({ label, span, children }) => (
 const inp = {
   padding: "9px 12px", borderRadius: "var(--radius-sm)",
   background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
-  color: "var(--text-primary)", fontSize: "13.5px", outline: "none",
+  color: "var(--text-primary)", fontSize: "15px", outline: "none",
   width: "100%", fontFamily: "var(--font-body)", transition: "border-color 0.15s"
 };
 
@@ -49,11 +49,11 @@ const MiniStat = ({ icon: Icon, label, val, color, bg }) => (
     borderRadius: "var(--radius-md)", padding: "12px 18px", flex: "1 1 140px"
   }}>
     <div style={{ width: "32px", height: "32px", borderRadius: "7px", background: bg, display: "flex", alignItems: "center", justifyContent: "center", color }}>
-      <Icon style={{ fontSize: "14px" }} />
+      <Icon style={{ fontSize: "16px" }} />
     </div>
     <div>
-      <div style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1 }}>{val}</div>
-      <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{label}</div>
+      <div style={{ fontFamily: "var(--font-display)", fontSize: "22px", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1 }}>{val}</div>
+      <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>{label}</div>
     </div>
   </div>
 );
@@ -71,14 +71,14 @@ const TrainerCard = ({ t, index, pagination, onEdit, onDelete, isSuper }) => (
         width: "40px", height: "40px", borderRadius: "50%",
         background: "var(--bg-active)", border: "1px solid var(--border-default)",
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: "15px", fontWeight: 700, color: "var(--text-secondary)", flexShrink: 0
+        fontSize: "17px", fontWeight: 700, color: "var(--text-secondary)", flexShrink: 0
       }}>{t.full_name?.charAt(0)?.toUpperCase()}</div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 700, fontSize: "14px", color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.full_name}</div>
-        <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "1px" }}>{t.email}</div>
+        <div style={{ fontWeight: 700, fontSize: "16px", color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.full_name}</div>
+        <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "1px" }}>{t.email}</div>
       </div>
       <span style={{
-        fontSize: "11px", fontWeight: 600, padding: "2px 10px",
+        fontSize: "12px", fontWeight: 600, padding: "2px 10px",
         borderRadius: "99px", flexShrink: 0, textTransform: "capitalize",
         background: t.status === "active" ? "var(--green-bg)" : "rgba(80,80,80,0.12)",
         color: t.status === "active" ? "var(--green)" : "var(--text-muted)"
@@ -87,16 +87,16 @@ const TrainerCard = ({ t, index, pagination, onEdit, onDelete, isSuper }) => (
 
     {/* Info row */}
     <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-      <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>📞 <span style={{ color: "var(--text-secondary)" }}>{t.phone || "—"}</span></span>
-      <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>🏋️ <span style={{ color: "var(--text-secondary)" }}>{t.specialization || "—"}</span></span>
+      <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>📞 <span style={{ color: "var(--text-secondary)" }}>{t.phone || "—"}</span></span>
+      <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>🏋️ <span style={{ color: "var(--text-secondary)" }}>{t.specialization || "—"}</span></span>
       {t.experience_years != null && (
-        <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>⏱ <span style={{ color: "var(--text-secondary)" }}>{t.experience_years} yrs</span></span>
+        <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>⏱ <span style={{ color: "var(--text-secondary)" }}>{t.experience_years} yrs</span></span>
       )}
       {t.salary && (
-        <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>₹ <span style={{ color: "var(--text-secondary)" }}>{Number(t.salary).toLocaleString("en-IN")}/mo</span></span>
+        <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>₹ <span style={{ color: "var(--text-secondary)" }}>{Number(t.salary).toLocaleString("en-IN")}/mo</span></span>
       )}
       {t.joining_date && (
-        <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>📅 <span style={{ color: "var(--text-secondary)" }}>{fmt(t.joining_date)}</span></span>
+        <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>📅 <span style={{ color: "var(--text-secondary)" }}>{fmt(t.joining_date)}</span></span>
       )}
     </div>
 
@@ -104,13 +104,13 @@ const TrainerCard = ({ t, index, pagination, onEdit, onDelete, isSuper }) => (
     <div style={{ display: "flex", gap: "8px" }}>
       <button
         onClick={() => onEdit(t)}
-        style={{ flex: 1, padding: "7px", borderRadius: "var(--radius-sm)", background: "var(--bg-active)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}
-      ><FaEdit style={{ fontSize: "11px" }} /> Edit</button>
+        style={{ flex: 1, padding: "7px", borderRadius: "var(--radius-sm)", background: "var(--bg-active)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}
+      ><FaEdit style={{ fontSize: "12px" }} /> Edit</button>
       {isSuper && (
         <button
           onClick={() => onDelete(t.id, t.full_name)}
-          style={{ flex: 1, padding: "7px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.25)", color: "var(--red)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}
-        ><FaTrash style={{ fontSize: "11px" }} /> Delete</button>
+          style={{ flex: 1, padding: "7px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.25)", color: "var(--red)", cursor: "pointer", fontSize: "13px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}
+        ><FaTrash style={{ fontSize: "12px" }} /> Delete</button>
       )}
     </div>
   </div>
@@ -252,8 +252,8 @@ export default function Trainers({ onLogout }) {
         {/* Header */}
         <div className="fade-up trainers-header">
           <div>
-            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>Trainers</h1>
-            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>
+            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "31px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>Trainers</h1>
+            <p style={{ color: "var(--text-muted)", fontSize: "15px", marginTop: "4px" }}>
               {pagination.total} trainer{pagination.total !== 1 ? "s" : ""} registered
             </p>
           </div>
@@ -263,14 +263,14 @@ export default function Trainers({ onLogout }) {
               display: "flex", alignItems: "center", gap: "8px",
               padding: "10px 18px", borderRadius: "var(--radius-sm)",
               background: "var(--text-primary)", color: "#0a0a0a",
-              border: "none", cursor: "pointer", fontSize: "13px",
+              border: "none", cursor: "pointer", fontSize: "15px",
               fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em",
               transition: "opacity 0.15s"
             }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.85"}
             onMouseLeave={e => e.currentTarget.style.opacity = "1"}
           >
-            <FaPlus style={{ fontSize: "11px" }} /> ADD TRAINER
+            <FaPlus style={{ fontSize: "12px" }} /> ADD TRAINER
           </button>
         </div>
 
@@ -293,15 +293,15 @@ export default function Trainers({ onLogout }) {
               background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
               borderRadius: "var(--radius-sm)", padding: "8px 14px", flex: 1
             }}>
-              <FaSearch style={{ color: "var(--text-muted)", fontSize: "12px", flexShrink: 0 }} />
+              <FaSearch style={{ color: "var(--text-muted)", fontSize: "13px", flexShrink: 0 }} />
               <input
                 value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Search by name, email, phone, specialization..."
-                style={{ background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontSize: "13.5px", width: "100%", fontFamily: "var(--font-body)" }}
+                style={{ background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontSize: "15px", width: "100%", fontFamily: "var(--font-body)" }}
               />
-              {search && <FaTimes style={{ color: "var(--text-muted)", cursor: "pointer", fontSize: "12px" }} onClick={() => setSearch("")} />}
+              {search && <FaTimes style={{ color: "var(--text-muted)", cursor: "pointer", fontSize: "13px" }} onClick={() => setSearch("")} />}
             </div>
-            <span style={{ color: "var(--text-muted)", fontSize: "12px", whiteSpace: "nowrap" }}>
+            <span style={{ color: "var(--text-muted)", fontSize: "13px", whiteSpace: "nowrap" }}>
               {pagination.total} result{pagination.total !== 1 ? "s" : ""}
             </span>
           </div>
@@ -314,7 +314,7 @@ export default function Trainers({ onLogout }) {
                   {["#", "Trainer", "Phone", "Specialization", "Experience", "Salary", "Joined", "Status", ""].map((h, i) => (
                     <th key={i} style={{
                       padding: "10px 16px", textAlign: h === "" ? "center" : "left",
-                      fontSize: "11px", fontWeight: 600, color: "var(--text-muted)",
+                      fontSize: "12px", fontWeight: 600, color: "var(--text-muted)",
                       textTransform: "uppercase", letterSpacing: "0.08em",
                       borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap"
                     }}>{h}</th>
@@ -326,7 +326,7 @@ export default function Trainers({ onLogout }) {
                   <tr><td colSpan={9} style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)" }}>Loading...</td></tr>
                 ) : trainers.length === 0 ? (
                   <tr><td colSpan={9} style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)" }}>
-                    <FaUserTie style={{ fontSize: "28px", display: "block", margin: "0 auto 10px", opacity: 0.25 }} />
+                    <FaUserTie style={{ fontSize: "31px", display: "block", margin: "0 auto 10px", opacity: 0.25 }} />
                     {search ? "No trainers match your search" : "No trainers yet — add your first one!"}
                   </td></tr>
                 ) : trainers.map((t, i) => (
@@ -335,7 +335,7 @@ export default function Trainers({ onLogout }) {
                     onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
-                    <td style={{ padding: "13px 16px", color: "var(--text-muted)", fontSize: "12px", fontWeight: 600 }}>
+                    <td style={{ padding: "13px 16px", color: "var(--text-muted)", fontSize: "13px", fontWeight: 600 }}>
                       {(pagination.page - 1) * pagination.limit + i + 1}
                     </td>
                     <td style={{ padding: "13px 16px" }}>
@@ -344,39 +344,39 @@ export default function Trainers({ onLogout }) {
                           width: "34px", height: "34px", borderRadius: "50%",
                           background: "var(--bg-active)", border: "1px solid var(--border-default)",
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: "13px", fontWeight: 700, color: "var(--text-secondary)", flexShrink: 0
+                          fontSize: "15px", fontWeight: 700, color: "var(--text-secondary)", flexShrink: 0
                         }}>{t.full_name?.charAt(0)?.toUpperCase()}</div>
                         <div>
-                          <div style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "13px" }}>{t.full_name}</div>
-                          <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{t.email}</div>
+                          <div style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "15px" }}>{t.full_name}</div>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{t.email}</div>
                         </div>
                       </div>
                     </td>
-                    <td style={{ padding: "13px 16px", color: "var(--text-secondary)", fontSize: "13px" }}>{t.phone}</td>
+                    <td style={{ padding: "13px 16px", color: "var(--text-secondary)", fontSize: "15px" }}>{t.phone}</td>
                     <td style={{ padding: "13px 16px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <FaDumbbell style={{ color: "var(--text-muted)", fontSize: "11px" }} />
-                        <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>{t.specialization || "—"}</span>
+                        <FaDumbbell style={{ color: "var(--text-muted)", fontSize: "12px" }} />
+                        <span style={{ fontSize: "15px", color: "var(--text-secondary)" }}>{t.specialization || "—"}</span>
                       </div>
                     </td>
                     <td style={{ padding: "13px 16px" }}>
-                      <span style={{ fontSize: "13px", color: "var(--text-primary)", fontWeight: 600 }}>
+                      <span style={{ fontSize: "15px", color: "var(--text-primary)", fontWeight: 600 }}>
                         {t.experience_years ?? "—"}
-                        <span style={{ fontWeight: 400, color: "var(--text-muted)", fontSize: "11px" }}> yrs</span>
+                        <span style={{ fontWeight: 400, color: "var(--text-muted)", fontSize: "12px" }}> yrs</span>
                       </span>
                     </td>
                     <td style={{ padding: "13px 16px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "13px", color: "var(--text-primary)", fontWeight: 600 }}>
-                        <FaRupeeSign style={{ fontSize: "10px", color: "var(--text-muted)" }} />
+                      <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "15px", color: "var(--text-primary)", fontWeight: 600 }}>
+                        <FaRupeeSign style={{ fontSize: "11px", color: "var(--text-muted)" }} />
                         {t.salary ? Number(t.salary).toLocaleString("en-IN") : "—"}
                       </div>
                     </td>
-                    <td style={{ padding: "13px 16px", color: "var(--text-secondary)", fontSize: "12px", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "13px 16px", color: "var(--text-secondary)", fontSize: "13px", whiteSpace: "nowrap" }}>
                       {fmt(t.joining_date)}
                     </td>
                     <td style={{ padding: "13px 16px" }}>
                       <span style={{
-                        fontSize: "11px", fontWeight: 600, padding: "2px 10px",
+                        fontSize: "12px", fontWeight: 600, padding: "2px 10px",
                         borderRadius: "99px", textTransform: "capitalize",
                         background: t.status === "active" ? "var(--green-bg)" : "rgba(80,80,80,0.12)",
                         color: t.status === "active" ? "var(--green)" : "var(--text-muted)"
@@ -389,7 +389,7 @@ export default function Trainers({ onLogout }) {
                           style={{ padding: "6px 8px", borderRadius: "var(--radius-sm)", background: "var(--bg-active)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", transition: "all 0.15s" }}
                           onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--blue)"; e.currentTarget.style.color = "var(--blue)"; }}
                           onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
-                        ><FaEdit style={{ fontSize: "12px" }} /></button>
+                        ><FaEdit style={{ fontSize: "13px" }} /></button>
 
                         {isSuper && (
                           <button
@@ -397,7 +397,7 @@ export default function Trainers({ onLogout }) {
                             style={{ padding: "6px 8px", borderRadius: "var(--radius-sm)", background: "var(--bg-active)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", transition: "all 0.15s" }}
                             onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--red)"; e.currentTarget.style.color = "var(--red)"; }}
                             onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
-                          ><FaTrash style={{ fontSize: "12px" }} /></button>
+                          ><FaTrash style={{ fontSize: "13px" }} /></button>
                         )}
                       </div>
                     </td>
@@ -424,7 +424,7 @@ export default function Trainers({ onLogout }) {
               ))
             ) : trainers.length === 0 ? (
               <div style={{ padding: "40px 16px", textAlign: "center", color: "var(--text-muted)" }}>
-                <FaUserTie style={{ fontSize: "32px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />
+                <FaUserTie style={{ fontSize: "36px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />
                 {search ? "No trainers match your search" : "No trainers yet — add your first one!"}
               </div>
             ) : trainers.map((t, i) => (
@@ -440,18 +440,18 @@ export default function Trainers({ onLogout }) {
           {/* Pagination */}
           {pagination.totalPages > 1 && (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderTop: "1px solid var(--border-subtle)", flexWrap: "wrap", gap: "8px" }}>
-              <span style={{ color: "var(--text-muted)", fontSize: "12px" }}>
+              <span style={{ color: "var(--text-muted)", fontSize: "13px" }}>
                 Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
               </span>
               <div style={{ display: "flex", gap: "6px" }}>
                 <button
                   disabled={pagination.page <= 1} onClick={() => fetchTrainers(pagination.page - 1, search)}
-                  style={{ display: "flex", alignItems: "center", gap: "5px", padding: "6px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: pagination.page <= 1 ? "var(--text-disabled)" : "var(--text-secondary)", cursor: pagination.page <= 1 ? "not-allowed" : "pointer", fontSize: "12px" }}
-                ><FaChevronLeft style={{ fontSize: "10px" }} /> Prev</button>
+                  style={{ display: "flex", alignItems: "center", gap: "5px", padding: "6px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: pagination.page <= 1 ? "var(--text-disabled)" : "var(--text-secondary)", cursor: pagination.page <= 1 ? "not-allowed" : "pointer", fontSize: "13px" }}
+                ><FaChevronLeft style={{ fontSize: "11px" }} /> Prev</button>
                 <button
                   disabled={pagination.page >= pagination.totalPages} onClick={() => fetchTrainers(pagination.page + 1, search)}
-                  style={{ display: "flex", alignItems: "center", gap: "5px", padding: "6px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: pagination.page >= pagination.totalPages ? "var(--text-disabled)" : "var(--text-secondary)", cursor: pagination.page >= pagination.totalPages ? "not-allowed" : "pointer", fontSize: "12px" }}
-                >Next <FaChevronRight style={{ fontSize: "10px" }} /></button>
+                  style={{ display: "flex", alignItems: "center", gap: "5px", padding: "6px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: pagination.page >= pagination.totalPages ? "var(--text-disabled)" : "var(--text-secondary)", cursor: pagination.page >= pagination.totalPages ? "not-allowed" : "pointer", fontSize: "13px" }}
+                >Next <FaChevronRight style={{ fontSize: "11px" }} /></button>
               </div>
             </div>
           )}
@@ -467,15 +467,15 @@ export default function Trainers({ onLogout }) {
             {/* Modal Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
               <div>
-                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "22px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
                   {editingId ? "Edit Trainer" : "Add New Trainer"}
                 </h2>
-                <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "3px" }}>
+                <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "3px" }}>
                   {editingId ? "Update trainer information" : "Fill in the details below"}
                 </p>
               </div>
               <button onClick={() => setShowModal(false)} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <FaTimes style={{ fontSize: "12px" }} />
+                <FaTimes style={{ fontSize: "13px" }} />
               </button>
             </div>
 
@@ -541,13 +541,13 @@ export default function Trainers({ onLogout }) {
             </div>
 
             {formError && (
-              <div style={{ marginTop: "14px", padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px" }}>
+              <div style={{ marginTop: "14px", padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "15px" }}>
                 {formError}
               </div>
             )}
 
             <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "22px", paddingTop: "18px", borderTop: "1px solid var(--border-subtle)" }}>
-              <button onClick={() => setShowModal(false)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>
+              <button onClick={() => setShowModal(false)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px" }}>
                 Cancel
               </button>
               <button
@@ -557,7 +557,7 @@ export default function Trainers({ onLogout }) {
                   background: saving ? "var(--bg-elevated)" : "var(--text-primary)",
                   color: saving ? "var(--text-muted)" : "#0a0a0a",
                   border: "none", cursor: saving ? "not-allowed" : "pointer",
-                  fontSize: "13px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em"
+                  fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em"
                 }}
               >{saving ? "Saving..." : editingId ? "UPDATE" : "ADD TRAINER"}</button>
             </div>
@@ -571,15 +571,15 @@ export default function Trainers({ onLogout }) {
           onClick={e => { if (e.target === e.currentTarget) setDeleteId(null); }}>
           <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", padding: "32px", maxWidth: "360px", width: "100%", textAlign: "center" }}>
             <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px", color: "var(--red)" }}>
-              <FaTrash style={{ fontSize: "16px" }} />
+              <FaTrash style={{ fontSize: "18px" }} />
             </div>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>Delete Trainer?</h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginBottom: "22px", lineHeight: 1.6 }}>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>Delete Trainer?</h3>
+            <p style={{ color: "var(--text-muted)", fontSize: "15px", marginBottom: "22px", lineHeight: 1.6 }}>
               <strong style={{ color: "var(--text-secondary)" }}>{deleteName}</strong> will be permanently removed.
             </p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-              <button onClick={() => setDeleteId(null)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px", flex: 1 }}>Cancel</button>
-              <button onClick={handleDelete} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--red)", cursor: "pointer", fontSize: "13px", fontWeight: 700, flex: 1 }}>Delete</button>
+              <button onClick={() => setDeleteId(null)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px", flex: 1 }}>Cancel</button>
+              <button onClick={handleDelete} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--red)", cursor: "pointer", fontSize: "15px", fontWeight: 700, flex: 1 }}>Delete</button>
             </div>
           </div>
         </div>

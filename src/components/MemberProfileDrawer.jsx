@@ -23,11 +23,11 @@ const daysLeft = (end) => end ? Math.ceil((new Date(end) - new Date()) / 8640000
 const InfoRow = ({ icon: Icon, label, value, color }) => (
   <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 0", borderBottom: "1px solid var(--border-subtle)" }}>
     <div style={{ width: "30px", height: "30px", borderRadius: "6px", background: "var(--bg-elevated)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-      <Icon style={{ fontSize: "12px", color: color || "var(--text-muted)" }} />
+      <Icon style={{ fontSize: "13px", color: color || "var(--text-muted)" }} />
     </div>
     <div style={{ flex: 1, minWidth: 0 }}>
-      <div style={{ fontSize: "10px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>
-      <div style={{ fontSize: "13px", color: "var(--text-primary)", fontWeight: 500, marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value || "—"}</div>
+      <div style={{ fontSize: "11px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>
+      <div style={{ fontSize: "15px", color: "var(--text-primary)", fontWeight: 500, marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value || "—"}</div>
     </div>
   </div>
 );
@@ -35,8 +35,8 @@ const InfoRow = ({ icon: Icon, label, value, color }) => (
 // ── Stat Card ─────────────────────────────────────────────────────────────────
 const StatCard = ({ label, value, color }) => (
   <div style={{ background: "var(--bg-surface)", borderRadius: "var(--radius-sm)", padding: "10px 12px", border: "1px solid var(--border-subtle)" }}>
-    <div style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</div>
-    <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "2px" }}>{label}</div>
+    <div style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 800, color, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</div>
+    <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{label}</div>
   </div>
 );
 
@@ -53,7 +53,7 @@ const TabBtn = ({ icon: Icon, label, active, onClick, badge }) => (
     }}
   >
     <div style={{ position: "relative" }}>
-      <Icon style={{ fontSize: "13px", color: active ? "var(--text-primary)" : "var(--text-muted)" }} />
+      <Icon style={{ fontSize: "15px", color: active ? "var(--text-primary)" : "var(--text-muted)" }} />
       {badge > 0 && (
         <span style={{
           position: "absolute", top: "-5px", right: "-7px",
@@ -75,7 +75,7 @@ const Skeleton = ({ h = 44, mb = 6 }) => (
 );
 
 const EmptyState = ({ text }) => (
-  <div style={{ padding: "32px 16px", textAlign: "center", color: "var(--text-muted)", fontSize: "12px", background: "var(--bg-elevated)", borderRadius: "var(--radius-sm)" }}>
+  <div style={{ padding: "32px 16px", textAlign: "center", color: "var(--text-muted)", fontSize: "13px", background: "var(--bg-elevated)", borderRadius: "var(--radius-sm)" }}>
     {text}
   </div>
 );
@@ -110,15 +110,15 @@ function TabProfile({ member, days, progressPct }) {
           {/* Plan name + days badge */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
             <div>
-              <div style={{ fontSize: "15px", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
+              <div style={{ fontSize: "17px", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
                 {member.plan_name || "No Active Plan"}
               </div>
               <div style={{ display: "flex", gap: "6px", marginTop: "4px", flexWrap: "wrap" }}>
-                <span style={{ padding: "2px 9px", borderRadius: "99px", fontSize: "10px", fontWeight: 600, background: statusBg, color: statusColor, textTransform: "capitalize" }}>
+                <span style={{ padding: "2px 9px", borderRadius: "99px", fontSize: "11px", fontWeight: 600, background: statusBg, color: statusColor, textTransform: "capitalize" }}>
                   {member.status}
                 </span>
                 {member.membership_type && (
-                  <span style={{ padding: "2px 9px", borderRadius: "99px", fontSize: "10px", fontWeight: 600, background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-muted)", textTransform: "capitalize" }}>
+                  <span style={{ padding: "2px 9px", borderRadius: "99px", fontSize: "11px", fontWeight: 600, background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-muted)", textTransform: "capitalize" }}>
                     {member.membership_type}
                   </span>
                 )}
@@ -126,7 +126,7 @@ function TabProfile({ member, days, progressPct }) {
             </div>
             {days !== null && (
               <span style={{
-                fontSize: "11px", fontWeight: 700, padding: "4px 10px", borderRadius: "99px",
+                fontSize: "12px", fontWeight: 700, padding: "4px 10px", borderRadius: "99px",
                 background: days <= 0 ? "var(--red-bg)" : days <= 7 ? "var(--red-bg)" : days <= 15 ? "var(--yellow-bg)" : "var(--green-bg)",
                 color: days <= 0 ? "var(--red)" : days <= 7 ? "var(--red)" : days <= 15 ? "var(--yellow)" : "var(--green)"
               }}>
@@ -138,13 +138,13 @@ function TabProfile({ member, days, progressPct }) {
           {/* Start → End */}
           <div style={{ display: "flex", gap: "24px", marginBottom: "12px" }}>
             <div>
-              <div style={{ fontSize: "10px", color: "var(--text-muted)", marginBottom: "2px" }}>Start</div>
-              <div style={{ fontSize: "13px", color: "var(--text-primary)", fontWeight: 600 }}>{fmt(member.membership_start)}</div>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "2px" }}>Start</div>
+              <div style={{ fontSize: "15px", color: "var(--text-primary)", fontWeight: 600 }}>{fmt(member.membership_start)}</div>
             </div>
             <div style={{ borderLeft: "1px dashed var(--border-default)", margin: "0" }} />
             <div>
-              <div style={{ fontSize: "10px", color: "var(--text-muted)", marginBottom: "2px" }}>End</div>
-              <div style={{ fontSize: "13px", color: "var(--text-primary)", fontWeight: 600 }}>{fmt(member.membership_end)}</div>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "2px" }}>End</div>
+              <div style={{ fontSize: "15px", color: "var(--text-primary)", fontWeight: 600 }}>{fmt(member.membership_end)}</div>
             </div>
           </div>
 
@@ -158,7 +158,7 @@ function TabProfile({ member, days, progressPct }) {
                   background: progressPct >= 90 ? "var(--red)" : progressPct >= 70 ? "var(--yellow)" : "var(--green)"
                 }} />
               </div>
-              <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "4px" }}>{progressPct}% duration used</div>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "4px" }}>{progressPct}% duration used</div>
             </div>
           )}
         </div>
@@ -192,7 +192,7 @@ function TabPlanHistory({ planHistory, loading }) {
         Object.entries(byMonth).map(([month, items]) => (
           <div key={month} style={{ marginBottom: "16px" }}>
             {/* Month header */}
-            <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", padding: "4px 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
+            <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", padding: "4px 0 8px", display: "flex", alignItems: "center", gap: "8px" }}>
               <span>{month}</span>
               <div style={{ flex: 1, height: "1px", background: "var(--border-subtle)" }} />
             </div>
@@ -208,28 +208,28 @@ function TabPlanHistory({ planHistory, loading }) {
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         {/* Plan name + badge */}
-                        <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                          {isFirst && <FaCrown style={{ fontSize: "10px", color: "var(--yellow)", flexShrink: 0 }} />}
+                        <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                          {isFirst && <FaCrown style={{ fontSize: "11px", color: "var(--yellow)", flexShrink: 0 }} />}
                           {ph.plan_name || "—"}
                           {isFirst && <span style={{ fontSize: "9px", fontWeight: 600, padding: "1px 6px", borderRadius: "99px", background: "var(--green-bg)", color: "var(--green)" }}>Current</span>}
                         </div>
                         {/* Dates */}
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "5px", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "5px", display: "flex", alignItems: "center", gap: "6px" }}>
                           <span style={{ background: "var(--bg-surface)", padding: "2px 7px", borderRadius: "4px", border: "1px solid var(--border-subtle)" }}>{fmt(ph.plan_start)}</span>
                           <span style={{ color: "var(--border-strong)" }}>→</span>
                           <span style={{ background: "var(--bg-surface)", padding: "2px 7px", borderRadius: "4px", border: "1px solid var(--border-subtle)" }}>{fmt(ph.plan_end)}</span>
                         </div>
                         {ph.notes && (
-                          <div style={{ fontSize: "11px", color: "var(--text-muted)", fontStyle: "italic", marginTop: "5px" }}>"{ph.notes}"</div>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)", fontStyle: "italic", marginTop: "5px" }}>"{ph.notes}"</div>
                         )}
                       </div>
                       {/* Amount */}
                       <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "14px" }}>
                         {ph.amount_paid != null
-                          ? <div style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--green)" }}>{rupee(ph.amount_paid)}</div>
-                          : <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>—</div>
+                          ? <div style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 800, color: "var(--green)" }}>{rupee(ph.amount_paid)}</div>
+                          : <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>—</div>
                         }
-                        <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "2px" }}>{fmt(ph.payment_date)}</div>
+                        <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{fmt(ph.payment_date)}</div>
                       </div>
                     </div>
                   </div>
@@ -287,12 +287,12 @@ function TabPayments({ payments, loading, onRefresh }) {
       {/* Summary */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "18px" }}>
         <div style={{ padding: "12px 14px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.2)" }}>
-          <div style={{ fontSize: "16px", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--green)" }}>{rupee(totalPaid)}</div>
-          <div style={{ fontSize: "10px", color: "var(--green)", marginTop: "2px", opacity: 0.8 }}>Total Paid</div>
+          <div style={{ fontSize: "18px", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--green)" }}>{rupee(totalPaid)}</div>
+          <div style={{ fontSize: "11px", color: "var(--green)", marginTop: "2px", opacity: 0.8 }}>Total Paid</div>
         </div>
         <div style={{ padding: "12px 14px", borderRadius: "var(--radius-sm)", background: pendingAmt > 0 ? "var(--red-bg)" : "var(--bg-elevated)", border: `1px solid ${pendingAmt > 0 ? "rgba(248,113,113,0.2)" : "var(--border-subtle)"}` }}>
-          <div style={{ fontSize: "16px", fontWeight: 800, fontFamily: "var(--font-display)", color: pendingAmt > 0 ? "var(--red)" : "var(--text-muted)" }}>{rupee(pendingAmt)}</div>
-          <div style={{ fontSize: "10px", color: pendingAmt > 0 ? "var(--red)" : "var(--text-muted)", marginTop: "2px", opacity: 0.8 }}>Pending Due</div>
+          <div style={{ fontSize: "18px", fontWeight: 800, fontFamily: "var(--font-display)", color: pendingAmt > 0 ? "var(--red)" : "var(--text-muted)" }}>{rupee(pendingAmt)}</div>
+          <div style={{ fontSize: "11px", color: pendingAmt > 0 ? "var(--red)" : "var(--text-muted)", marginTop: "2px", opacity: 0.8 }}>Pending Due</div>
         </div>
       </div>
 
@@ -300,7 +300,7 @@ function TabPayments({ payments, loading, onRefresh }) {
       <div style={{ display: "flex", gap: "6px", marginBottom: "14px" }}>
         {["all", "paid", "pending"].map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
-            padding: "4px 12px", borderRadius: "99px", fontSize: "10px", fontWeight: 600,
+            padding: "4px 12px", borderRadius: "99px", fontSize: "11px", fontWeight: 600,
             cursor: "pointer", textTransform: "capitalize", transition: "all 0.15s",
             background: filter === f ? "var(--text-primary)" : "var(--bg-elevated)",
             color: filter === f ? "#0a0a0a" : "var(--text-muted)",
@@ -324,10 +324,10 @@ function TabPayments({ payments, loading, onRefresh }) {
             <div key={month} style={{ marginBottom: "16px" }}>
               {/* Month header with totals */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 0 8px" }}>
-                <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>{month}</div>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em" }}>{month}</div>
                 <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                  {monthPending > 0 && <span style={{ fontSize: "10px", color: "var(--red)", fontWeight: 600 }}>⏳ {rupee(monthPending)}</span>}
-                  {monthTotal > 0 && <span style={{ fontSize: "10px", color: "var(--green)", fontWeight: 600 }}>✓ {rupee(monthTotal)}</span>}
+                  {monthPending > 0 && <span style={{ fontSize: "11px", color: "var(--red)", fontWeight: 600 }}>⏳ {rupee(monthPending)}</span>}
+                  {monthTotal > 0 && <span style={{ fontSize: "11px", color: "var(--green)", fontWeight: 600 }}>✓ {rupee(monthTotal)}</span>}
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -345,10 +345,10 @@ function TabPayments({ payments, loading, onRefresh }) {
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px" }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           {/* Plan name (primary) + payment_for (secondary) */}
-                          <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-primary)", textTransform: "capitalize" }}>
+                          <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)", textTransform: "capitalize" }}>
                             {p.plan_name || p.payment_for?.replace(/_/g, " ") || "Payment"}
                           </div>
-                          <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "2px" }}>
+                          <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
                             {fmt(p.payment_date)} · {p.payment_method}
                             {p.plan_start && p.plan_end && (
                               <span style={{ marginLeft: "6px", opacity: 0.7 }}>· {fmt(p.plan_start)} → {fmt(p.plan_end)}</span>
@@ -357,13 +357,13 @@ function TabPayments({ payments, loading, onRefresh }) {
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
                           {/* Total Amount */}
-                          <div style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 800, color: "var(--text-primary)" }}>
+                          <div style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--text-primary)" }}>
                             {rupee(p.amount)}
                           </div>
                           {/* Paid / Due breakdown */}
                           {Number(p.due_amount) > 0 ? (
                             <div style={{ marginTop: "4px", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "2px" }}>
-                              <span style={{ fontSize: "10px", color: "var(--green)", fontWeight: 600 }}>
+                              <span style={{ fontSize: "11px", color: "var(--green)", fontWeight: 600 }}>
                                 ✓ Paid: {rupee(p.paid_amount)}
                               </span>
                               <span style={{ fontSize: "9px", fontWeight: 700, padding: "1px 6px", borderRadius: "99px", background: "var(--yellow-bg)", color: "var(--yellow)", border: "1px solid rgba(251,191,36,0.3)" }}>
@@ -387,7 +387,7 @@ function TabPayments({ payments, loading, onRefresh }) {
                               width: "100%", padding: "6px", borderRadius: "var(--radius-sm)", cursor: markingId === p.id ? "not-allowed" : "pointer",
                               background: markingId === p.id ? "var(--bg-surface)" : "rgba(74,222,128,0.08)",
                               border: "1px solid rgba(74,222,128,0.3)", color: markingId === p.id ? "var(--text-muted)" : "var(--green)",
-                              fontSize: "11px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px",
+                              fontSize: "12px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px",
                               transition: "all 0.15s"
                             }}
                           >
@@ -488,7 +488,7 @@ function AttendanceHeatmap({ attendance, membershipEnd }) {
             width: "8px", height: "8px", borderRadius: "2px", flexShrink: 0,
             background: selInfo ? selInfo.color : "var(--border-strong)"
           }} />
-          <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {selectedDay
               ? selectedDay.date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
               : "Tap a day to see details"}
@@ -496,7 +496,7 @@ function AttendanceHeatmap({ attendance, membershipEnd }) {
         </div>
         {selInfo && (
           <span style={{
-            fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "99px",
+            fontSize: "11px", fontWeight: 700, padding: "2px 8px", borderRadius: "99px",
             background: selInfo.bg, color: selInfo.color, flexShrink: 0
           }}>
             {selInfo.text}
@@ -573,16 +573,16 @@ function MonthWiseCount({ attendance, membershipEnd }) {
           padding: "7px 12px", borderRadius: "var(--radius-sm)",
           background: "var(--bg-surface)", border: "1px solid var(--border-subtle)"
         }}>
-          <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-secondary)", minWidth: "70px" }}>{month}</span>
+          <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)", minWidth: "70px" }}>{month}</span>
           <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
             {counts.active > 0 && (
-              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11px", fontWeight: 700, color: "var(--green)" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: 700, color: "var(--green)" }}>
                 <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--green)", flexShrink: 0 }} />
                 {counts.active} visit{counts.active > 1 ? "s" : ""}
               </span>
             )}
             {counts.expired > 0 && (
-              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11px", fontWeight: 700, color: "var(--red)" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: 700, color: "var(--red)" }}>
                 <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--red)", flexShrink: 0 }} />
                 {counts.expired} after expiry
               </span>
@@ -613,10 +613,10 @@ function TabAttendance({ attendance, loading, membershipEnd, thisMonthAtt, after
           background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.25)"
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <FaExclamationTriangle style={{ fontSize: "12px", color: "var(--red)" }} />
-            <span style={{ fontSize: "12px", color: "var(--red)", fontWeight: 600 }}>Visited after membership expired</span>
+            <FaExclamationTriangle style={{ fontSize: "13px", color: "var(--red)" }} />
+            <span style={{ fontSize: "13px", color: "var(--red)", fontWeight: 600 }}>Visited after membership expired</span>
           </div>
-          <span style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--red)" }}>{afterExpiryCount}</span>
+          <span style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--red)" }}>{afterExpiryCount}</span>
         </div>
       )}
 
@@ -626,10 +626,10 @@ function TabAttendance({ attendance, loading, membershipEnd, thisMonthAtt, after
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", flexWrap: "wrap", gap: "6px" }}>
             <SectionLabel>Activity — Last 6 Months</SectionLabel>
             <div style={{ display: "flex", gap: "12px" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "10px", color: "var(--text-muted)" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11px", color: "var(--text-muted)" }}>
                 <span style={{ width: "8px", height: "8px", borderRadius: "2px", background: "var(--green)" }} /> Active period
               </span>
-              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "10px", color: "var(--text-muted)" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11px", color: "var(--text-muted)" }}>
                 <span style={{ width: "8px", height: "8px", borderRadius: "2px", background: "var(--red)" }} /> After expiry
               </span>
             </div>
@@ -656,16 +656,16 @@ function TabAttendance({ attendance, loading, membershipEnd, thisMonthAtt, after
               padding: "8px 12px", borderRadius: "var(--radius-sm)",
               background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)"
             }}>
-              <div style={{ fontSize: "12px", color: "var(--text-primary)", fontWeight: 500 }}>{fmt(a.date)}</div>
-              <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+              <div style={{ fontSize: "13px", color: "var(--text-primary)", fontWeight: 500 }}>{fmt(a.date)}</div>
+              <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
                 {a.check_in ? a.check_in.slice(11, 16) : "—"}
                 {a.check_out ? ` → ${a.check_out.slice(11, 16)}` : ""}
               </div>
-              <span style={{ fontSize: "10px", fontWeight: 600, padding: "2px 8px", borderRadius: "99px", background: "var(--green-bg)", color: "var(--green)" }}>✓ Present</span>
+              <span style={{ fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "99px", background: "var(--green-bg)", color: "var(--green)" }}>✓ Present</span>
             </div>
           ))}
           {attendance.length > 15 && (
-            <div style={{ fontSize: "11px", color: "var(--text-muted)", textAlign: "center", padding: "8px" }}>
+            <div style={{ fontSize: "12px", color: "var(--text-muted)", textAlign: "center", padding: "8px" }}>
               +{attendance.length - 15} more records
             </div>
           )}
@@ -677,7 +677,7 @@ function TabAttendance({ attendance, loading, membershipEnd, thisMonthAtt, after
 
 // ── Section Label ─────────────────────────────────────────────────────────────
 const SectionLabel = ({ children }) => (
-  <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "10px" }}>
+  <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "10px" }}>
     {children}
   </div>
 );
@@ -838,7 +838,7 @@ export default function MemberProfileDrawer({ member, onClose, onEdit, onRecordP
                 width: "48px", height: "48px", borderRadius: "50%", flexShrink: 0,
                 background: "var(--bg-active)", border: "2px solid var(--border-strong)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800,
+                fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800,
                 color: "var(--text-primary)", overflow: "hidden"
               }}>
                 {member.photo
@@ -846,20 +846,20 @@ export default function MemberProfileDrawer({ member, onClose, onEdit, onRecordP
                   : initials}
               </div>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {member.full_name}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                  <span style={{ padding: "2px 10px", borderRadius: "99px", fontSize: "10px", fontWeight: 600, background: statusBg, color: statusColor, textTransform: "capitalize" }}>
+                  <span style={{ padding: "2px 10px", borderRadius: "99px", fontSize: "11px", fontWeight: 600, background: statusBg, color: statusColor, textTransform: "capitalize" }}>
                     {member.status}
                   </span>
                   {member.membership_type && (
-                    <span style={{ padding: "2px 10px", borderRadius: "99px", fontSize: "10px", fontWeight: 600, background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-muted)", textTransform: "capitalize" }}>
+                    <span style={{ padding: "2px 10px", borderRadius: "99px", fontSize: "11px", fontWeight: 600, background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-muted)", textTransform: "capitalize" }}>
                       {member.membership_type}
                     </span>
                   )}
                   {days !== null && days <= 7 && days >= 0 && (
-                    <span style={{ padding: "2px 10px", borderRadius: "99px", fontSize: "10px", fontWeight: 600, background: "var(--red-bg)", color: "var(--red)" }}>
+                    <span style={{ padding: "2px 10px", borderRadius: "99px", fontSize: "11px", fontWeight: 600, background: "var(--red-bg)", color: "var(--red)" }}>
                       Expiring soon!
                     </span>
                   )}
@@ -867,7 +867,7 @@ export default function MemberProfileDrawer({ member, onClose, onEdit, onRecordP
               </div>
             </div>
             <button onClick={onClose} style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <FaTimes style={{ fontSize: "12px" }} />
+              <FaTimes style={{ fontSize: "13px" }} />
             </button>
           </div>
 
@@ -880,17 +880,17 @@ export default function MemberProfileDrawer({ member, onClose, onEdit, onRecordP
 
           {/* Action Buttons */}
           <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap" }}>
-            <button onClick={() => onEdit && onEdit(member)} style={{ flex: 1, padding: "8px", borderRadius: "var(--radius-sm)", background: "var(--text-primary)", color: "#0a0a0a", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", fontFamily: "var(--font-display)" }}>
-              <FaEdit style={{ fontSize: "10px" }} /> Edit Member
+            <button onClick={() => onEdit && onEdit(member)} style={{ flex: 1, padding: "8px", borderRadius: "var(--radius-sm)", background: "var(--text-primary)", color: "#0a0a0a", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", fontFamily: "var(--font-display)" }}>
+              <FaEdit style={{ fontSize: "11px" }} /> Edit Member
             </button>
             {onRecordPayment && (
-              <button onClick={() => onRecordPayment(member)} style={{ flex: 1, padding: "8px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.3)", color: "var(--green)", cursor: "pointer", fontWeight: 600, fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
-                <FaRupeeSign style={{ fontSize: "10px" }} /> Record Payment
+              <button onClick={() => onRecordPayment(member)} style={{ flex: 1, padding: "8px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.3)", color: "var(--green)", cursor: "pointer", fontWeight: 600, fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
+                <FaRupeeSign style={{ fontSize: "11px" }} /> Record Payment
               </button>
             )}
             {onMarkAttendance && (
-              <button onClick={() => onMarkAttendance(member)} style={{ flex: 1, padding: "8px", borderRadius: "var(--radius-sm)", background: "var(--blue-bg)", border: "1px solid rgba(96,165,250,0.3)", color: "var(--blue)", cursor: "pointer", fontWeight: 600, fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
-                <FaClipboardCheck style={{ fontSize: "10px" }} /> Mark Attendance
+              <button onClick={() => onMarkAttendance(member)} style={{ flex: 1, padding: "8px", borderRadius: "var(--radius-sm)", background: "var(--blue-bg)", border: "1px solid rgba(96,165,250,0.3)", color: "var(--blue)", cursor: "pointer", fontWeight: 600, fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
+                <FaClipboardCheck style={{ fontSize: "11px" }} /> Mark Attendance
               </button>
             )}
           </div>

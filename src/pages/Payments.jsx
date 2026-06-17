@@ -76,10 +76,10 @@ function OverlayModal({ open, onClose, title, subtitle, children, width = "640px
           display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0
         }}>
           <div>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>{title}</div>
-            {subtitle && <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{subtitle}</div>}
+            <div style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 700, color: "var(--text-primary)" }}>{title}</div>
+            {subtitle && <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>{subtitle}</div>}
           </div>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "16px", padding: "4px" }}><FaTimes /></button>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "18px", padding: "4px" }}><FaTimes /></button>
         </div>
         <div style={{
           flex: 1, overflowY: "auto",
@@ -141,17 +141,17 @@ function DrillDownModal({ open, onClose }) {
       {/* Back Button */}
       {level !== "years" && (
         <button onClick={() => { setLevel(level === "members" ? "months" : "years"); setSearch(""); }}
-          style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", marginBottom: "16px" }}>
-          <FaChevronLeft style={{ fontSize: "10px" }} /> Back
+          style={{ display: "flex", alignItems: "center", gap: "6px", padding: "6px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px", marginBottom: "16px" }}>
+          <FaChevronLeft style={{ fontSize: "11px" }} /> Back
         </button>
       )}
 
       {/* Search (members level) */}
       {level === "members" && (
         <div style={{ position: "relative", marginBottom: "14px" }}>
-          <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px" }} />
+          <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "12px" }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search member..."
-            style={{ width: "100%", padding: "8px 12px 8px 30px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "12px", outline: "none" }} />
+            style={{ width: "100%", padding: "8px 12px 8px 30px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "13px", outline: "none" }} />
         </div>
       )}
 
@@ -167,12 +167,12 @@ function DrillDownModal({ open, onClose }) {
                 onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.background = "var(--bg-elevated)"; }}
               >
                 <div>
-                  <div style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)" }}>{y.year}</div>
-                  <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{y.count} payments</div>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)" }}>{y.year}</div>
+                  <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>{y.count} payments</div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--green)" }}>{fmt(y.total)}</span>
-                  <FaChevronRight style={{ fontSize: "11px", color: "var(--text-muted)" }} />
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: "22px", fontWeight: 800, color: "var(--green)" }}>{fmt(y.total)}</span>
+                  <FaChevronRight style={{ fontSize: "12px", color: "var(--text-muted)" }} />
                 </div>
               </div>
             ))}
@@ -187,12 +187,12 @@ function DrillDownModal({ open, onClose }) {
                 onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.background = "var(--bg-elevated)"; }}
               >
                 <div>
-                  <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>{m.month_name} {selYear}</div>
-                  <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.count} payments</div>
+                  <div style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-primary)" }}>{m.month_name} {selYear}</div>
+                  <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{m.count} payments</div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--green)" }}>{fmt(m.total)}</span>
-                  <FaChevronRight style={{ fontSize: "10px", color: "var(--text-muted)" }} />
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--green)" }}>{fmt(m.total)}</span>
+                  <FaChevronRight style={{ fontSize: "11px", color: "var(--text-muted)" }} />
                 </div>
               </div>
             ))}
@@ -204,19 +204,19 @@ function DrillDownModal({ open, onClose }) {
               filteredMembers.map(p => (
                 <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)" }}>
                   <div>
-                    <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
-                    <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+                    <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
+                    <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>
                       {METHOD_ICON[p.payment_method]} {p.payment_method} · {fmtDate(p.payment_date)}
                       {p.plan_name && ` · ${p.plan_name}`}
                     </div>
                   </div>
-                  <span style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 800, color: "var(--green)" }}>{fmt(p.amount)}</span>
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--green)" }}>{fmt(p.amount)}</span>
                 </div>
               ))}
           </div>
           <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-strong)", display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Total — {filteredMembers.length} payments</span>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--green)" }}>
+            <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Total — {filteredMembers.length} payments</span>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 800, color: "var(--green)" }}>
               {fmt(filteredMembers.reduce((s, p) => s + Number(p.amount), 0))}
             </span>
           </div>
@@ -244,18 +244,18 @@ function PaymentListModal({ open, onClose, endpoint, title }) {
   return (
     <OverlayModal open={open} onClose={onClose} title={title} subtitle={`${filtered.length} payments`}>
       <div style={{ position: "relative", marginBottom: "14px" }}>
-        <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px" }} />
+        <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "12px" }} />
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search member..."
-          style={{ width: "100%", padding: "8px 12px 8px 30px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "12px", outline: "none" }} />
+          style={{ width: "100%", padding: "8px 12px 8px 30px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "13px", outline: "none" }} />
       </div>
       {loading ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>Loading...</div> :
         filtered.length === 0 ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>No payments found</div> : (
           <>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
               <thead>
                 <tr style={{ background: "var(--bg-elevated)" }}>
                   {["Member", "Amount", "Method", "Plan", "Time"].map(h => (
-                    <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", borderBottom: "1px solid var(--border-subtle)" }}>{h}</th>
+                    <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", borderBottom: "1px solid var(--border-subtle)" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -267,19 +267,19 @@ function PaymentListModal({ open, onClose, endpoint, title }) {
                   >
                     <td style={{ padding: "10px 12px" }}>
                       <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
-                      <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>{p.phone}</div>
+                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{p.phone}</div>
                     </td>
                     <td style={{ padding: "10px 12px", fontFamily: "var(--font-display)", fontWeight: 700, color: "var(--green)" }}>{fmt(p.amount)}</td>
                     <td style={{ padding: "10px 12px", color: "var(--text-secondary)" }}>{METHOD_ICON[p.payment_method]} {p.payment_method}</td>
-                    <td style={{ padding: "10px 12px", color: "var(--text-muted)", fontSize: "11px" }}>{p.plan_name || p.payment_for || "—"}</td>
+                    <td style={{ padding: "10px 12px", color: "var(--text-muted)", fontSize: "12px" }}>{p.plan_name || p.payment_for || "—"}</td>
                     <td style={{ padding: "10px 12px", color: "var(--text-muted)" }}>{fmtDate(p.payment_date)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-strong)", display: "flex", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Total</span>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--green)" }}>{fmt(total)}</span>
+              <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Total</span>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 800, color: "var(--green)" }}>{fmt(total)}</span>
             </div>
           </>
         )}
@@ -334,9 +334,9 @@ function PendingCountModal({ open, onClose, onStatsRefresh }) {
   return (
     <OverlayModal open={open} onClose={onClose} title="⏳ Pending Payments" subtitle={`${filtered.length} pending records`} width="660px">
       <div style={{ position: "relative", marginBottom: "14px" }}>
-        <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px" }} />
+        <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "12px" }} />
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search member..."
-          style={{ width: "100%", padding: "8px 12px 8px 30px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "12px", outline: "none" }} />
+          style={{ width: "100%", padding: "8px 12px 8px 30px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "13px", outline: "none" }} />
       </div>
       {loading ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>Loading...</div> :
         filtered.length === 0 ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>No pending payments 🎉</div> : (
@@ -346,16 +346,16 @@ function PendingCountModal({ open, onClose, onStatsRefresh }) {
                 <div key={p.id} style={{ borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid rgba(251,191,36,0.2)", borderLeft: "3px solid var(--yellow)", overflow: "hidden" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "10px 14px" }}>
                     <div>
-                      <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
-                      <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+                      <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
+                      <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>
                         <span style={{ textTransform: "capitalize" }}>{p.plan_name || p.payment_for?.replace(/_/g, " ")}</span>
                         {" · "}Due since {fmtDate(p.payment_date)}
                       </div>
-                      <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>{p.phone}</div>
+                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{p.phone}</div>
                     </div>
                     <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "12px" }}>
-                      <div style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 800, color: "var(--yellow)" }}>{fmt(p.amount)}</div>
-                      {Number(p.paid_amount) > 0 && <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>Paid: {fmt(p.paid_amount)}</div>}
+                      <div style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--yellow)" }}>{fmt(p.amount)}</div>
+                      {Number(p.paid_amount) > 0 && <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>Paid: {fmt(p.paid_amount)}</div>}
                     </div>
                   </div>
                   {/* Mark Complete */}
@@ -365,7 +365,7 @@ function PendingCountModal({ open, onClose, onStatsRefresh }) {
                       background: markingId === p.id ? "var(--bg-surface)" : "rgba(74,222,128,0.08)",
                       border: "1px solid rgba(74,222,128,0.3)", color: markingId === p.id ? "var(--text-muted)" : "var(--green)",
                       cursor: markingId === p.id ? "not-allowed" : "pointer",
-                      fontSize: "11px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px"
+                      fontSize: "12px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px"
                     }}>
                       <FaCheck style={{ fontSize: "9px" }} />
                       {markingId === p.id ? "Marking..." : `Mark Complete — ${fmt(p.amount)}`}
@@ -375,8 +375,8 @@ function PendingCountModal({ open, onClose, onStatsRefresh }) {
               ))}
             </div>
             <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--yellow-bg)", border: "1px solid rgba(234,179,8,0.2)", display: "flex", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "12px", color: "var(--yellow)" }}>Total Pending — {filtered.length} records</span>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--yellow)" }}>{fmt(totalPend)}</span>
+              <span style={{ fontSize: "13px", color: "var(--yellow)" }}>Total Pending — {filtered.length} records</span>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 800, color: "var(--yellow)" }}>{fmt(totalPend)}</span>
             </div>
           </>
         )}
@@ -402,18 +402,18 @@ function DueAmountModal({ open, onClose }) {
   return (
     <OverlayModal open={open} onClose={onClose} title="⚠️ Due Amounts — Member Wise" subtitle="Sorted by highest due first">
       <div style={{ position: "relative", marginBottom: "14px" }}>
-        <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px" }} />
+        <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "12px" }} />
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search member..."
-          style={{ width: "100%", padding: "8px 12px 8px 30px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "12px", outline: "none" }} />
+          style={{ width: "100%", padding: "8px 12px 8px 30px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "13px", outline: "none" }} />
       </div>
       {loading ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>Loading...</div> :
         filtered.length === 0 ? <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)" }}>No due amounts 🎉</div> : (
           <>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
               <thead>
                 <tr style={{ background: "var(--bg-elevated)" }}>
                   {["Member", "Total Amount", "Paid", "Balance Due"].map(h => (
-                    <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", borderBottom: "1px solid var(--border-subtle)" }}>{h}</th>
+                    <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", borderBottom: "1px solid var(--border-subtle)" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -425,20 +425,20 @@ function DueAmountModal({ open, onClose }) {
                   >
                     <td style={{ padding: "10px 12px" }}>
                       <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>{m.full_name}</div>
-                      <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>{m.phone} · {m.payment_count} payment{m.payment_count !== 1 ? "s" : ""}</div>
+                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.phone} · {m.payment_count} payment{m.payment_count !== 1 ? "s" : ""}</div>
                     </td>
                     <td style={{ padding: "10px 12px", color: "var(--text-secondary)", fontWeight: 600 }}>{fmt(m.total_amount)}</td>
                     <td style={{ padding: "10px 12px", color: "var(--green)", fontWeight: 600 }}>{fmt(m.total_paid)}</td>
                     <td style={{ padding: "10px 12px" }}>
-                      <span style={{ fontFamily: "var(--font-display)", fontSize: "13px", fontWeight: 800, color: "var(--red)" }}>{fmt(m.total_due)}</span>
+                      <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--red)" }}>{fmt(m.total_due)}</span>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", display: "flex", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "12px", color: "var(--red)" }}>Grand Total Due</span>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--red)" }}>{fmt(grandTotal)}</span>
+              <span style={{ fontSize: "13px", color: "var(--red)" }}>Grand Total Due</span>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 800, color: "var(--red)" }}>{fmt(grandTotal)}</span>
             </div>
           </>
         )}
@@ -504,7 +504,7 @@ function ChartMonthModal({ open, onClose, year, month, label }) {
           { key: "plans", label: `📋 Plans (${Object.keys(planGroups).length})`, color: "var(--blue)", bg: "var(--blue-bg)", border: "rgba(96,165,250,0.3)" },
         ].map(t => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{
-            padding: "6px 14px", borderRadius: "99px", fontSize: "11px", fontWeight: 600, cursor: "pointer",
+            padding: "6px 14px", borderRadius: "99px", fontSize: "12px", fontWeight: 600, cursor: "pointer",
             background: tab === t.key ? t.bg : "var(--bg-elevated)",
             color: tab === t.key ? t.color : "var(--text-muted)",
             border: `1px solid ${tab === t.key ? t.border : "var(--border-default)"}`,
@@ -525,12 +525,12 @@ function ChartMonthModal({ open, onClose, year, month, label }) {
                   {/* Plan header */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-surface)" }}>
                     <div>
-                      <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)", textTransform: "capitalize" }}>{g.plan}</div>
-                      <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "2px" }}>{g.members.length} member{g.members.length !== 1 ? "s" : ""}</div>
+                      <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)", textTransform: "capitalize" }}>{g.plan}</div>
+                      <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{g.members.length} member{g.members.length !== 1 ? "s" : ""}</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      {g.total > 0 && <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--green)" }}>{fmt(g.total)} paid</div>}
-                      {g.pendingAmt > 0 && <div style={{ fontSize: "11px", color: "var(--yellow)", marginTop: "2px" }}>⏳ {fmt(g.pendingAmt)} pending</div>}
+                      {g.total > 0 && <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--green)" }}>{fmt(g.total)} paid</div>}
+                      {g.pendingAmt > 0 && <div style={{ fontSize: "12px", color: "var(--yellow)", marginTop: "2px" }}>⏳ {fmt(g.pendingAmt)} pending</div>}
                     </div>
                   </div>
                   {/* Member list */}
@@ -538,14 +538,14 @@ function ChartMonthModal({ open, onClose, year, month, label }) {
                     {g.members.map(p => (
                       <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 16px", borderBottom: "1px solid var(--border-subtle)", borderLeft: `3px solid ${p.status === "paid" ? "var(--green)" : "var(--yellow)"}` }}>
                         <div>
-                          <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
-                          <div style={{ fontSize: "10px", color: "var(--text-muted)" }}>
+                          <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
+                          <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
                             {METHOD_ICON[p.payment_method]} {p.payment_method} · {fmtDate(p.payment_date)}
                             {p.status === "pending" && Number(p.due_amount) > 0 && ` · Due: ${fmt(p.due_amount)}`}
                           </div>
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span style={{ fontFamily: "var(--font-display)", fontSize: "13px", fontWeight: 700, color: p.status === "paid" ? "var(--green)" : "var(--yellow)" }}>{fmt(p.amount)}</span>
+                          <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 700, color: p.status === "paid" ? "var(--green)" : "var(--yellow)" }}>{fmt(p.amount)}</span>
                           <span style={{ fontSize: "9px", padding: "2px 6px", borderRadius: "99px", background: p.status === "paid" ? "var(--green-bg)" : "var(--yellow-bg)", color: p.status === "paid" ? "var(--green)" : "var(--yellow)", fontWeight: 600 }}>{p.status}</span>
                         </div>
                       </div>
@@ -565,19 +565,19 @@ function ChartMonthModal({ open, onClose, year, month, label }) {
                   <div key={p.id} style={{ borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: `1px solid ${tab === "pending" ? "rgba(251,191,36,0.2)" : "var(--border-subtle)"}`, borderLeft: `3px solid ${tab === "pending" ? "var(--yellow)" : "var(--green)"}`, overflow: "hidden" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "10px 14px" }}>
                       <div>
-                        <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+                        <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
+                        <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>
                           <span style={{ textTransform: "capitalize" }}>{p.plan_name || p.payment_for?.replace(/_/g, " ")}</span>
                           {" · "}{METHOD_ICON[p.payment_method]} {p.payment_method}
                           {" · "}{fmtDate(p.payment_date)}
                         </div>
                         {tab === "pending" && Number(p.due_amount) > 0 && (
-                          <div style={{ fontSize: "10px", color: "var(--yellow)", marginTop: "3px" }}>
+                          <div style={{ fontSize: "11px", color: "var(--yellow)", marginTop: "3px" }}>
                             Paid: {fmt(p.paid_amount)} · Due: {fmt(p.due_amount)}
                           </div>
                         )}
                       </div>
-                      <span style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 800, color: tab === "pending" ? "var(--yellow)" : "var(--green)", flexShrink: 0, marginLeft: "12px" }}>
+                      <span style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: tab === "pending" ? "var(--yellow)" : "var(--green)", flexShrink: 0, marginLeft: "12px" }}>
                         {fmt(tab === "pending" ? (p.due_amount || p.amount) : p.amount)}
                       </span>
                     </div>
@@ -589,7 +589,7 @@ function ChartMonthModal({ open, onClose, year, month, label }) {
                           background: markingId === p.id ? "var(--bg-surface)" : "rgba(74,222,128,0.08)",
                           border: "1px solid rgba(74,222,128,0.3)", color: markingId === p.id ? "var(--text-muted)" : "var(--green)",
                           cursor: markingId === p.id ? "not-allowed" : "pointer",
-                          fontSize: "11px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px"
+                          fontSize: "12px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px"
                         }}>
                           <FaCheck style={{ fontSize: "9px" }} />
                           {markingId === p.id ? "Marking..." : `Mark Complete — ${fmt(p.due_amount || p.amount)}`}
@@ -600,8 +600,8 @@ function ChartMonthModal({ open, onClose, year, month, label }) {
                 ))}
               </div>
               <div style={{ marginTop: "14px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-strong)", display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Total {tab === "pending" ? "Pending" : "Paid"} — {displayed.length} records</span>
-                <span style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: tab === "pending" ? "var(--yellow)" : "var(--green)" }}>
+                <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Total {tab === "pending" ? "Pending" : "Paid"} — {displayed.length} records</span>
+                <span style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 800, color: tab === "pending" ? "var(--yellow)" : "var(--green)" }}>
                   {fmt(displayed.reduce((s, p) => s + Number(tab === "pending" ? (p.due_amount || p.amount) : p.amount), 0))}
                 </span>
               </div>
@@ -622,14 +622,14 @@ const StatCard = ({ icon: Icon, label, value, color, bg, sub, trend, onClick }) 
     {onClick && <div style={{ position: "absolute", top: "10px", right: "10px", fontSize: "9px", color: "var(--text-muted)", background: "var(--bg-elevated)", padding: "2px 6px", borderRadius: "4px" }}>Click to view</div>}
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
       <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: bg, display: "flex", alignItems: "center", justifyContent: "center", color }}>
-        <Icon style={{ fontSize: "15px" }} />
+        <Icon style={{ fontSize: "17px" }} />
       </div>
     </div>
-    <div style={{ fontFamily: "var(--font-display)", fontSize: "24px", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1, marginBottom: "5px" }}>{value}</div>
-    <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 500 }}>{label}</div>
-    {sub && <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "3px" }}>{sub}</div>}
+    <div style={{ fontFamily: "var(--font-display)", fontSize: "27px", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1, marginBottom: "5px" }}>{value}</div>
+    <div style={{ fontSize: "13px", color: "var(--text-secondary)", fontWeight: 500 }}>{label}</div>
+    {sub && <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "3px" }}>{sub}</div>}
     {trend !== undefined && (
-      <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "8px", fontSize: "11px", color: trend >= 0 ? "var(--green)" : "var(--red)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "8px", fontSize: "12px", color: trend >= 0 ? "var(--green)" : "var(--red)" }}>
         {trend >= 0 ? <FaArrowUp /> : <FaArrowDown />}
         {trend >= 0 ? "+" : ""}{fmt(trend)} vs last month
       </div>
@@ -641,9 +641,9 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
     <div style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "8px", padding: "10px 14px" }}>
-      <p style={{ color: "var(--text-muted)", fontSize: "11px", marginBottom: "4px" }}>{label}</p>
-      <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "14px" }}>₹{Number(payload[0].value).toLocaleString("en-IN")}</p>
-      <p style={{ color: "var(--text-muted)", fontSize: "10px", marginTop: "2px" }}>Click bar for details</p>
+      <p style={{ color: "var(--text-muted)", fontSize: "12px", marginBottom: "4px" }}>{label}</p>
+      <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "16px" }}>₹{Number(payload[0].value).toLocaleString("en-IN")}</p>
+      <p style={{ color: "var(--text-muted)", fontSize: "11px", marginTop: "2px" }}>Click bar for details</p>
     </div>
   );
 };
@@ -712,7 +712,7 @@ function MemberSearchInput({ value, onChange, members, style }) {
   return (
     <div ref={wrapRef} style={{ position: "relative" }}>
       <div style={{ position: "relative" }}>
-        <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px", pointerEvents: "none" }} />
+        <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "12px", pointerEvents: "none" }} />
         <input
           value={query}
           onChange={handleInputChange}
@@ -725,7 +725,7 @@ function MemberSearchInput({ value, onChange, members, style }) {
           <button
             type="button"
             onClick={() => { setQuery(""); onChange(""); setOpen(false); }}
-            style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "12px", padding: "2px", display: "flex", alignItems: "center" }}
+            style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "13px", padding: "2px", display: "flex", alignItems: "center" }}
           >
             <FaTimes />
           </button>
@@ -746,8 +746,8 @@ function MemberSearchInput({ value, onChange, members, style }) {
               onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
               onMouseLeave={e => e.currentTarget.style.background = "transparent"}
             >
-              <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{m.full_name}</div>
-              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "1px" }}>{m.phone}{m.email ? ` · ${m.email}` : ""}</div>
+              <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text-primary)" }}>{m.full_name}</div>
+              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "1px" }}>{m.phone}{m.email ? ` · ${m.email}` : ""}</div>
             </div>
           ))}
         </div>
@@ -756,7 +756,7 @@ function MemberSearchInput({ value, onChange, members, style }) {
         <div style={{
           position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 9999,
           background: "var(--bg-surface)", border: "1px solid var(--border-default)",
-          borderRadius: "var(--radius-sm)", padding: "12px", fontSize: "12px", color: "var(--text-muted)", textAlign: "center"
+          borderRadius: "var(--radius-sm)", padding: "12px", fontSize: "13px", color: "var(--text-muted)", textAlign: "center"
         }}>
           No member found
         </div>
@@ -878,8 +878,8 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
 
   if (!isOpen) return null;
 
-  const inp = { width: "100%", padding: "9px 12px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "13px", outline: "none" };
-  const lbl = { display: "block", marginBottom: "5px", fontSize: "11px", fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.08em" };
+  const inp = { width: "100%", padding: "9px 12px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "15px", outline: "none" };
+  const lbl = { display: "block", marginBottom: "5px", fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.08em" };
 
   const selectedPlan = plans.find(p => p.name === form.payment_for);
   const planPrice = selectedPlan ? Number(selectedPlan.price) : 0;
@@ -901,14 +901,14 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
         {/* Header */}
         <div style={{ padding: "20px 24px", paddingTop: isMobile ? "calc(20px + env(safe-area-inset-top))" : "20px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: "var(--bg-surface)", zIndex: 10 }}>
           <div>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>{editData ? "Edit Payment" : "Record Payment"}</h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "12px", margin: "3px 0 0" }}>{editData ? "Update payment details" : "Add a new payment record"}</p>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>{editData ? "Edit Payment" : "Record Payment"}</h3>
+            <p style={{ color: "var(--text-muted)", fontSize: "13px", margin: "3px 0 0" }}>{editData ? "Update payment details" : "Add a new payment record"}</p>
           </div>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "16px" }}><FaTimes /></button>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "18px" }}><FaTimes /></button>
         </div>
 
         <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "16px" }}>
-          {error && <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px" }}>{error}</div>}
+          {error && <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "15px" }}>{error}</div>}
 
           {/* ── Member Search ── */}
           <div>
@@ -927,10 +927,10 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
             <PlanSelect value={form.payment_for} onChange={e => handlePlanSelect(e.target.value)} plans={plans} style={inp} includeOther={true} />
             {selectedPlan && (
               <div style={{ marginTop: "8px", padding: "9px 13px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", display: "flex", gap: "18px", alignItems: "center", flexWrap: "wrap" }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Duration: <strong style={{ color: "var(--text-secondary)" }}>{selectedPlan.duration_days} days</strong></span>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>MRP: <strong style={{ color: "var(--text-secondary)", textDecoration: discountAmt > 0 ? "line-through" : "none" }}>₹{Number(selectedPlan.price).toLocaleString("en-IN")}</strong></span>
-                {discountAmt > 0 && <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--green)" }}>After discount: ₹{afterDiscount.toLocaleString("en-IN")}</span>}
-                {discountAmt === 0 && <span style={{ fontSize: "11px", color: "var(--text-muted)", fontStyle: "italic" }}>Amount auto-filled ✓</span>}
+                <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Duration: <strong style={{ color: "var(--text-secondary)" }}>{selectedPlan.duration_days} days</strong></span>
+                <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>MRP: <strong style={{ color: "var(--text-secondary)", textDecoration: discountAmt > 0 ? "line-through" : "none" }}>₹{Number(selectedPlan.price).toLocaleString("en-IN")}</strong></span>
+                {discountAmt > 0 && <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--green)" }}>After discount: ₹{afterDiscount.toLocaleString("en-IN")}</span>}
+                {discountAmt === 0 && <span style={{ fontSize: "12px", color: "var(--text-muted)", fontStyle: "italic" }}>Amount auto-filled ✓</span>}
               </div>
             )}
           </div>
@@ -943,7 +943,7 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
                 {[{ val: "flat", label: "₹" }, { val: "percent", label: "%" }].map(opt => (
                   <button key={opt.val} type="button"
                     onClick={() => handleDiscountChange(opt.val, "")}
-                    style={{ padding: "9px 14px", background: form.discount_type === opt.val ? "var(--bg-active, rgba(255,255,255,0.08))" : "var(--bg-elevated)", border: "none", color: form.discount_type === opt.val ? "var(--text-primary)" : "var(--text-muted)", cursor: "pointer", fontWeight: form.discount_type === opt.val ? 700 : 400, fontSize: "13px", transition: "all 0.15s" }}>
+                    style={{ padding: "9px 14px", background: form.discount_type === opt.val ? "var(--bg-active, rgba(255,255,255,0.08))" : "var(--bg-elevated)", border: "none", color: form.discount_type === opt.val ? "var(--text-primary)" : "var(--text-muted)", cursor: "pointer", fontWeight: form.discount_type === opt.val ? 700 : 400, fontSize: "15px", transition: "all 0.15s" }}>
                     {opt.label}
                   </button>
                 ))}
@@ -959,9 +959,9 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
             </div>
             {discountAmt > 0 && selectedPlan && (
               <div style={{ marginTop: "6px", display: "flex", gap: "10px", padding: "7px 12px", borderRadius: "var(--radius-sm)", background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.2)", alignItems: "center", flexWrap: "wrap" }}>
-                <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>Original: <strong style={{ color: "var(--text-secondary)", textDecoration: "line-through" }}>₹{planPrice.toLocaleString("en-IN")}</strong></span>
-                <span style={{ fontSize: "11px", color: "var(--red)" }}>− ₹{discountAmt.toLocaleString("en-IN")}</span>
-                <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--green)" }}>= ₹{afterDiscount.toLocaleString("en-IN")}</span>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Original: <strong style={{ color: "var(--text-secondary)", textDecoration: "line-through" }}>₹{planPrice.toLocaleString("en-IN")}</strong></span>
+                <span style={{ fontSize: "12px", color: "var(--red)" }}>− ₹{discountAmt.toLocaleString("en-IN")}</span>
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--green)" }}>= ₹{afterDiscount.toLocaleString("en-IN")}</span>
               </div>
             )}
           </div>
@@ -981,30 +981,30 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
           {/* ── Payment Summary ── */}
           {form.amount && (
             <div style={{ padding: "12px 14px", borderRadius: "var(--radius-sm)", background: isPartial ? "rgba(245,158,11,0.07)" : "rgba(74,222,128,0.06)", border: `1px solid ${isPartial ? "rgba(245,158,11,0.3)" : "rgba(74,222,128,0.25)"}` }}>
-              <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Payment Summary</div>
+              <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Payment Summary</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 {discountAmt > 0 && selectedPlan && (
                   <>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
                       <span style={{ color: "var(--text-muted)" }}>Plan Price</span>
                       <span style={{ color: "var(--text-secondary)", textDecoration: "line-through" }}>₹{planPrice.toLocaleString("en-IN")}</span>
                     </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
                       <span style={{ color: "var(--text-muted)" }}>Discount ({form.discount_type === "percent" ? `${form.discount_value}%` : "Flat"})</span>
                       <span style={{ color: "var(--red)", fontWeight: 600 }}>− ₹{discountAmt.toLocaleString("en-IN")}</span>
                     </div>
                   </>
                 )}
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
                   <span style={{ color: "var(--text-muted)" }}>Payable Amount</span>
                   <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>₹{Number(form.amount).toLocaleString("en-IN")}</span>
                 </div>
                 <div style={{ height: "1px", background: "var(--border-subtle)", margin: "2px 0" }} />
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
                   <span style={{ color: "var(--text-muted)" }}>Paid Now</span>
                   <span style={{ color: "var(--green)", fontWeight: 700 }}>₹{(Number(form.paid_amount) || Number(form.amount)).toLocaleString("en-IN")}</span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px" }}>
                   <span style={{ fontWeight: 700, color: isPartial ? "#f59e0b" : "var(--green)" }}>
                     {isPartial ? "⚠️ Balance Due" : "✅ Fully Paid"}
                   </span>
@@ -1013,7 +1013,7 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
                   </span>
                 </div>
                 {isPartial && (
-                  <div style={{ marginTop: "2px", fontSize: "11px", color: "var(--text-muted)", background: "rgba(245,158,11,0.08)", padding: "5px 8px", borderRadius: "6px" }}>
+                  <div style={{ marginTop: "2px", fontSize: "12px", color: "var(--text-muted)", background: "rgba(245,158,11,0.08)", padding: "5px 8px", borderRadius: "6px" }}>
                     💡 Partial payment — remaining ₹{dueAmount.toLocaleString("en-IN")} will be recorded as due.
                   </div>
                 )}
@@ -1078,8 +1078,8 @@ function PaymentModal({ isOpen, onClose, onSave, editData, members, plans }) {
 
         {/* Footer */}
         <div style={{ padding: "16px 24px", borderTop: "1px solid var(--border-subtle)", display: "flex", gap: "10px", justifyContent: "flex-end", position: "sticky", bottom: 0, background: "var(--bg-surface)" }}>
-          <button onClick={onClose} style={{ padding: "9px 18px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>Cancel</button>
-          <button onClick={handleSubmit} disabled={saving} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: saving ? "var(--bg-elevated)" : "var(--text-primary)", color: saving ? "var(--text-muted)" : "#0a0a0a", border: "none", cursor: saving ? "not-allowed" : "pointer", fontWeight: 700, fontSize: "13px", fontFamily: "var(--font-display)" }}>
+          <button onClick={onClose} style={{ padding: "9px 18px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px" }}>Cancel</button>
+          <button onClick={handleSubmit} disabled={saving} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: saving ? "var(--bg-elevated)" : "var(--text-primary)", color: saving ? "var(--text-muted)" : "#0a0a0a", border: "none", cursor: saving ? "not-allowed" : "pointer", fontWeight: 700, fontSize: "15px", fontFamily: "var(--font-display)" }}>
             {saving ? "Saving..." : editData ? "Update" : "Record Payment"}
           </button>
         </div>
@@ -1185,10 +1185,10 @@ export default function Payments({ onLogout }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: isMobile ? "16px" : "28px", flexWrap: "wrap", gap: "12px" }}>
           <div>
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: isMobile ? "22px" : "28px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>Payments</h1>
-            {!isMobile && <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>Billing & revenue tracking — {totalCount} records</p>}
+            {!isMobile && <p style={{ color: "var(--text-muted)", fontSize: "15px", marginTop: "4px" }}>Billing & revenue tracking — {totalCount} records</p>}
           </div>
-          <button onClick={() => { setEditData(null); setModal(true); }} style={{ display: "flex", alignItems: "center", gap: "8px", padding: isMobile ? "9px 14px" : "10px 18px", borderRadius: "var(--radius-md)", background: "var(--text-primary)", color: "#0a0a0a", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "13px", fontFamily: "var(--font-display)" }}>
-            <FaPlus style={{ fontSize: "11px" }} /> {isMobile ? "Add" : "Record Payment"}
+          <button onClick={() => { setEditData(null); setModal(true); }} style={{ display: "flex", alignItems: "center", gap: "8px", padding: isMobile ? "9px 14px" : "10px 18px", borderRadius: "var(--radius-md)", background: "var(--text-primary)", color: "#0a0a0a", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "15px", fontFamily: "var(--font-display)" }}>
+            <FaPlus style={{ fontSize: "12px" }} /> {isMobile ? "Add" : "Record Payment"}
           </button>
         </div>
 
@@ -1205,10 +1205,10 @@ export default function Payments({ onLogout }) {
         {chartData.length > 0 && (
           <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", padding: isMobile ? "16px" : "22px", marginBottom: "16px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Monthly Revenue</h3>
-              {!isMobile && <span style={{ fontSize: "11px", color: "var(--text-muted)", background: "var(--bg-elevated)", padding: "3px 8px", borderRadius: "4px" }}>Click bar for details</span>}
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Monthly Revenue</h3>
+              {!isMobile && <span style={{ fontSize: "12px", color: "var(--text-muted)", background: "var(--bg-elevated)", padding: "3px 8px", borderRadius: "4px" }}>Click bar for details</span>}
             </div>
-            <p style={{ color: "var(--text-muted)", fontSize: "12px", marginBottom: "12px" }}>Last 6 months</p>
+            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginBottom: "12px" }}>Last 6 months</p>
             <ResponsiveContainer width="100%" height={isMobile ? 120 : 160}>
               <BarChart data={chartData} margin={{ top: 5, right: 5, bottom: 0, left: isMobile ? -20 : 0 }} onClick={handleBarClick} style={{ cursor: "pointer" }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
@@ -1226,15 +1226,15 @@ export default function Payments({ onLogout }) {
         {/* ── Filters ── */}
         <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", padding: isMobile ? "12px" : "14px 18px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap", marginBottom: "14px" }}>
           <div style={{ position: "relative", flex: 1, minWidth: isMobile ? "100%" : "200px" }}>
-            <FaSearch style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "12px" }} />
+            <FaSearch style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "13px" }} />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search member..."
-              style={{ width: "100%", padding: "9px 12px 9px 34px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "13px", outline: "none" }} />
+              style={{ width: "100%", padding: "9px 12px 9px 34px", boxSizing: "border-box", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "15px", outline: "none" }} />
           </div>
           <div style={{ display: "flex", gap: "8px", width: isMobile ? "100%" : "auto", flexWrap: "wrap" }}>
-            <select value={statusFilter} onChange={e => setStatus(e.target.value)} style={{ flex: 1, minWidth: "120px", padding: "9px 12px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-secondary)", fontSize: "13px", outline: "none", cursor: "pointer" }}>
+            <select value={statusFilter} onChange={e => setStatus(e.target.value)} style={{ flex: 1, minWidth: "120px", padding: "9px 12px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-secondary)", fontSize: "15px", outline: "none", cursor: "pointer" }}>
               <option value="">All Status</option><option value="paid">Paid</option><option value="pending">Pending</option><option value="failed">Failed</option><option value="refunded">Refunded</option>
             </select>
-            <select value={methodFilter} onChange={e => setMethod(e.target.value)} style={{ flex: 1, minWidth: "120px", padding: "9px 12px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-secondary)", fontSize: "13px", outline: "none", cursor: "pointer" }}>
+            <select value={methodFilter} onChange={e => setMethod(e.target.value)} style={{ flex: 1, minWidth: "120px", padding: "9px 12px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-secondary)", fontSize: "15px", outline: "none", cursor: "pointer" }}>
               <option value="">All Methods</option><option value="cash">💵 Cash</option><option value="card">💳 Card</option><option value="upi">📱 UPI</option><option value="bank_transfer">🏦 Bank Transfer</option>
             </select>
           </div>
@@ -1255,7 +1255,7 @@ export default function Payments({ onLogout }) {
                 ))
               ) : payments.length === 0 ? (
                 <div style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>
-                  <FaMoneyBill style={{ fontSize: "28px", opacity: 0.3, display: "block", margin: "0 auto 10px" }} />
+                  <FaMoneyBill style={{ fontSize: "31px", opacity: 0.3, display: "block", margin: "0 auto 10px" }} />
                   No payments found
                 </div>
               ) : payments.map(p => {
@@ -1270,31 +1270,31 @@ export default function Payments({ onLogout }) {
                     {/* Top: name + status + amount */}
                     <div style={{ padding: "12px 14px", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "14px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.full_name}</div>
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "3px" }}>
+                        <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "16px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.full_name}</div>
+                        <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "3px" }}>
                           {fmtDate(p.payment_date)} · {METHOD_ICON[p.payment_method]} {p.payment_method?.replace("_", " ")}
                         </div>
                       </div>
                       <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "10px" }}>
-                        <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "15px" }}>{fmt(p.amount)}</div>
-                        <span style={{ padding: "2px 8px", borderRadius: "99px", background: sc.bg, color: sc.color, fontSize: "10px", fontWeight: 600, textTransform: "capitalize" }}>{p.status}</span>
+                        <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "17px" }}>{fmt(p.amount)}</div>
+                        <span style={{ padding: "2px 8px", borderRadius: "99px", background: sc.bg, color: sc.color, fontSize: "11px", fontWeight: 600, textTransform: "capitalize" }}>{p.status}</span>
                       </div>
                     </div>
                     {/* Bottom: plan + due + actions */}
                     <div style={{ padding: "8px 14px 10px", borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
-                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+                      <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
                         {p.plan_name || p.payment_for?.replace("_", " ")}
                         {hasDue && <span style={{ color: "var(--yellow)", marginLeft: "8px", fontWeight: 600 }}>Due: {fmt(p.due_amount)}</span>}
                       </div>
                       <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
-                        <button onClick={() => downloadInvoice(p.id)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
+                        <button onClick={() => downloadInvoice(p.id)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
                           <FaFilePdf /> Invoice
                         </button>
-                        <button onClick={() => { setEditData(p); setModal(true); }} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
+                        <button onClick={() => { setEditData(p); setModal(true); }} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
                           <FaEdit /> Edit
                         </button>
                         {admin.role === "super_admin" && (
-                          <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
+                          <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
                             <FaTrash />{deleting === p.id ? "..." : "Del"}
                           </button>
                         )}
@@ -1307,11 +1307,11 @@ export default function Payments({ onLogout }) {
           ) : (
             /* ── Desktop Table ── */
             <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "15px" }}>
                 <thead>
                   <tr style={{ background: "var(--bg-elevated)" }}>
                     {["Member", "Amount / Due", "Date", "Method", "For", "Months", "Status", "Actions"].map(h => (
-                      <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap" }}>{h}</th>
+                      <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -1319,7 +1319,7 @@ export default function Payments({ onLogout }) {
                   {loading ? (
                     [...Array(5)].map((_, i) => <tr key={i}>{[...Array(8)].map((_, j) => <td key={j} style={{ padding: "14px 16px", borderBottom: "1px solid var(--border-subtle)" }}><div style={{ height: "12px", borderRadius: "4px", background: "var(--bg-elevated)", width: j === 0 ? "140px" : "70px" }} /></td>)}</tr>)
                   ) : payments.length === 0 ? (
-                    <tr><td colSpan={8} style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)" }}><FaMoneyBill style={{ fontSize: "32px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />No payments found</td></tr>
+                    <tr><td colSpan={8} style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)" }}><FaMoneyBill style={{ fontSize: "36px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />No payments found</td></tr>
                   ) : (
                     payments.map(p => {
                       const sc = STATUS_COLOR[p.status] || STATUS_COLOR.paid;
@@ -1331,40 +1331,40 @@ export default function Payments({ onLogout }) {
                         >
                           <td style={{ padding: "14px 16px" }}>
                             <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
-                            <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{p.email}</div>
+                            <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>{p.email}</div>
                           </td>
                           <td style={{ padding: "14px 16px" }}>
-                            <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, color: "var(--text-primary)", fontSize: "14px" }}>{fmt(p.amount)}</span>
+                            <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, color: "var(--text-primary)", fontSize: "16px" }}>{fmt(p.amount)}</span>
                             {hasDue ? (
                               <div style={{ marginTop: "5px", display: "flex", flexDirection: "column", gap: "3px" }}>
-                                <span style={{ fontSize: "11px", color: "var(--green)", fontWeight: 600 }}>✓ Paid: {fmt(p.paid_amount)}</span>
-                                <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 7px", borderRadius: "99px", background: "var(--yellow-bg)", color: "var(--yellow)", border: "1px solid rgba(234,179,8,0.3)", display: "inline-flex", alignItems: "center", gap: "3px", width: "fit-content" }}>
+                                <span style={{ fontSize: "12px", color: "var(--green)", fontWeight: 600 }}>✓ Paid: {fmt(p.paid_amount)}</span>
+                                <span style={{ fontSize: "11px", fontWeight: 700, padding: "2px 7px", borderRadius: "99px", background: "var(--yellow-bg)", color: "var(--yellow)", border: "1px solid rgba(234,179,8,0.3)", display: "inline-flex", alignItems: "center", gap: "3px", width: "fit-content" }}>
                                   <FaExclamationTriangle style={{ fontSize: "8px" }} />Due: {fmt(p.due_amount)}
                                 </span>
                                 <button onClick={async () => {
                                   if (!window.confirm(`Mark ₹${Number(p.due_amount).toLocaleString("en-IN")} as paid for ${p.full_name}?`)) return;
                                   try { await api.put(`/payments/${p.id}`, { ...p, paid_amount: Number(p.amount), due_amount: 0, status: "paid", payment_date: p.payment_date?.split("T")[0] || new Date().toISOString().split("T")[0] }); fetchPayments(); fetchStats(); } catch (e) { alert("Failed: " + (e.response?.data?.message || e.message)); }
-                                }} style={{ marginTop: "2px", padding: "3px 10px", borderRadius: "99px", cursor: "pointer", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.3)", color: "var(--green)", fontSize: "10px", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                }} style={{ marginTop: "2px", padding: "3px 10px", borderRadius: "99px", cursor: "pointer", background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.3)", color: "var(--green)", fontSize: "11px", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "4px" }}>
                                   ✓ Pay Due {fmt(p.due_amount)}
                                 </button>
                               </div>
-                            ) : <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "2px" }}>Fully paid ✓</div>}
+                            ) : <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>Fully paid ✓</div>}
                           </td>
                           <td style={{ padding: "14px 16px", color: "var(--text-secondary)", whiteSpace: "nowrap" }}>{fmtDate(p.payment_date)}</td>
                           <td style={{ padding: "14px 16px" }}><span style={{ display: "flex", alignItems: "center", gap: "5px", color: "var(--text-secondary)" }}>{METHOD_ICON[p.payment_method]} {p.payment_method?.replace("_", " ")}</span></td>
-                          <td style={{ padding: "14px 16px" }}><span style={{ padding: "3px 8px", borderRadius: "99px", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", fontSize: "11px", color: "var(--text-secondary)", textTransform: "capitalize", whiteSpace: "nowrap" }}>{p.plan_name || p.payment_for?.replace("_", " ")}</span></td>
+                          <td style={{ padding: "14px 16px" }}><span style={{ padding: "3px 8px", borderRadius: "99px", background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)", fontSize: "12px", color: "var(--text-secondary)", textTransform: "capitalize", whiteSpace: "nowrap" }}>{p.plan_name || p.payment_for?.replace("_", " ")}</span></td>
                           <td style={{ padding: "14px 16px", color: "var(--text-secondary)", textAlign: "center" }}>{p.months_covered}</td>
-                          <td style={{ padding: "14px 16px" }}><span style={{ padding: "4px 10px", borderRadius: "99px", background: sc.bg, color: sc.color, fontSize: "11px", fontWeight: 600, textTransform: "capitalize", whiteSpace: "nowrap" }}>{p.status}</span></td>
+                          <td style={{ padding: "14px 16px" }}><span style={{ padding: "4px 10px", borderRadius: "99px", background: sc.bg, color: sc.color, fontSize: "12px", fontWeight: 600, textTransform: "capitalize", whiteSpace: "nowrap" }}>{p.status}</span></td>
                           <td style={{ padding: "14px 16px" }}>
                             <div style={{ display: "flex", gap: "6px" }}>
-                              <button onClick={() => downloadInvoice(p.id)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
+                              <button onClick={() => downloadInvoice(p.id)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
                                 <FaFilePdf /> Invoice
                               </button>
-                              <button onClick={() => { setEditData(p); setModal(true); }} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
+                              <button onClick={() => { setEditData(p); setModal(true); }} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
                                 <FaEdit /> Edit
                               </button>
                               {admin.role === "super_admin" && (
-                                <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}>
+                                <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
                                   <FaTrash />{deleting === p.id ? "..." : "Del"}
                                 </button>
                               )}
@@ -1381,7 +1381,7 @@ export default function Payments({ onLogout }) {
 
           {totalPages > 1 && (
             <div style={{ padding: "14px 20px", borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Page {page} of {totalPages} — {totalCount} total</span>
+              <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Page {page} of {totalPages} — {totalCount} total</span>
               <div style={{ display: "flex", gap: "6px" }}>
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={{ padding: "6px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page === 1 ? "var(--text-muted)" : "var(--text-secondary)", cursor: page === 1 ? "not-allowed" : "pointer" }}><FaChevronLeft /></button>
                 <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} style={{ padding: "6px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page === totalPages ? "var(--text-muted)" : "var(--text-secondary)", cursor: page === totalPages ? "not-allowed" : "pointer" }}><FaChevronRight /></button>

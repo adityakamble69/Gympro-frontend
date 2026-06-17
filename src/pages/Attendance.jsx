@@ -29,7 +29,7 @@ const todayStr = () => new Date().toISOString().split("T")[0];
 
 // ─── Reusable badge ───────────────────────────────────────────────────────────
 const Badge = ({ label, color, bg }) => (
-  <span style={{ fontSize: "11px", fontWeight: 600, padding: "2px 10px", borderRadius: "99px", background: bg, color, textTransform: "capitalize" }}>
+  <span style={{ fontSize: "12px", fontWeight: 600, padding: "2px 10px", borderRadius: "99px", background: bg, color, textTransform: "capitalize" }}>
     {label}
   </span>
 );
@@ -83,11 +83,11 @@ function CheckInModal({ onClose, onSuccess }) {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <div>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Mark Attendance</h2>
-            <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "3px" }}>Search and select a member to check in</p>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "22px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Mark Attendance</h2>
+            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "3px" }}>Search and select a member to check in</p>
           </div>
           <button onClick={onClose} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <FaTimes style={{ fontSize: "12px" }} />
+            <FaTimes style={{ fontSize: "13px" }} />
           </button>
         </div>
 
@@ -97,15 +97,15 @@ function CheckInModal({ onClose, onSuccess }) {
           background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
           borderRadius: "var(--radius-sm)", padding: "10px 14px", marginBottom: "12px"
         }}>
-          <FaSearch style={{ color: "var(--text-muted)", fontSize: "13px", flexShrink: 0 }} />
+          <FaSearch style={{ color: "var(--text-muted)", fontSize: "15px", flexShrink: 0 }} />
           <input
             autoFocus
             value={query}
             onChange={e => { setQuery(e.target.value); setSelected(null); }}
             placeholder="Search by name, email or phone..."
-            style={{ background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontSize: "14px", width: "100%", fontFamily: "var(--font-body)" }}
+            style={{ background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontSize: "16px", width: "100%", fontFamily: "var(--font-body)" }}
           />
-          {query && <FaTimes style={{ color: "var(--text-muted)", cursor: "pointer", fontSize: "12px" }} onClick={() => { setQuery(""); setSelected(null); }} />}
+          {query && <FaTimes style={{ color: "var(--text-muted)", cursor: "pointer", fontSize: "13px" }} onClick={() => { setQuery(""); setSelected(null); }} />}
         </div>
 
         {/* Results */}
@@ -130,11 +130,11 @@ function CheckInModal({ onClose, onSuccess }) {
                   width: "32px", height: "32px", borderRadius: "50%",
                   background: "var(--bg-active)", border: "1px solid var(--border-strong)",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "12px", fontWeight: 700, color: "var(--text-secondary)", flexShrink: 0
+                  fontSize: "13px", fontWeight: 700, color: "var(--text-secondary)", flexShrink: 0
                 }}>{m.full_name?.charAt(0)?.toUpperCase()}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{m.full_name}</div>
-                  <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.email} · {m.phone}</div>
+                  <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text-primary)" }}>{m.full_name}</div>
+                  <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{m.email} · {m.phone}</div>
                 </div>
                 <Badge label={m.membership_type}
                   color={m.membership_type === "premium" ? "var(--yellow)" : m.membership_type === "standard" ? "var(--blue)" : "var(--text-muted)"}
@@ -156,23 +156,23 @@ function CheckInModal({ onClose, onSuccess }) {
               width: "36px", height: "36px", borderRadius: "50%",
               background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.3)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "14px", fontWeight: 700, color: "var(--green)", flexShrink: 0
+              fontSize: "16px", fontWeight: 700, color: "var(--green)", flexShrink: 0
             }}>{selected.full_name?.charAt(0)?.toUpperCase()}</div>
             <div>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-primary)" }}>{selected.full_name}</div>
-              <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{selected.email} · {selected.membership_type}</div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: "var(--text-primary)" }}>{selected.full_name}</div>
+              <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>{selected.email} · {selected.membership_type}</div>
             </div>
           </div>
         )}
 
         {error && (
-          <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px", marginBottom: "16px" }}>
+          <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "15px", marginBottom: "16px" }}>
             {error}
           </div>
         )}
 
         <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>
+          <button onClick={onClose} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px" }}>
             Cancel
           </button>
           <button
@@ -182,7 +182,7 @@ function CheckInModal({ onClose, onSuccess }) {
               background: (!selected || loading) ? "var(--bg-elevated)" : "var(--text-primary)",
               color: (!selected || loading) ? "var(--text-muted)" : "#0a0a0a",
               border: "none", cursor: (!selected || loading) ? "not-allowed" : "pointer",
-              fontSize: "13px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em"
+              fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em"
             }}
           >
             {loading ? "Checking in..." : "✓ CHECK IN"}
@@ -206,11 +206,11 @@ const AttendanceCard = ({ r, isToday, canMark, isSuper, onCheckout, onDelete }) 
         width: "38px", height: "38px", borderRadius: "50%",
         background: "var(--bg-active)", border: "1px solid var(--border-default)",
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: "13px", fontWeight: 700, color: "var(--text-secondary)", flexShrink: 0
+        fontSize: "15px", fontWeight: 700, color: "var(--text-secondary)", flexShrink: 0
       }}>{r.full_name?.charAt(0)?.toUpperCase()}</div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 700, fontSize: "14px", color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.full_name}</div>
-        <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "1px" }}>{r.email}</div>
+        <div style={{ fontWeight: 700, fontSize: "16px", color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.full_name}</div>
+        <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "1px" }}>{r.email}</div>
       </div>
       <Badge
         label={r.check_out ? "completed" : "active"}
@@ -221,18 +221,18 @@ const AttendanceCard = ({ r, isToday, canMark, isSuper, onCheckout, onDelete }) 
 
     {/* Times row */}
     <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-      <span style={{ fontSize: "12px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
-        <FaClock style={{ fontSize: "10px", color: "var(--green)" }} />
+      <span style={{ fontSize: "13px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
+        <FaClock style={{ fontSize: "11px", color: "var(--green)" }} />
         <span>In: <strong style={{ color: "var(--green)" }}>{fmtTime(r.check_in)}</strong></span>
       </span>
       {r.check_out ? (
-        <span style={{ fontSize: "12px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
-          <FaClock style={{ fontSize: "10px", color: "var(--text-secondary)" }} />
+        <span style={{ fontSize: "13px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
+          <FaClock style={{ fontSize: "11px", color: "var(--text-secondary)" }} />
           <span>Out: <strong style={{ color: "var(--text-secondary)" }}>{fmtTime(r.check_out)}</strong></span>
         </span>
       ) : null}
       {r.check_out && (
-        <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+        <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>
           ⏱ <strong style={{ color: "var(--text-secondary)" }}>{duration(r.check_in, r.check_out)}</strong>
         </span>
       )}
@@ -246,13 +246,13 @@ const AttendanceCard = ({ r, isToday, canMark, isSuper, onCheckout, onDelete }) 
     {((!r.check_out && isToday && canMark) || isSuper) && (
       <div style={{ display: "flex", gap: "8px" }}>
         {!r.check_out && isToday && canMark && (
-          <button onClick={() => onCheckout(r.id)} style={{ flex: 1, padding: "7px", borderRadius: "var(--radius-sm)", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", color: "var(--yellow)", cursor: "pointer", fontSize: "12px", fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
-            <FaClock style={{ fontSize: "11px" }} /> Check Out
+          <button onClick={() => onCheckout(r.id)} style={{ flex: 1, padding: "7px", borderRadius: "var(--radius-sm)", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", color: "var(--yellow)", cursor: "pointer", fontSize: "13px", fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
+            <FaClock style={{ fontSize: "12px" }} /> Check Out
           </button>
         )}
         {isSuper && (
-          <button onClick={() => onDelete(r.id)} style={{ padding: "7px 12px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.25)", color: "var(--red)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "5px" }}>
-            <FaTrash style={{ fontSize: "11px" }} />
+          <button onClick={() => onDelete(r.id)} style={{ padding: "7px 12px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.25)", color: "var(--red)", cursor: "pointer", fontSize: "13px", display: "flex", alignItems: "center", gap: "5px" }}>
+            <FaTrash style={{ fontSize: "12px" }} />
           </button>
         )}
       </div>
@@ -356,8 +356,8 @@ export default function Attendance({ onLogout }) {
         {/* Header */}
         <div className="fade-up attend-header">
           <div>
-            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>Attendance</h1>
-            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>
+            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "31px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>Attendance</h1>
+            <p style={{ color: "var(--text-muted)", fontSize: "15px", marginTop: "4px" }}>
               {isToday ? "Today — " : ""}{fmtDate(date)} · {presentCount} check-in{presentCount !== 1 ? "s" : ""}
             </p>
           </div>
@@ -368,14 +368,14 @@ export default function Attendance({ onLogout }) {
                 display: "flex", alignItems: "center", gap: "8px",
                 padding: "10px 18px", borderRadius: "var(--radius-sm)",
                 background: "var(--text-primary)", color: "#0a0a0a",
-                border: "none", cursor: "pointer", fontSize: "13px",
+                border: "none", cursor: "pointer", fontSize: "15px",
                 fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em",
                 transition: "opacity 0.15s"
               }}
               onMouseEnter={e => e.currentTarget.style.opacity = "0.85"}
               onMouseLeave={e => e.currentTarget.style.opacity = "1"}
             >
-              <FaUserCheck style={{ fontSize: "13px" }} /> MARK CHECK-IN
+              <FaUserCheck style={{ fontSize: "15px" }} /> MARK CHECK-IN
             </button>
           )}
         </div>
@@ -393,11 +393,11 @@ export default function Attendance({ onLogout }) {
               borderRadius: "var(--radius-md)", padding: "12px 18px", flex: "1 1 140px"
             }}>
               <div style={{ width: "32px", height: "32px", borderRadius: "7px", background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", color: s.color }}>
-                <s.icon style={{ fontSize: "14px" }} />
+                <s.icon style={{ fontSize: "16px" }} />
               </div>
               <div>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1 }}>{s.val}</div>
-                <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{s.label}</div>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: "22px", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1 }}>{s.val}</div>
+                <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>{s.label}</div>
               </div>
             </div>
           ))}
@@ -413,21 +413,21 @@ export default function Attendance({ onLogout }) {
             {/* Date navigator */}
             <div className="attend-date-nav" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <button onClick={prevDay} style={{ padding: "7px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer" }}>
-                <FaChevronLeft style={{ fontSize: "11px" }} />
+                <FaChevronLeft style={{ fontSize: "12px" }} />
               </button>
               <div style={{ display: "flex", alignItems: "center", gap: "7px", padding: "7px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)" }}>
-                <FaCalendarAlt style={{ color: "var(--text-muted)", fontSize: "12px" }} />
+                <FaCalendarAlt style={{ color: "var(--text-muted)", fontSize: "13px" }} />
                 <input
                   type="date" value={date} max={todayStr()}
                   onChange={e => setDate(e.target.value)}
-                  style={{ background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontSize: "13px", fontFamily: "var(--font-body)", cursor: "pointer" }}
+                  style={{ background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontSize: "15px", fontFamily: "var(--font-body)", cursor: "pointer" }}
                 />
               </div>
               <button onClick={nextDay} disabled={isToday} style={{ padding: "7px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: isToday ? "var(--text-disabled)" : "var(--text-secondary)", cursor: isToday ? "not-allowed" : "pointer" }}>
-                <FaChevronRight style={{ fontSize: "11px" }} />
+                <FaChevronRight style={{ fontSize: "12px" }} />
               </button>
               {!isToday && (
-                <button onClick={() => setDate(todayStr())} style={{ padding: "7px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px" }}>
+                <button onClick={() => setDate(todayStr())} style={{ padding: "7px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>
                   Today
                 </button>
               )}
@@ -439,13 +439,13 @@ export default function Attendance({ onLogout }) {
               background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
               borderRadius: "var(--radius-sm)", padding: "7px 12px", flex: 1, minWidth: "180px"
             }}>
-              <FaSearch style={{ color: "var(--text-muted)", fontSize: "12px", flexShrink: 0 }} />
+              <FaSearch style={{ color: "var(--text-muted)", fontSize: "13px", flexShrink: 0 }} />
               <input
                 value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Filter by name or email..."
-                style={{ background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontSize: "13px", width: "100%", fontFamily: "var(--font-body)" }}
+                style={{ background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontSize: "15px", width: "100%", fontFamily: "var(--font-body)" }}
               />
-              {search && <FaTimes style={{ color: "var(--text-muted)", cursor: "pointer", fontSize: "11px" }} onClick={() => setSearch("")} />}
+              {search && <FaTimes style={{ color: "var(--text-muted)", cursor: "pointer", fontSize: "12px" }} onClick={() => setSearch("")} />}
             </div>
           </div>
 
@@ -457,7 +457,7 @@ export default function Attendance({ onLogout }) {
                   {["#", "Member", "Membership", "Check In", "Check Out", "Duration", "Status", ""].map((h, i) => (
                     <th key={i} style={{
                       padding: "10px 16px", textAlign: h === "" ? "center" : "left",
-                      fontSize: "11px", fontWeight: 600, color: "var(--text-muted)",
+                      fontSize: "12px", fontWeight: 600, color: "var(--text-muted)",
                       textTransform: "uppercase", letterSpacing: "0.08em",
                       borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap"
                     }}>{h}</th>
@@ -469,7 +469,7 @@ export default function Attendance({ onLogout }) {
                   <tr><td colSpan={8} style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)" }}>Loading...</td></tr>
                 ) : filtered.length === 0 ? (
                   <tr><td colSpan={8} style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)" }}>
-                    <FaClipboardCheck style={{ fontSize: "28px", display: "block", margin: "0 auto 10px", opacity: 0.25 }} />
+                    <FaClipboardCheck style={{ fontSize: "31px", display: "block", margin: "0 auto 10px", opacity: 0.25 }} />
                     {search ? "No records match your search" : isToday ? "No check-ins yet today — mark the first one!" : "No attendance records for this date"}
                   </td></tr>
                 ) : filtered.map((r, i) => (
@@ -478,18 +478,18 @@ export default function Attendance({ onLogout }) {
                     onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
-                    <td style={{ padding: "13px 16px", color: "var(--text-muted)", fontSize: "12px", fontWeight: 600 }}>{i + 1}</td>
+                    <td style={{ padding: "13px 16px", color: "var(--text-muted)", fontSize: "13px", fontWeight: 600 }}>{i + 1}</td>
                     <td style={{ padding: "13px 16px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                         <div style={{
                           width: "32px", height: "32px", borderRadius: "50%",
                           background: "var(--bg-active)", border: "1px solid var(--border-default)",
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: "12px", fontWeight: 700, color: "var(--text-secondary)", flexShrink: 0
+                          fontSize: "13px", fontWeight: 700, color: "var(--text-secondary)", flexShrink: 0
                         }}>{r.full_name?.charAt(0)?.toUpperCase()}</div>
                         <div>
-                          <div style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "13px" }}>{r.full_name}</div>
-                          <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{r.email}</div>
+                          <div style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "15px" }}>{r.full_name}</div>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{r.email}</div>
                         </div>
                       </div>
                     </td>
@@ -500,14 +500,14 @@ export default function Attendance({ onLogout }) {
                       />
                     </td>
                     <td style={{ padding: "13px 16px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--green)", fontSize: "13px" }}>
-                        <FaClock style={{ fontSize: "11px" }} /> {fmtTime(r.check_in)}
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--green)", fontSize: "15px" }}>
+                        <FaClock style={{ fontSize: "12px" }} /> {fmtTime(r.check_in)}
                       </div>
                     </td>
                     <td style={{ padding: "13px 16px" }}>
                       {r.check_out ? (
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--text-secondary)", fontSize: "13px" }}>
-                          <FaClock style={{ fontSize: "11px" }} /> {fmtTime(r.check_out)}
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--text-secondary)", fontSize: "15px" }}>
+                          <FaClock style={{ fontSize: "12px" }} /> {fmtTime(r.check_out)}
                         </div>
                       ) : (
                         isToday && can("mark_attendance") ? (
@@ -516,15 +516,15 @@ export default function Attendance({ onLogout }) {
                             style={{
                               padding: "4px 12px", borderRadius: "var(--radius-sm)",
                               background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)",
-                              color: "var(--yellow)", cursor: "pointer", fontSize: "11px", fontWeight: 600
+                              color: "var(--yellow)", cursor: "pointer", fontSize: "12px", fontWeight: 600
                             }}
                           >Check Out</button>
                         ) : (
-                          <span style={{ color: "var(--text-muted)", fontSize: "12px" }}>Still inside</span>
+                          <span style={{ color: "var(--text-muted)", fontSize: "13px" }}>Still inside</span>
                         )
                       )}
                     </td>
-                    <td style={{ padding: "13px 16px", color: "var(--text-secondary)", fontSize: "13px" }}>
+                    <td style={{ padding: "13px 16px", color: "var(--text-secondary)", fontSize: "15px" }}>
                       {duration(r.check_in, r.check_out)}
                     </td>
                     <td style={{ padding: "13px 16px" }}>
@@ -545,7 +545,7 @@ export default function Attendance({ onLogout }) {
                           }}
                           onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--red)"; e.currentTarget.style.color = "var(--red)"; }}
                           onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
-                        ><FaTrash style={{ fontSize: "12px" }} /></button>
+                        ><FaTrash style={{ fontSize: "13px" }} /></button>
                       )}
                     </td>
                   </tr>
@@ -571,7 +571,7 @@ export default function Attendance({ onLogout }) {
               ))
             ) : filtered.length === 0 ? (
               <div style={{ padding: "40px 16px", textAlign: "center", color: "var(--text-muted)" }}>
-                <FaClipboardCheck style={{ fontSize: "32px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />
+                <FaClipboardCheck style={{ fontSize: "36px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />
                 {search ? "No records match your search" : isToday ? "No check-ins yet today!" : "No records for this date"}
               </div>
             ) : filtered.map(r => (
@@ -597,13 +597,13 @@ export default function Attendance({ onLogout }) {
           onClick={e => { if (e.target === e.currentTarget) setDeleteId(null); }}>
           <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", padding: "32px", maxWidth: "360px", width: "100%", textAlign: "center" }}>
             <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px", color: "var(--red)" }}>
-              <FaTrash style={{ fontSize: "16px" }} />
+              <FaTrash style={{ fontSize: "18px" }} />
             </div>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>Delete Record?</h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginBottom: "22px" }}>This attendance record will be permanently deleted.</p>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>Delete Record?</h3>
+            <p style={{ color: "var(--text-muted)", fontSize: "15px", marginBottom: "22px" }}>This attendance record will be permanently deleted.</p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-              <button onClick={() => setDeleteId(null)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px", flex: 1 }}>Cancel</button>
-              <button onClick={handleDelete} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--red)", cursor: "pointer", fontSize: "13px", fontWeight: 700, flex: 1 }}>Delete</button>
+              <button onClick={() => setDeleteId(null)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px", flex: 1 }}>Cancel</button>
+              <button onClick={handleDelete} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--red)", cursor: "pointer", fontSize: "15px", fontWeight: 700, flex: 1 }}>Delete</button>
             </div>
           </div>
         </div>

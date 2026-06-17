@@ -13,14 +13,14 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-dig
 const Field = ({ label, icon: Icon, type = "text", value, onChange, placeholder, disabled, rightEl }) => (
   <div style={{ marginBottom: "18px" }}>
     <label style={{
-      display: "block", marginBottom: "6px", fontSize: "11px", fontWeight: 600,
+      display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: 600,
       color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.08em"
     }}>{label}</label>
     <div style={{ position: "relative" }}>
       {Icon && (
         <Icon style={{
           position: "absolute", left: "13px", top: "50%", transform: "translateY(-50%)",
-          color: "var(--text-muted)", fontSize: "13px", pointerEvents: "none"
+          color: "var(--text-muted)", fontSize: "15px", pointerEvents: "none"
         }} />
       )}
       <input
@@ -32,7 +32,7 @@ const Field = ({ label, icon: Icon, type = "text", value, onChange, placeholder,
           background: disabled ? "var(--bg-base)" : "var(--bg-elevated)",
           border: "1px solid var(--border-default)",
           borderRadius: "var(--radius-sm)", color: disabled ? "var(--text-muted)" : "var(--text-primary)",
-          fontSize: "13px", outline: "none", transition: "border-color 0.2s",
+          fontSize: "15px", outline: "none", transition: "border-color 0.2s",
           cursor: disabled ? "not-allowed" : "text"
         }}
         onFocus={e => { if (!disabled) e.target.style.borderColor = "var(--border-strong)"; }}
@@ -53,7 +53,7 @@ const Alert = ({ msg, type }) => {
   const isError = type === "error";
   return (
     <div style={{
-      padding: "11px 14px", borderRadius: "var(--radius-sm)", marginBottom: "16px", fontSize: "13px",
+      padding: "11px 14px", borderRadius: "var(--radius-sm)", marginBottom: "16px", fontSize: "15px",
       background: isError ? "var(--red-bg)"   : "var(--green-bg)",
       border:     `1px solid ${isError ? "rgba(248,113,113,0.25)" : "rgba(74,222,128,0.25)"}`,
       color:      isError ? "var(--red)"       : "var(--green)",
@@ -157,7 +157,7 @@ export default function Profile({ onLogout }) {
 
   const eyeBtn = (show, toggle) => (
     <button onClick={toggle} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0, display: "flex" }}>
-      {show ? <FaEyeSlash style={{ fontSize: "13px" }} /> : <FaEye style={{ fontSize: "13px" }} />}
+      {show ? <FaEyeSlash style={{ fontSize: "15px" }} /> : <FaEye style={{ fontSize: "15px" }} />}
     </button>
   );
 
@@ -201,10 +201,10 @@ export default function Profile({ onLogout }) {
 
         {/* Header */}
         <div style={{ marginBottom: "24px" }}>
-          <h1 className="profile-h1" style={{ fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>
+          <h1 className="profile-h1" style={{ fontFamily: "var(--font-display)", fontSize: "31px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>
             Profile
           </h1>
-          <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>
+          <p style={{ color: "var(--text-muted)", fontSize: "15px", marginTop: "4px" }}>
             Manage your account details and password
           </p>
         </div>
@@ -223,24 +223,24 @@ export default function Profile({ onLogout }) {
                 width: "80px", height: "80px", borderRadius: "50%",
                 background: "var(--bg-active)", border: "2px solid var(--border-strong)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: 800,
+                fontFamily: "var(--font-display)", fontSize: "31px", fontWeight: 800,
                 color: "var(--text-primary)", margin: "0 auto 16px"
               }}>{loading ? "—" : initials}</div>
 
-              <div style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "4px" }}>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "4px" }}>
                 {loading ? "—" : profile?.full_name}
               </div>
-              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "16px" }}>
+              <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "16px" }}>
                 {loading ? "—" : profile?.email}
               </div>
 
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: "6px",
-                padding: "5px 14px", borderRadius: "99px", fontSize: "12px", fontWeight: 600,
+                padding: "5px 14px", borderRadius: "99px", fontSize: "13px", fontWeight: 600,
                 background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
                 color: "var(--text-secondary)"
               }}>
-                <FaShieldAlt style={{ fontSize: "10px", color: "var(--green)" }} />
+                <FaShieldAlt style={{ fontSize: "11px", color: "var(--green)" }} />
                 {profile?.role?.replace("_", " ") || "admin"}
               </span>
             </div>
@@ -250,7 +250,7 @@ export default function Profile({ onLogout }) {
               background: "var(--bg-surface)", border: "1px solid var(--border-subtle)",
               borderRadius: "var(--radius-lg)", padding: "20px"
             }}>
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "13px", fontWeight: 700, color: "var(--text-primary)", margin: "0 0 14px" }}>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 700, color: "var(--text-primary)", margin: "0 0 14px" }}>
                 Account Info
               </h3>
               {[
@@ -268,11 +268,11 @@ export default function Profile({ onLogout }) {
                     background: "var(--bg-elevated)", display: "flex", alignItems: "center",
                     justifyContent: "center", color: "var(--text-muted)", flexShrink: 0
                   }}>
-                    <Icon style={{ fontSize: "11px" }} />
+                    <Icon style={{ fontSize: "12px" }} />
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: "10px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>
-                    <div style={{ fontSize: "13px", color: "var(--text-primary)", fontWeight: 500, textTransform: "capitalize", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <div style={{ fontSize: "11px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>
+                    <div style={{ fontSize: "15px", color: "var(--text-primary)", fontWeight: 500, textTransform: "capitalize", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {loading ? "—" : value || "—"}
                     </div>
                   </div>
@@ -291,20 +291,20 @@ export default function Profile({ onLogout }) {
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                 <div>
-                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
                     Edit Profile
                   </h3>
-                  <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "3px" }}>Update your name and email</p>
+                  <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "3px" }}>Update your name and email</p>
                 </div>
                 {!editMode && (
                   <button onClick={() => setEditMode(true)} style={{
                     display: "flex", alignItems: "center", gap: "6px",
                     padding: "7px 14px", borderRadius: "var(--radius-sm)",
                     background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
-                    color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px",
+                    color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px",
                     whiteSpace: "nowrap"
                   }}>
-                    <FaEdit style={{ fontSize: "10px" }} /> Edit
+                    <FaEdit style={{ fontSize: "11px" }} /> Edit
                   </button>
                 )}
               </div>
@@ -316,14 +316,14 @@ export default function Profile({ onLogout }) {
 
               <div style={{ marginBottom: "0" }}>
                 <label style={{
-                  display: "block", marginBottom: "6px", fontSize: "11px", fontWeight: 600,
+                  display: "block", marginBottom: "6px", fontSize: "12px", fontWeight: 600,
                   color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.08em"
                 }}>Role</label>
                 <input value={profile?.role?.replace("_", " ") || ""} disabled style={{
                   width: "100%", padding: "10px 14px", boxSizing: "border-box",
                   background: "var(--bg-base)", border: "1px solid var(--border-default)",
                   borderRadius: "var(--radius-sm)", color: "var(--text-muted)",
-                  fontSize: "13px", cursor: "not-allowed", textTransform: "capitalize"
+                  fontSize: "15px", cursor: "not-allowed", textTransform: "capitalize"
                 }} />
               </div>
 
@@ -332,20 +332,20 @@ export default function Profile({ onLogout }) {
                   <button onClick={handleCancelEdit} style={{
                     flex: 1, padding: "10px", borderRadius: "var(--radius-sm)",
                     background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
-                    color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px",
+                    color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px",
                     display: "flex", alignItems: "center", justifyContent: "center", gap: "6px"
                   }}>
-                    <FaTimes style={{ fontSize: "11px" }} /> Cancel
+                    <FaTimes style={{ fontSize: "12px" }} /> Cancel
                   </button>
                   <button onClick={handleSaveProfile} disabled={saving} style={{
                     flex: 1, padding: "10px", borderRadius: "var(--radius-sm)",
                     background: saving ? "var(--bg-elevated)" : "var(--text-primary)",
                     color: saving ? "var(--text-muted)" : "#0a0a0a",
                     border: "none", cursor: saving ? "not-allowed" : "pointer",
-                    fontWeight: 700, fontSize: "13px", fontFamily: "var(--font-display)",
+                    fontWeight: 700, fontSize: "15px", fontFamily: "var(--font-display)",
                     display: "flex", alignItems: "center", justifyContent: "center", gap: "6px"
                   }}>
-                    <FaCheck style={{ fontSize: "11px" }} />
+                    <FaCheck style={{ fontSize: "12px" }} />
                     {saving ? "Saving..." : "Save Changes"}
                   </button>
                 </div>
@@ -358,10 +358,10 @@ export default function Profile({ onLogout }) {
               borderRadius: "var(--radius-lg)", padding: "24px"
             }}>
               <div style={{ marginBottom: "20px" }}>
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
+                <h3 style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
                   Change Password
                 </h3>
-                <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "3px" }}>Keep your account secure</p>
+                <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "3px" }}>Keep your account secure</p>
               </div>
 
               <Alert msg={pwdMsg.text} type={pwdMsg.type} />
@@ -382,7 +382,7 @@ export default function Profile({ onLogout }) {
                   <div style={{ height: "3px", background: "var(--bg-elevated)", borderRadius: "99px", overflow: "hidden" }}>
                     <div style={{ height: "100%", width: strength.width, background: strength.color, borderRadius: "99px", transition: "all 0.3s" }} />
                   </div>
-                  <div style={{ fontSize: "10px", color: strength.color, marginTop: "4px", fontWeight: 600 }}>{strength.label}</div>
+                  <div style={{ fontSize: "11px", color: strength.color, marginTop: "4px", fontWeight: 600 }}>{strength.label}</div>
                 </div>
               )}
 
@@ -394,7 +394,7 @@ export default function Profile({ onLogout }) {
               {/* Match indicator */}
               {confPwd && newPwd && (
                 <div style={{
-                  marginTop: "-12px", marginBottom: "16px", fontSize: "11px", fontWeight: 600,
+                  marginTop: "-12px", marginBottom: "16px", fontSize: "12px", fontWeight: 600,
                   color: confPwd === newPwd ? "var(--green)" : "var(--red)",
                   display: "flex", alignItems: "center", gap: "5px"
                 }}>
@@ -408,10 +408,10 @@ export default function Profile({ onLogout }) {
                 background: pwdSaving ? "var(--bg-elevated)" : "var(--text-primary)",
                 color: pwdSaving ? "var(--text-muted)" : "#0a0a0a",
                 border: "none", cursor: pwdSaving ? "not-allowed" : "pointer",
-                fontWeight: 700, fontSize: "13px", fontFamily: "var(--font-display)",
+                fontWeight: 700, fontSize: "15px", fontFamily: "var(--font-display)",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "8px"
               }}>
-                <FaLock style={{ fontSize: "11px" }} />
+                <FaLock style={{ fontSize: "12px" }} />
                 {pwdSaving ? "Changing..." : "Change Password"}
               </button>
             </div>

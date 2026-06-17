@@ -13,7 +13,7 @@ import MemberProfileDrawer from "../components/MemberProfileDrawer";
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 const Field = ({ label, children }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-    <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</label>
+    <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</label>
     {children}
   </div>
 );
@@ -21,7 +21,7 @@ const Field = ({ label, children }) => (
 const inputStyle = {
   padding: "9px 12px", borderRadius: "var(--radius-sm)",
   background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
-  color: "var(--text-primary)", fontSize: "13.5px", outline: "none",
+  color: "var(--text-primary)", fontSize: "15px", outline: "none",
   width: "100%", transition: "border-color 0.15s", fontFamily: "var(--font-body)"
 };
 
@@ -44,13 +44,13 @@ const DUR_COLOR = {
 const MembershipBadge = ({ type, plans }) => {
   const plan = plans.find(p => p.name === type || p.duration_type === type);
   const [color, bg] = DUR_COLOR[plan?.duration_type] || ["var(--text-muted)", "rgba(80,80,80,0.12)"];
-  return <span style={{ fontSize: "11px", fontWeight: 600, padding: "2px 10px", borderRadius: "99px", background: bg, color, textTransform: "capitalize", whiteSpace: "nowrap" }}>{type || "—"}</span>;
+  return <span style={{ fontSize: "12px", fontWeight: 600, padding: "2px 10px", borderRadius: "99px", background: bg, color, textTransform: "capitalize", whiteSpace: "nowrap" }}>{type || "—"}</span>;
 };
 
 const StatusBadge = ({ status }) => {
   const map = { active: ["var(--green)", "var(--green-bg)"], expired: ["var(--red)", "var(--red-bg)"], inactive: ["var(--text-muted)", "rgba(80,80,80,0.12)"] };
   const [color, bg] = map[status] || map.inactive;
-  return <span style={{ fontSize: "11px", fontWeight: 600, padding: "2px 10px", borderRadius: "99px", background: bg, color, textTransform: "capitalize" }}>{status}</span>;
+  return <span style={{ fontSize: "12px", fontWeight: 600, padding: "2px 10px", borderRadius: "99px", background: bg, color, textTransform: "capitalize" }}>{status}</span>;
 };
 
 // ─── WhatsApp Templates ────────────────────────────────────────────────────────
@@ -97,10 +97,10 @@ function NotifyModal({ member, onClose }) {
     <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "18px" }}>
       {NOTIFY_TYPES.map(t => (
         <div key={t.key} onClick={() => onChange(t.key)} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "11px 14px", borderRadius: "var(--radius-sm)", cursor: "pointer", border: value === t.key ? `1px solid ${t.color}55` : "1px solid var(--border-default)", background: value === t.key ? `${t.color}10` : "var(--bg-elevated)", transition: "all 0.15s" }}>
-          <span style={{ fontSize: "20px", lineHeight: 1 }}>{t.icon}</span>
+          <span style={{ fontSize: "22px", lineHeight: 1 }}>{t.icon}</span>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{t.label}</div>
-            <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{t.desc}</div>
+            <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text-primary)" }}>{t.label}</div>
+            <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>{t.desc}</div>
           </div>
           <div style={{ width: "18px", height: "18px", borderRadius: "50%", border: value === t.key ? `2px solid ${t.color}` : "2px solid var(--border-default)", background: value === t.key ? t.color : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             {value === t.key && <FaCheck style={{ fontSize: "8px", color: "#fff" }} />}
@@ -111,7 +111,7 @@ function NotifyModal({ member, onClose }) {
   );
 
   const ResultBanner = () => result ? (
-    <div style={{ padding: "11px 14px", borderRadius: "var(--radius-sm)", marginBottom: "14px", background: result.ok ? "var(--green-bg)" : "var(--red-bg)", border: `1px solid ${result.ok ? "rgba(74,222,128,0.2)" : "rgba(248,113,113,0.2)"}`, color: result.ok ? "var(--green)" : "var(--red)", fontSize: "13px" }}>
+    <div style={{ padding: "11px 14px", borderRadius: "var(--radius-sm)", marginBottom: "14px", background: result.ok ? "var(--green-bg)" : "var(--red-bg)", border: `1px solid ${result.ok ? "rgba(74,222,128,0.2)" : "rgba(248,113,113,0.2)"}`, color: result.ok ? "var(--green)" : "var(--red)", fontSize: "15px" }}>
       {result.ok ? "✅" : "❌"} {result.msg}
     </div>
   ) : null;
@@ -123,18 +123,18 @@ function NotifyModal({ member, onClose }) {
         <div style={{ padding: "22px 24px 16px", borderBottom: "1px solid var(--border-subtle)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Notify Member</h2>
-              <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "4px" }}>{member.full_name} · {member.phone || "No phone"}</p>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Notify Member</h2>
+              <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>{member.full_name} · {member.phone || "No phone"}</p>
             </div>
             <button onClick={onClose} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <FaTimes style={{ fontSize: "12px" }} />
+              <FaTimes style={{ fontSize: "13px" }} />
             </button>
           </div>
           <div style={{ display: "flex", gap: "12px", marginTop: "12px", flexWrap: "wrap", alignItems: "center" }}>
-            <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Plan: <strong style={{ color: "var(--text-secondary)" }}>{member.membership_type || "—"}</strong></span>
-            <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Expiry: <strong style={{ color: days !== null && days <= 7 ? "var(--red)" : days !== null && days <= 15 ? "var(--yellow)" : "var(--text-secondary)" }}>{fmtLong(member.membership_end)}</strong></span>
+            <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Plan: <strong style={{ color: "var(--text-secondary)" }}>{member.membership_type || "—"}</strong></span>
+            <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Expiry: <strong style={{ color: days !== null && days <= 7 ? "var(--red)" : days !== null && days <= 15 ? "var(--yellow)" : "var(--text-secondary)" }}>{fmtLong(member.membership_end)}</strong></span>
             {days !== null && (
-              <span style={{ fontSize: "11px", padding: "1px 8px", borderRadius: "99px", background: days <= 0 ? "var(--red-bg)" : days <= 7 ? "var(--red-bg)" : days <= 15 ? "var(--yellow-bg)" : "var(--green-bg)", color: days <= 0 ? "var(--red)" : days <= 7 ? "var(--red)" : days <= 15 ? "var(--yellow)" : "var(--green)", fontWeight: 600 }}>
+              <span style={{ fontSize: "12px", padding: "1px 8px", borderRadius: "99px", background: days <= 0 ? "var(--red-bg)" : days <= 7 ? "var(--red-bg)" : days <= 15 ? "var(--yellow-bg)" : "var(--green-bg)", color: days <= 0 ? "var(--red)" : days <= 7 ? "var(--red)" : days <= 15 ? "var(--yellow)" : "var(--green)", fontWeight: 600 }}>
                 {days <= 0 ? "Expired" : `${days}d left`}
               </span>
             )}
@@ -142,21 +142,21 @@ function NotifyModal({ member, onClose }) {
         </div>
         <div style={{ padding: "20px 24px" }}>
           <>
-            {!member.phone && <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", color: "var(--red)", fontSize: "13px", marginBottom: "14px", border: "1px solid rgba(248,113,113,0.2)" }}>⚠️ No phone number registered for this member.</div>}
-            <p style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "12px" }}>Select message type:</p>
+            {!member.phone && <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", color: "var(--red)", fontSize: "15px", marginBottom: "14px", border: "1px solid rgba(248,113,113,0.2)" }}>⚠️ No phone number registered for this member.</div>}
+            <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "12px" }}>Select message type:</p>
             <TypeSelector value={selType} onChange={setSelType} />
             {waPreview && (
               <div style={{ marginBottom: "16px" }}>
-                <p style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Message Preview</p>
-                <div style={{ background: "#1a2e1a", border: "1px solid rgba(74,222,128,0.2)", borderRadius: "var(--radius-sm)", padding: "14px 16px", fontSize: "12px", color: "#dcfce7", lineHeight: 1.75, whiteSpace: "pre-wrap", fontFamily: "monospace", maxHeight: "160px", overflowY: "auto" }}>
+                <p style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Message Preview</p>
+                <div style={{ background: "#1a2e1a", border: "1px solid rgba(74,222,128,0.2)", borderRadius: "var(--radius-sm)", padding: "14px 16px", fontSize: "13px", color: "#dcfce7", lineHeight: 1.75, whiteSpace: "pre-wrap", fontFamily: "monospace", maxHeight: "160px", overflowY: "auto" }}>
                   {waPreview}
                 </div>
-                <p style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "6px" }}>💡 Message will be pre-filled in WhatsApp — send from there</p>
+                <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "6px" }}>💡 Message will be pre-filled in WhatsApp — send from there</p>
               </div>
             )}
             <ResultBanner />
-            <button onClick={openWhatsApp} disabled={!selType || !member.phone} style={{ width: "100%", padding: "11px", borderRadius: "var(--radius-sm)", background: (!selType || !member.phone) ? "var(--bg-elevated)" : "#25d366", color: (!selType || !member.phone) ? "var(--text-muted)" : "#fff", border: "none", cursor: (!selType || !member.phone) ? "not-allowed" : "pointer", fontWeight: 700, fontSize: "13px", fontFamily: "var(--font-display)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-              <FaWhatsapp style={{ fontSize: "15px" }} />
+            <button onClick={openWhatsApp} disabled={!selType || !member.phone} style={{ width: "100%", padding: "11px", borderRadius: "var(--radius-sm)", background: (!selType || !member.phone) ? "var(--bg-elevated)" : "#25d366", color: (!selType || !member.phone) ? "var(--text-muted)" : "#fff", border: "none", cursor: (!selType || !member.phone) ? "not-allowed" : "pointer", fontWeight: 700, fontSize: "15px", fontFamily: "var(--font-display)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+              <FaWhatsapp style={{ fontSize: "17px" }} />
               Open WhatsApp — {member.phone || "No phone"}
             </button>
           </>
@@ -227,7 +227,7 @@ function ViewBillModal({ member, onClose }) {
   const editInputStyle = {
     padding: "6px 10px", borderRadius: "var(--radius-sm)",
     background: "var(--bg-base)", border: "1px solid var(--border-default)",
-    color: "var(--text-primary)", fontSize: "12px", outline: "none",
+    color: "var(--text-primary)", fontSize: "13px", outline: "none",
     width: "100%", boxSizing: "border-box", fontFamily: "var(--font-body)"
   };
 
@@ -241,16 +241,16 @@ function ViewBillModal({ member, onClose }) {
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <div style={{ width: "34px", height: "34px", borderRadius: "50%", background: "rgba(96,165,250,0.12)", border: "1px solid rgba(96,165,250,0.25)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--blue)", flexShrink: 0 }}>
-                <FaFileInvoiceDollar style={{ fontSize: "14px" }} />
+                <FaFileInvoiceDollar style={{ fontSize: "16px" }} />
               </div>
               <div>
-                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Membership Bills</h2>
-                <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "2px" }}>{member.full_name} · {member.membership_type || "—"}</p>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Membership Bills</h2>
+                <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "2px" }}>{member.full_name} · {member.membership_type || "—"}</p>
               </div>
             </div>
           </div>
           <button onClick={onClose} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <FaTimes style={{ fontSize: "12px" }} />
+            <FaTimes style={{ fontSize: "13px" }} />
           </button>
         </div>
 
@@ -264,8 +264,8 @@ function ViewBillModal({ member, onClose }) {
             </div>
           ) : history.length === 0 ? (
             <div style={{ textAlign: "center", padding: "48px 20px", color: "var(--text-muted)" }}>
-              <FaFileInvoiceDollar style={{ fontSize: "32px", opacity: 0.25, display: "block", margin: "0 auto 12px" }} />
-              <p style={{ fontSize: "13px" }}>Koi bill history nahi mili.</p>
+              <FaFileInvoiceDollar style={{ fontSize: "36px", opacity: 0.25, display: "block", margin: "0 auto 12px" }} />
+              <p style={{ fontSize: "15px" }}>Koi bill history nahi mili.</p>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -279,32 +279,32 @@ function ViewBillModal({ member, onClose }) {
                       <div style={{ display: "flex", align: "center", gap: "16px", flexWrap: "wrap", flex: 1 }}>
                         {/* Month */}
                         <div style={{ minWidth: "110px" }}>
-                          <div style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Month</div>
-                          <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)" }}>{fmtMonth(row.plan_start)}</div>
+                          <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Month</div>
+                          <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>{fmtMonth(row.plan_start)}</div>
                         </div>
                         {/* Period */}
                         <div style={{ minWidth: "180px" }}>
-                          <div style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Period</div>
-                          <div style={{ fontSize: "12px", color: "var(--text-secondary)" }}>{fmtDate(row.plan_start)} <span style={{ color: "var(--text-muted)" }}>→</span> {fmtDate(row.plan_end)}</div>
+                          <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Period</div>
+                          <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>{fmtDate(row.plan_start)} <span style={{ color: "var(--text-muted)" }}>→</span> {fmtDate(row.plan_end)}</div>
                         </div>
                         {/* Plan */}
                         <div style={{ minWidth: "120px" }}>
-                          <div style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Plan</div>
-                          <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--blue)", textTransform: "capitalize" }}>{row.plan_name || "—"}</div>
+                          <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Plan</div>
+                          <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--blue)", textTransform: "capitalize" }}>{row.plan_name || "—"}</div>
                         </div>
                         {/* Amount */}
                         <div>
-                          <div style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Amount Paid</div>
-                          <div style={{ fontSize: "14px", fontWeight: 800, color: "var(--green)", fontFamily: "var(--font-display)" }}>₹{Number(row.amount_paid || 0).toLocaleString("en-IN")}</div>
+                          <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "3px" }}>Amount Paid</div>
+                          <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--green)", fontFamily: "var(--font-display)" }}>₹{Number(row.amount_paid || 0).toLocaleString("en-IN")}</div>
                         </div>
                       </div>
                       {/* Edit button */}
                       {!isEditing && (
                         <button onClick={() => openEdit(row)}
-                          style={{ padding: "5px 11px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "5px", fontWeight: 600, flexShrink: 0, transition: "all 0.15s" }}
+                          style={{ padding: "5px 11px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "5px", fontWeight: 600, flexShrink: 0, transition: "all 0.15s" }}
                           onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(96,165,250,0.5)"; e.currentTarget.style.color = "var(--blue)"; e.currentTarget.style.background = "rgba(96,165,250,0.07)"; }}
                           onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.background = "var(--bg-surface)"; }}>
-                          <FaEdit style={{ fontSize: "10px" }} /> Edit Bill
+                          <FaEdit style={{ fontSize: "11px" }} /> Edit Bill
                         </button>
                       )}
                     </div>
@@ -314,35 +314,35 @@ function ViewBillModal({ member, onClose }) {
                       <div style={{ padding: "0 16px 16px", borderTop: "1px solid var(--border-subtle)" }}>
                         <div style={{ paddingTop: "14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                           <div>
-                            <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Plan Name *</label>
+                            <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Plan Name *</label>
                             <input style={editInputStyle} value={editForm.plan_name} onChange={e => setEF("plan_name", e.target.value)} placeholder="e.g. Monthly Plan" />
                           </div>
                           <div>
-                            <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Amount Paid (₹)</label>
+                            <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Amount Paid (₹)</label>
                             <input style={editInputStyle} type="number" min="0" value={editForm.amount_paid} onChange={e => setEF("amount_paid", e.target.value)} placeholder="0" />
                           </div>
                           <div>
-                            <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Start Date *</label>
+                            <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Start Date *</label>
                             <input style={editInputStyle} type="date" value={editForm.plan_start} onChange={e => setEF("plan_start", e.target.value)} />
                           </div>
                           <div>
-                            <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>End Date</label>
+                            <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>End Date</label>
                             <input style={editInputStyle} type="date" value={editForm.plan_end} onChange={e => setEF("plan_end", e.target.value)} />
                           </div>
                           <div style={{ gridColumn: "1 / -1" }}>
-                            <label style={{ fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Notes</label>
+                            <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>Notes</label>
                             <input style={editInputStyle} value={editForm.notes} onChange={e => setEF("notes", e.target.value)} placeholder="Optional note..." />
                           </div>
                         </div>
-                        {saveError && <div style={{ marginTop: "10px", padding: "8px 12px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "12px" }}>⚠️ {saveError}</div>}
+                        {saveError && <div style={{ marginTop: "10px", padding: "8px 12px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px" }}>⚠️ {saveError}</div>}
                         <div style={{ display: "flex", gap: "8px", marginTop: "12px", justifyContent: "flex-end" }}>
                           <button onClick={() => { setEditingId(null); setSaveError(""); }}
-                            style={{ padding: "7px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px" }}>
+                            style={{ padding: "7px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>
                             Cancel
                           </button>
                           <button onClick={handleSave} disabled={saving}
-                            style={{ padding: "7px 18px", borderRadius: "var(--radius-sm)", background: saving ? "var(--bg-elevated)" : "var(--blue)", border: "none", color: saving ? "var(--text-muted)" : "#fff", cursor: saving ? "not-allowed" : "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-display)", display: "flex", alignItems: "center", gap: "6px" }}>
-                            <FaSave style={{ fontSize: "10px" }} /> {saving ? "Saving..." : "Save Changes"}
+                            style={{ padding: "7px 18px", borderRadius: "var(--radius-sm)", background: saving ? "var(--bg-elevated)" : "var(--blue)", border: "none", color: saving ? "var(--text-muted)" : "#fff", cursor: saving ? "not-allowed" : "pointer", fontSize: "13px", fontWeight: 700, fontFamily: "var(--font-display)", display: "flex", alignItems: "center", gap: "6px" }}>
+                            <FaSave style={{ fontSize: "11px" }} /> {saving ? "Saving..." : "Save Changes"}
                           </button>
                         </div>
                       </div>
@@ -351,7 +351,7 @@ function ViewBillModal({ member, onClose }) {
                     {/* Notes preview (when not editing) */}
                     {!isEditing && row.notes && (
                       <div style={{ padding: "6px 16px 10px", borderTop: "1px solid var(--border-subtle)" }}>
-                        <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>📝 {row.notes}</span>
+                        <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>📝 {row.notes}</span>
                       </div>
                     )}
                   </div>
@@ -363,7 +363,7 @@ function ViewBillModal({ member, onClose }) {
 
         {/* Footer */}
         <div style={{ padding: "14px 24px", borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "flex-end", flexShrink: 0 }}>
-          <button onClick={onClose} style={{ padding: "8px 22px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>Close</button>
+          <button onClick={onClose} style={{ padding: "8px 22px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px" }}>Close</button>
         </div>
       </div>
     </div>
@@ -482,24 +482,24 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
       <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", width: "100%", maxWidth: "480px", maxHeight: "90vh", overflowY: "auto", boxShadow: "var(--shadow-lg)" }}>
         <div style={{ padding: "22px 24px 16px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
-              <FaSyncAlt style={{ fontSize: "14px", color: "var(--green)" }} /> Renew Membership
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+              <FaSyncAlt style={{ fontSize: "16px", color: "var(--green)" }} /> Renew Membership
             </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "4px" }}>{member.full_name}</p>
+            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>{member.full_name}</p>
           </div>
           <button onClick={onClose} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <FaTimes style={{ fontSize: "12px" }} />
+            <FaTimes style={{ fontSize: "13px" }} />
           </button>
         </div>
 
         <div style={{ margin: "16px 24px", padding: "12px 16px", borderRadius: "var(--radius-sm)", background: days !== null && days <= 0 ? "var(--red-bg)" : "var(--bg-elevated)", border: "1px solid var(--border-default)" }}>
-          <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Current Plan</div>
+          <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Current Plan</div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
             <div>
-              <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>{member.membership_type || "No Plan"}</div>
-              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{fmt(member.membership_start)} → {fmt(member.membership_end)}</div>
+              <div style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-primary)" }}>{member.membership_type || "No Plan"}</div>
+              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>{fmt(member.membership_start)} → {fmt(member.membership_end)}</div>
             </div>
-            <span style={{ padding: "3px 10px", borderRadius: "99px", fontSize: "11px", fontWeight: 700, background: days === null ? "rgba(80,80,80,0.12)" : days <= 0 ? "var(--red-bg)" : days <= 7 ? "var(--red-bg)" : days <= 15 ? "var(--yellow-bg)" : "var(--green-bg)", color: days === null ? "var(--text-muted)" : days <= 0 ? "var(--red)" : days <= 7 ? "var(--red)" : days <= 15 ? "var(--yellow)" : "var(--green)" }}>
+            <span style={{ padding: "3px 10px", borderRadius: "99px", fontSize: "12px", fontWeight: 700, background: days === null ? "rgba(80,80,80,0.12)" : days <= 0 ? "var(--red-bg)" : days <= 7 ? "var(--red-bg)" : days <= 15 ? "var(--yellow-bg)" : "var(--green-bg)", color: days === null ? "var(--text-muted)" : days <= 0 ? "var(--red)" : days <= 7 ? "var(--red)" : days <= 15 ? "var(--yellow)" : "var(--green)" }}>
               {days === null ? "—" : days <= 0 ? "Expired" : `${days}d left`}
             </span>
           </div>
@@ -509,8 +509,8 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
           {!pendingLoading && totalPending > 0 && (
             <div style={{ borderRadius: "var(--radius-sm)", border: "1px solid rgba(248,113,113,0.3)", background: "var(--red-bg)", overflow: "hidden" }}>
               <div style={{ padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--red)" }}>⚠️ Pending Due: ₹{totalPending.toLocaleString("en-IN")}</span>
-                <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "12px", color: "var(--text-secondary)" }}>
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--red)" }}>⚠️ Pending Due: ₹{totalPending.toLocaleString("en-IN")}</span>
+                <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "13px", color: "var(--text-secondary)" }}>
                   <input type="checkbox" checked={collectPending} onChange={e => setCollectPending(e.target.checked)} />
                   Collect now
                 </label>
@@ -529,8 +529,8 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
             </select>
             {plan && (
               <div style={{ marginTop: "6px", padding: "8px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", display: "flex", gap: "20px", flexWrap: "wrap" }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Duration: <strong style={{ color: "var(--text-secondary)" }}>{plan.duration_days} days</strong></span>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Price: <strong style={{ color: "var(--green)" }}>₹{Number(plan.price).toLocaleString("en-IN")}</strong></span>
+                <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Duration: <strong style={{ color: "var(--text-secondary)" }}>{plan.duration_days} days</strong></span>
+                <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Price: <strong style={{ color: "var(--green)" }}>₹{Number(plan.price).toLocaleString("en-IN")}</strong></span>
               </div>
             )}
           </Field>
@@ -538,10 +538,10 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
           <Field label="Start From">
             <div style={{ display: "flex", gap: "8px" }}>
               {[["today", "Today"], ["expiry", "After Expiry"]].map(([v, l]) => (
-                <button key={v} onClick={() => setStartFrom(v)} style={{ flex: 1, padding: "8px", borderRadius: "var(--radius-sm)", border: startFrom === v ? "1px solid var(--green)" : "1px solid var(--border-default)", background: startFrom === v ? "var(--green-bg)" : "var(--bg-elevated)", color: startFrom === v ? "var(--green)" : "var(--text-muted)", cursor: "pointer", fontSize: "12px", fontWeight: startFrom === v ? 700 : 400 }}>{l}</button>
+                <button key={v} onClick={() => setStartFrom(v)} style={{ flex: 1, padding: "8px", borderRadius: "var(--radius-sm)", border: startFrom === v ? "1px solid var(--green)" : "1px solid var(--border-default)", background: startFrom === v ? "var(--green-bg)" : "var(--bg-elevated)", color: startFrom === v ? "var(--green)" : "var(--text-muted)", cursor: "pointer", fontSize: "13px", fontWeight: startFrom === v ? 700 : 400 }}>{l}</button>
               ))}
             </div>
-            {plan && newStart && newEnd && <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "4px" }}>📅 {fmt(newStart)} → {fmt(newEnd)}</div>}
+            {plan && newStart && newEnd && <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>📅 {fmt(newStart)} → {fmt(newEnd)}</div>}
           </Field>
 
           <Field label="Discount (Optional)">
@@ -549,7 +549,7 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
               <div style={{ display: "flex", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-default)", overflow: "hidden", flexShrink: 0 }}>
                 {[{ val: "flat", label: "₹" }, { val: "percent", label: "%" }].map(opt => (
                   <button key={opt.val} type="button" onClick={() => { setDiscountType(opt.val); setDiscountValue(""); }}
-                    style={{ padding: "9px 14px", background: discountType === opt.val ? "var(--bg-active, rgba(255,255,255,0.08))" : "var(--bg-elevated)", border: "none", color: discountType === opt.val ? "var(--text-primary)" : "var(--text-muted)", cursor: "pointer", fontWeight: discountType === opt.val ? 700 : 400, fontSize: "13px" }}>
+                    style={{ padding: "9px 14px", background: discountType === opt.val ? "var(--bg-active, rgba(255,255,255,0.08))" : "var(--bg-elevated)", border: "none", color: discountType === opt.val ? "var(--text-primary)" : "var(--text-muted)", cursor: "pointer", fontWeight: discountType === opt.val ? 700 : 400, fontSize: "15px" }}>
                     {opt.label}
                   </button>
                 ))}
@@ -560,9 +560,9 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
             </div>
             {discountAmt > 0 && plan && (
               <div style={{ marginTop: "6px", display: "flex", gap: "10px", padding: "7px 12px", borderRadius: "var(--radius-sm)", background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.2)", flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ fontSize: "11px", color: "var(--text-muted)", textDecoration: "line-through" }}>₹{planPrice.toLocaleString("en-IN")}</span>
-                <span style={{ fontSize: "11px", color: "var(--red)" }}>− ₹{discountAmt.toLocaleString("en-IN")}</span>
-                <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--green)" }}>= ₹{afterDiscount.toLocaleString("en-IN")}</span>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)", textDecoration: "line-through" }}>₹{planPrice.toLocaleString("en-IN")}</span>
+                <span style={{ fontSize: "12px", color: "var(--red)" }}>− ₹{discountAmt.toLocaleString("en-IN")}</span>
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--green)" }}>= ₹{afterDiscount.toLocaleString("en-IN")}</span>
               </div>
             )}
           </Field>
@@ -588,12 +588,12 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
             const isPartial = due > 0;
             return (
               <div style={{ padding: "12px 14px", borderRadius: "var(--radius-sm)", background: isPartial ? "rgba(245,158,11,0.07)" : "rgba(74,222,128,0.06)", border: `1px solid ${isPartial ? "rgba(245,158,11,0.3)" : "rgba(74,222,128,0.25)"}` }}>
-                <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Payment Summary</div>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Payment Summary</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}><span style={{ color: "var(--text-muted)" }}>Discount</span><span style={{ color: "var(--red)", fontWeight: 600 }}>− ₹{discountAmt.toLocaleString("en-IN")}</span></div>}
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}><span style={{ color: "var(--text-muted)" }}>Payable</span><span style={{ color: "var(--text-primary)", fontWeight: 700 }}>₹{afterDiscount.toLocaleString("en-IN")}</span></div>
+                  {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}><span style={{ color: "var(--text-muted)" }}>Discount</span><span style={{ color: "var(--red)", fontWeight: 600 }}>− ₹{discountAmt.toLocaleString("en-IN")}</span></div>}
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}><span style={{ color: "var(--text-muted)" }}>Payable</span><span style={{ color: "var(--text-primary)", fontWeight: 700 }}>₹{afterDiscount.toLocaleString("en-IN")}</span></div>
                   <div style={{ height: "1px", background: "var(--border-subtle)", margin: "2px 0" }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px" }}>
                     <span style={{ fontWeight: 700, color: isPartial ? "#f59e0b" : "var(--green)" }}>{isPartial ? "⚠️ Balance Due" : "✅ Fully Paid"}</span>
                     <span style={{ fontWeight: 800, color: isPartial ? "#f59e0b" : "var(--green)", fontFamily: "var(--font-display)" }}>₹{due.toLocaleString("en-IN")}</span>
                   </div>
@@ -612,7 +612,7 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
                 <input style={{ ...inputStyle, borderColor: dueDate ? "rgba(245,158,11,0.5)" : "var(--border-default)" }}
                   type="date" min={minDate.toISOString().split("T")[0]} value={dueDate}
                   onChange={e => setDueDate(e.target.value)} />
-                {dueDate && <p style={{ fontSize: "11px", color: "#f59e0b", margin: "4px 0 0" }}>⏰ Reminder set for {fmt(dueDate)}</p>}
+                {dueDate && <p style={{ fontSize: "12px", color: "#f59e0b", margin: "4px 0 0" }}>⏰ Reminder set for {fmt(dueDate)}</p>}
               </Field>
             );
           })()}
@@ -621,12 +621,12 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
             <input style={inputStyle} value={notes} placeholder={`Renewal — ${selectedPlan || "Plan"}`} onChange={e => setNotes(e.target.value)} />
           </Field>
 
-          {error && <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px" }}>⚠️ {error}</div>}
+          {error && <div style={{ padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "15px" }}>⚠️ {error}</div>}
 
           <div style={{ display: "flex", gap: "10px", paddingTop: "4px" }}>
-            <button onClick={onClose} style={{ flex: 1, padding: "10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>Cancel</button>
-            <button onClick={handleRenew} disabled={saving} style={{ flex: 2, padding: "10px", borderRadius: "var(--radius-sm)", background: saving ? "var(--bg-elevated)" : "var(--green-bg)", border: saving ? "1px solid var(--border-default)" : "1px solid rgba(74,222,128,0.4)", color: saving ? "var(--text-muted)" : "var(--green)", cursor: saving ? "not-allowed" : "pointer", fontSize: "13px", fontWeight: 700, fontFamily: "var(--font-display)", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px" }}>
-              <FaSyncAlt style={{ fontSize: "11px" }} /> {saving ? "Renewing..." : "CONFIRM RENEWAL"}
+            <button onClick={onClose} style={{ flex: 1, padding: "10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px" }}>Cancel</button>
+            <button onClick={handleRenew} disabled={saving} style={{ flex: 2, padding: "10px", borderRadius: "var(--radius-sm)", background: saving ? "var(--bg-elevated)" : "var(--green-bg)", border: saving ? "1px solid var(--border-default)" : "1px solid rgba(74,222,128,0.4)", color: saving ? "var(--text-muted)" : "var(--green)", cursor: saving ? "not-allowed" : "pointer", fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px" }}>
+              <FaSyncAlt style={{ fontSize: "12px" }} /> {saving ? "Renewing..." : "CONFIRM RENEWAL"}
             </button>
           </div>
         </div>
@@ -643,15 +643,15 @@ const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDele
     <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", padding: "14px 16px", display: "flex", flexDirection: "column", gap: "10px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div onClick={() => onProfile(m)} style={{ cursor: "pointer", flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: "14px", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "5px" }}>
+          <div style={{ fontWeight: 700, fontSize: "16px", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "5px" }}>
             <FaUser style={{ fontSize: "9px", opacity: 0.4 }} /> {m.full_name}
           </div>
-          <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+          <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
             <span>{phoneVisible[m.id] ? m.phone : m.phone ? "••••••" + m.phone.slice(-4) : "—"}</span>
             {m.phone && (
               <button onClick={e => { e.stopPropagation(); onTogglePhone(m.id); }}
                 style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0, display: "flex", alignItems: "center" }}>
-                {phoneVisible[m.id] ? <FaEyeSlash style={{ fontSize: "11px" }} /> : <FaEye style={{ fontSize: "11px" }} />}
+                {phoneVisible[m.id] ? <FaEyeSlash style={{ fontSize: "12px" }} /> : <FaEye style={{ fontSize: "12px" }} />}
               </button>
             )}
             <span>· {m.email}</span>
@@ -661,9 +661,9 @@ const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDele
       </div>
       <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
         <MembershipBadge type={m.membership_type} plans={plans} />
-        <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>{fmt(m.membership_start)} → {fmt(m.membership_end)}</span>
+        <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>{fmt(m.membership_start)} → {fmt(m.membership_end)}</span>
         {days !== null && (
-          <span style={{ fontSize: "10px", padding: "1px 7px", borderRadius: "99px", fontWeight: 600, background: days <= 0 ? "var(--red-bg)" : days <= 7 ? "var(--red-bg)" : "var(--green-bg)", color: days <= 0 ? "var(--red)" : days <= 7 ? "var(--red)" : "var(--green)" }}>
+          <span style={{ fontSize: "11px", padding: "1px 7px", borderRadius: "99px", fontWeight: 600, background: days <= 0 ? "var(--red-bg)" : days <= 7 ? "var(--red-bg)" : "var(--green-bg)", color: days <= 0 ? "var(--red)" : days <= 7 ? "var(--red)" : "var(--green)" }}>
             {days <= 0 ? "Expired" : `${days}d left`}
           </span>
         )}
@@ -671,21 +671,21 @@ const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDele
       {dueInfo?.total > 0 && (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 10px", borderRadius: "var(--radius-sm)", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>Due:</span>
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#f59e0b" }}>₹{Number(dueInfo.total).toLocaleString("en-IN")}</span>
+            <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Due:</span>
+            <span style={{ fontSize: "13px", fontWeight: 700, color: "#f59e0b" }}>₹{Number(dueInfo.total).toLocaleString("en-IN")}</span>
           </div>
           <button onClick={() => onMarkPaid(m.id)} disabled={dueInfo?.marking}
-            style={{ padding: "3px 8px", borderRadius: "var(--radius-sm)", background: dueInfo?.marking ? "var(--bg-elevated)" : "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.3)", color: dueInfo?.marking ? "var(--text-muted)" : "var(--green)", cursor: dueInfo?.marking ? "not-allowed" : "pointer", fontSize: "10px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}>
+            style={{ padding: "3px 8px", borderRadius: "var(--radius-sm)", background: dueInfo?.marking ? "var(--bg-elevated)" : "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.3)", color: dueInfo?.marking ? "var(--text-muted)" : "var(--green)", cursor: dueInfo?.marking ? "not-allowed" : "pointer", fontSize: "11px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}>
             <FaCheck style={{ fontSize: "8px" }} />
             {dueInfo?.marking ? "Marking..." : "Mark Paid"}
           </button>
         </div>
       )}
       <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-        <button onClick={() => onRenew(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.25)", color: "var(--green)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaSyncAlt style={{ fontSize: "10px" }} /> Renew</button>
-        <button onClick={() => onViewBill(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", color: "var(--blue)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaFileInvoiceDollar style={{ fontSize: "10px" }} /> Bill</button>
-        <button onClick={() => onNotify(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)", border: warn ? "1px solid rgba(245,158,11,0.35)" : "1px solid var(--border-default)", color: warn ? "#f59e0b" : "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px" }}><FaEnvelope style={{ fontSize: "10px" }} /> Notify</button>
-        <button onClick={() => onDelete(m.id)} style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center" }}><FaTrash style={{ fontSize: "10px" }} /></button>
+        <button onClick={() => onRenew(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.25)", color: "var(--green)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaSyncAlt style={{ fontSize: "11px" }} /> Renew</button>
+        <button onClick={() => onViewBill(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", color: "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaFileInvoiceDollar style={{ fontSize: "11px" }} /> Bill</button>
+        <button onClick={() => onNotify(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)", border: warn ? "1px solid rgba(245,158,11,0.35)" : "1px solid var(--border-default)", color: warn ? "#f59e0b" : "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}><FaEnvelope style={{ fontSize: "11px" }} /> Notify</button>
+        <button onClick={() => onDelete(m.id)} style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center" }}><FaTrash style={{ fontSize: "11px" }} /></button>
       </div>
     </div>
   );
@@ -909,11 +909,11 @@ export default function Members({ onLogout }) {
         {/* Header */}
         <div className="fade-up members-header">
           <div>
-            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>Members</h1>
-            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>{totalCount} total member{totalCount !== 1 ? "s" : ""} registered</p>
+            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "31px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>Members</h1>
+            <p style={{ color: "var(--text-muted)", fontSize: "15px", marginTop: "4px" }}>{totalCount} total member{totalCount !== 1 ? "s" : ""} registered</p>
           </div>
-          <button onClick={openAdd} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 18px", borderRadius: "var(--radius-sm)", background: "var(--text-primary)", color: "#0a0a0a", border: "none", cursor: "pointer", fontSize: "13px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em", transition: "opacity 0.15s" }} onMouseEnter={e => e.currentTarget.style.opacity = "0.85"} onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
-            <FaPlus style={{ fontSize: "11px" }} /> ADD MEMBER
+          <button onClick={openAdd} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 18px", borderRadius: "var(--radius-sm)", background: "var(--text-primary)", color: "#0a0a0a", border: "none", cursor: "pointer", fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em", transition: "opacity 0.15s" }} onMouseEnter={e => e.currentTarget.style.opacity = "0.85"} onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
+            <FaPlus style={{ fontSize: "12px" }} /> ADD MEMBER
           </button>
         </div>
 
@@ -923,19 +923,19 @@ export default function Members({ onLogout }) {
           {/* Search */}
           <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)", display: "flex", gap: "10px", alignItems: "center" }}>
             <div style={{ position: "relative", flex: 1, maxWidth: "360px" }}>
-              <FaSearch style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "12px" }} />
+              <FaSearch style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "13px" }} />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, email, phone…" style={{ ...inputStyle, paddingLeft: "34px", width: "100%", boxSizing: "border-box" }} />
             </div>
-            {search && <button onClick={() => setSearch("")} style={{ padding: "8px", background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer" }}><FaTimes style={{ fontSize: "12px" }} /></button>}
+            {search && <button onClick={() => setSearch("")} style={{ padding: "8px", background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer" }}><FaTimes style={{ fontSize: "13px" }} /></button>}
           </div>
 
           {/* Desktop Table */}
           <div className="members-table-wrap" style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "15px" }}>
               <thead>
                 <tr style={{ background: "var(--bg-elevated)" }}>
                   {["Name", "Contact", "Membership Plan", "Due Amount", "Period", "Status", "Actions"].map(h => (
-                    <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap" }}>{h}</th>
+                    <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -952,7 +952,7 @@ export default function Members({ onLogout }) {
                   ))
                 ) : members.length === 0 ? (
                   <tr><td colSpan={7} style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)" }}>
-                    <FaUsers style={{ fontSize: "32px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />
+                    <FaUsers style={{ fontSize: "36px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />
                     {search ? `No members match "${search}"` : "No members yet. Add your first one!"}
                   </td></tr>
                 ) : (
@@ -969,16 +969,16 @@ export default function Members({ onLogout }) {
                             onMouseLeave={e => e.currentTarget.style.color = "var(--text-primary)"}>
                             <FaUser style={{ fontSize: "9px", opacity: 0.4 }} /> {m.full_name}
                           </div>
-                          <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{m.email}</div>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>{m.email}</div>
                         </td>
                         <td style={{ padding: "14px 16px" }}>
                           <div style={{ color: "var(--text-secondary)" }}>{m.email || "—"}</div>
-                          <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "5px" }}>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "5px" }}>
                             <span>{phoneVisible[m.id] ? m.phone : m.phone ? "••••••" + m.phone.slice(-4) : "—"}</span>
                             {m.phone && (
                               <button onClick={() => setPhoneVisible(prev => ({ ...prev, [m.id]: !prev[m.id] }))}
                                 style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0, display: "flex", alignItems: "center" }}>
-                                {phoneVisible[m.id] ? <FaEyeSlash style={{ fontSize: "11px" }} /> : <FaEye style={{ fontSize: "11px" }} />}
+                                {phoneVisible[m.id] ? <FaEyeSlash style={{ fontSize: "12px" }} /> : <FaEye style={{ fontSize: "12px" }} />}
                               </button>
                             )}
                           </div>
@@ -987,44 +987,44 @@ export default function Members({ onLogout }) {
                         <td style={{ padding: "14px 16px" }}>
                           {dueMap[m.id]?.total > 0 ? (
                             <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#f59e0b" }}>₹{Number(dueMap[m.id].total).toLocaleString("en-IN")}</span>
+                              <span style={{ fontSize: "13px", fontWeight: 700, color: "#f59e0b" }}>₹{Number(dueMap[m.id].total).toLocaleString("en-IN")}</span>
                               <button onClick={() => markDuePaid(m.id)} disabled={dueMap[m.id]?.marking}
-                                style={{ padding: "3px 8px", borderRadius: "var(--radius-sm)", background: dueMap[m.id]?.marking ? "var(--bg-elevated)" : "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.3)", color: dueMap[m.id]?.marking ? "var(--text-muted)" : "var(--green)", cursor: dueMap[m.id]?.marking ? "not-allowed" : "pointer", fontSize: "10px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px", whiteSpace: "nowrap" }}>
+                                style={{ padding: "3px 8px", borderRadius: "var(--radius-sm)", background: dueMap[m.id]?.marking ? "var(--bg-elevated)" : "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.3)", color: dueMap[m.id]?.marking ? "var(--text-muted)" : "var(--green)", cursor: dueMap[m.id]?.marking ? "not-allowed" : "pointer", fontSize: "11px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px", whiteSpace: "nowrap" }}>
                                 <FaCheck style={{ fontSize: "8px" }} />
                                 {dueMap[m.id]?.marking ? "Marking..." : "Mark Paid"}
                               </button>
                             </div>
                           ) : (
-                            <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>—</span>
+                            <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>—</span>
                           )}
                         </td>
                         <td style={{ padding: "14px 16px" }}>
-                          <div style={{ fontSize: "12px", color: "var(--text-secondary)", whiteSpace: "nowrap" }}>{fmt(m.membership_start)}</div>
-                          <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>→ {fmt(m.membership_end)}</div>
+                          <div style={{ fontSize: "13px", color: "var(--text-secondary)", whiteSpace: "nowrap" }}>{fmt(m.membership_start)}</div>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>→ {fmt(m.membership_end)}</div>
                         </td>
                         <td style={{ padding: "14px 16px" }}><StatusBadge status={m.status} /></td>
                         <td style={{ padding: "14px 16px" }}>
                           <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
-                            <button onClick={() => setRenewMember(m)} title="Renew" style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.25)", color: "var(--green)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>
-                              <FaSyncAlt style={{ fontSize: "10px" }} /> Renew
+                            <button onClick={() => setRenewMember(m)} title="Renew" style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.25)", color: "var(--green)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>
+                              <FaSyncAlt style={{ fontSize: "11px" }} /> Renew
                             </button>
                             <button onClick={() => setViewBillMember(m)} title="View Bill"
-                              style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", color: "var(--blue)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, transition: "all 0.15s" }}
+                              style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", color: "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, transition: "all 0.15s" }}
                               onMouseEnter={e => { e.currentTarget.style.background = "rgba(96,165,250,0.16)"; e.currentTarget.style.borderColor = "rgba(96,165,250,0.5)"; }}
                               onMouseLeave={e => { e.currentTarget.style.background = "rgba(96,165,250,0.08)"; e.currentTarget.style.borderColor = "rgba(96,165,250,0.25)"; }}>
-                              <FaFileInvoiceDollar style={{ fontSize: "10px" }} /> Bill
+                              <FaFileInvoiceDollar style={{ fontSize: "11px" }} /> Bill
                             </button>
                             <button onClick={() => setNotifyMember(m)} title="Notify"
-                              style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)", border: warn ? "1px solid rgba(245,158,11,0.35)" : "1px solid var(--border-default)", color: warn ? "#f59e0b" : "var(--text-secondary)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", gap: "4px", transition: "all 0.15s" }}
+                              style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)", border: warn ? "1px solid rgba(245,158,11,0.35)" : "1px solid var(--border-default)", color: warn ? "#f59e0b" : "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", transition: "all 0.15s" }}
                               onMouseEnter={e => { e.currentTarget.style.background = "rgba(37,211,102,0.1)"; e.currentTarget.style.borderColor = "#25d36655"; e.currentTarget.style.color = "#25d366"; }}
                               onMouseLeave={e => { e.currentTarget.style.background = warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)"; e.currentTarget.style.borderColor = warn ? "rgba(245,158,11,0.35)" : "var(--border-default)"; e.currentTarget.style.color = warn ? "#f59e0b" : "var(--text-secondary)"; }}>
-                              <FaEnvelope style={{ fontSize: "10px" }} /> Notify
+                              <FaEnvelope style={{ fontSize: "11px" }} /> Notify
                             </button>
                             <button onClick={() => setDeleteId(m.id)} title="Delete"
-                              style={{ padding: "5px 8px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "11px", display: "flex", alignItems: "center", transition: "all 0.15s" }}
+                              style={{ padding: "5px 8px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", transition: "all 0.15s" }}
                               onMouseEnter={e => { e.currentTarget.style.background = "var(--red-bg)"; e.currentTarget.style.borderColor = "rgba(248,113,113,0.4)"; e.currentTarget.style.color = "var(--red)"; }}
                               onMouseLeave={e => { e.currentTarget.style.background = "var(--bg-elevated)"; e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-muted)"; }}>
-                              <FaTrash style={{ fontSize: "10px" }} />
+                              <FaTrash style={{ fontSize: "11px" }} />
                             </button>
                           </div>
                         </td>
@@ -1048,7 +1048,7 @@ export default function Members({ onLogout }) {
               ))
             ) : members.length === 0 ? (
               <div style={{ padding: "40px 16px", textAlign: "center", color: "var(--text-muted)" }}>
-                <FaUsers style={{ fontSize: "32px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />
+                <FaUsers style={{ fontSize: "36px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />
                 {search ? `No members match "${search}"` : "No members yet."}
               </div>
             ) : (
@@ -1068,13 +1068,13 @@ export default function Members({ onLogout }) {
           {/* ── Infinite Scroll Sentinel ── */}
           <div ref={sentinelRef} style={{ padding: "20px", textAlign: "center", borderTop: members.length > 0 ? "1px solid var(--border-subtle)" : "none" }}>
             {loadingMore && (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", color: "var(--text-muted)", fontSize: "13px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", color: "var(--text-muted)", fontSize: "15px" }}>
                 <div style={{ width: "16px", height: "16px", border: "2px solid var(--border-default)", borderTopColor: "var(--text-primary)", borderRadius: "50%", animation: "spin 0.7s linear infinite", flexShrink: 0 }} />
                 Loading more members...
               </div>
             )}
             {!loading && !loadingMore && !hasMore && members.length > 0 && (
-              <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>✅ All {totalCount} members loaded</div>
+              <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>✅ All {totalCount} members loaded</div>
             )}
           </div>
         </div>
@@ -1095,10 +1095,10 @@ export default function Members({ onLogout }) {
           <div className="fade-up modal-inner" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-lg)", maxHeight: "92vh", overflowY: "auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
               <div>
-                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>{editingId ? "Edit Member" : "Add Member"}</h2>
-                <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "4px" }}>{editingId ? "Update member details" : "Register a new gym member"}</p>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "22px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>{editingId ? "Edit Member" : "Add Member"}</h2>
+                <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>{editingId ? "Update member details" : "Register a new gym member"}</p>
               </div>
-              <button onClick={() => setShowModal(false)} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}><FaTimes style={{ fontSize: "12px" }} /></button>
+              <button onClick={() => setShowModal(false)} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}><FaTimes style={{ fontSize: "13px" }} /></button>
             </div>
             <div style={{ height: "1px", background: "var(--border-subtle)", marginBottom: "22px" }} />
             <div className="modal-form-grid">
@@ -1118,18 +1118,18 @@ export default function Members({ onLogout }) {
                     ))}
                   </select>
                 </Field>
-                {form.membership_type && (() => { const p = plans.find(pl => pl.name === form.membership_type); if (!p) return null; return <div style={{ marginTop: "8px", padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", display: "flex", gap: "20px", flexWrap: "wrap" }}><span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Duration: <strong style={{ color: "var(--text-secondary)" }}>{p.duration_days} days</strong></span><span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Price: <strong style={{ color: "var(--green)" }}>₹{Number(p.price).toLocaleString("en-IN")}</strong></span></div>; })()}
+                {form.membership_type && (() => { const p = plans.find(pl => pl.name === form.membership_type); if (!p) return null; return <div style={{ marginTop: "8px", padding: "10px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", display: "flex", gap: "20px", flexWrap: "wrap" }}><span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Duration: <strong style={{ color: "var(--text-secondary)" }}>{p.duration_days} days</strong></span><span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Price: <strong style={{ color: "var(--green)" }}>₹{Number(p.price).toLocaleString("en-IN")}</strong></span></div>; })()}
               </div>
               <Field label="Status"><select style={inputStyle} value={form.status} onChange={e => setF("status", e.target.value)}><option value="active">Active</option><option value="inactive">Inactive</option><option value="expired">Expired</option></select></Field>
               <div />
               <Field label="Membership Start"><input style={inputStyle} type="date" value={form.membership_start} onChange={e => setF("membership_start", e.target.value)} onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field>
               <Field label="Membership End"><input style={inputStyle} type="date" value={form.membership_end} onChange={e => setF("membership_end", e.target.value)} onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field>
-              <div style={{ gridColumn: "1 / -1" }}><p style={{ fontSize: "11px", color: "var(--text-muted)", margin: 0 }}>💡 Start/end dates are automatically set when a plan is selected.</p></div>
+              <div style={{ gridColumn: "1 / -1" }}><p style={{ fontSize: "12px", color: "var(--text-muted)", margin: 0 }}>💡 Start/end dates are automatically set when a plan is selected.</p></div>
             </div>
-            {formError && <div style={{ marginTop: "16px", padding: "11px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px" }}>{formError}</div>}
+            {formError && <div style={{ marginTop: "16px", padding: "11px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "15px" }}>{formError}</div>}
             <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "24px", paddingTop: "20px", borderTop: "1px solid var(--border-subtle)" }}>
-              <button onClick={() => setShowModal(false)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>Cancel</button>
-              <button onClick={handleSave} disabled={saving} style={{ padding: "9px 24px", borderRadius: "var(--radius-sm)", background: saving ? "var(--bg-elevated)" : "var(--text-primary)", color: saving ? "var(--text-muted)" : "#0a0a0a", border: "none", cursor: saving ? "not-allowed" : "pointer", fontSize: "13px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em" }}>
+              <button onClick={() => setShowModal(false)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px" }}>Cancel</button>
+              <button onClick={handleSave} disabled={saving} style={{ padding: "9px 24px", borderRadius: "var(--radius-sm)", background: saving ? "var(--bg-elevated)" : "var(--text-primary)", color: saving ? "var(--text-muted)" : "#0a0a0a", border: "none", cursor: saving ? "not-allowed" : "pointer", fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em" }}>
                 {saving ? "Saving..." : editingId ? "UPDATE" : "ADD MEMBER"}
               </button>
             </div>
@@ -1157,16 +1157,16 @@ export default function Members({ onLogout }) {
           onClick={e => { if (e.target === e.currentTarget) setDeleteId(null); }}>
           <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", padding: "32px", maxWidth: "360px", width: "100%", textAlign: "center", boxShadow: "var(--shadow-lg)" }}>
             <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "var(--red)" }}>
-              <FaTrash style={{ fontSize: "18px" }} />
+              <FaTrash style={{ fontSize: "20px" }} />
             </div>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>Delete Member?</h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginBottom: "8px" }}>Yeh member permanently delete ho jayega.</p>
-            <p style={{ color: "var(--red)", fontSize: "12px", marginBottom: "24px", padding: "8px 12px", background: "var(--red-bg)", borderRadius: "var(--radius-sm)", border: "1px solid rgba(248,113,113,0.2)" }}>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>Delete Member?</h3>
+            <p style={{ color: "var(--text-muted)", fontSize: "15px", marginBottom: "8px" }}>Yeh member permanently delete ho jayega.</p>
+            <p style={{ color: "var(--red)", fontSize: "13px", marginBottom: "24px", padding: "8px 12px", background: "var(--red-bg)", borderRadius: "var(--radius-sm)", border: "1px solid rgba(248,113,113,0.2)" }}>
               ⚠️ Saare payments aur attendance records bhi delete honge.
             </p>
             <div style={{ display: "flex", gap: "10px" }}>
-              <button onClick={() => setDeleteId(null)} style={{ flex: 1, padding: "10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}>Cancel</button>
-              <button onClick={handleDelete} style={{ flex: 1, padding: "10px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--red)", cursor: "pointer", fontSize: "13px", fontWeight: 700, fontFamily: "var(--font-display)" }}>DELETE</button>
+              <button onClick={() => setDeleteId(null)} style={{ flex: 1, padding: "10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px", fontWeight: 600 }}>Cancel</button>
+              <button onClick={handleDelete} style={{ flex: 1, padding: "10px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--red)", cursor: "pointer", fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)" }}>DELETE</button>
             </div>
           </div>
         </div>

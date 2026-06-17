@@ -82,7 +82,7 @@ html, body, #root {
 
 /* Scales the ENTIRE app (including all hardcoded inline px sizes) */
 html {
-  zoom: 1.15;
+  zoom: 1;
 }
 
 /* ── Scrollbar ── */

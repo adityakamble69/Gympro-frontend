@@ -25,7 +25,7 @@ export default function NotFound() {
           {/* 404 big number */}
           <div style={{
             fontFamily: "'Syne', sans-serif",
-            fontSize: "clamp(80px, 20vw, 160px)",
+            fontSize: "clamp(90px, 20vw, 179px)",
             fontWeight: 800,
             lineHeight: 1,
             color: "#0d1117",
@@ -42,13 +42,13 @@ export default function NotFound() {
             background: "rgba(47,129,247,0.1)",
             border: "1px solid rgba(47,129,247,0.2)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "24px",
+            fontSize: "27px",
             margin: "-12px auto 20px",
           }}>🔒</div>
 
           <h1 style={{
             fontFamily: "'Syne', sans-serif",
-            fontSize: "clamp(18px, 4vw, 24px)",
+            fontSize: "clamp(20px, 4vw, 27px)",
             fontWeight: 700,
             color: "#e6edf3",
             margin: "0 0 10px",
@@ -57,33 +57,13 @@ export default function NotFound() {
 
           <p style={{
             color: "#8b949e",
-            fontSize: "14px",
+            fontSize: "16px",
             lineHeight: 1.6,
             maxWidth: "320px",
             margin: "0 auto 32px",
           }}>
             The page you're looking for doesn't exist or you don't have access to it.
           </p>
-
-          <a href="/" style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "11px 24px",
-            borderRadius: "8px",
-            background: "#2f81f7",
-            color: "#fff",
-            textDecoration: "none",
-            fontSize: "14px",
-            fontWeight: 600,
-            boxShadow: "0 0 20px rgba(47,129,247,0.3)",
-            transition: "opacity 0.15s",
-          }}
-            onMouseEnter={e => e.currentTarget.style.opacity = "0.85"}
-            onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-          >
-            ← Go to Login
-          </a>
         </div>
       </div>
     </>

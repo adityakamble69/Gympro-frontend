@@ -47,13 +47,13 @@ function StatCard({ icon: Icon, label, value, color = "#60a5fa", sub, onClick, c
       onMouseLeave={e => { if (clickable) { e.currentTarget.style.background = "var(--bg-surface)"; e.currentTarget.style.transform = "translateY(0)"; } }}
     >
       <div style={{ width: "44px", height: "44px", borderRadius: "10px", flexShrink: 0, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Icon style={{ color, fontSize: "18px" }} />
+        <Icon style={{ color, fontSize: "20px" }} />
       </div>
       <div>
-        <div style={{ fontSize: "22px", fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-display)" }}>{value}</div>
-        <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{label}</div>
-        {sub && <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{sub}</div>}
-        {clickable && <div style={{ fontSize: "10px", color: "#60a5fa", marginTop: "3px" }}>Click to view members →</div>}
+        <div style={{ fontSize: "25px", fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-display)" }}>{value}</div>
+        <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>{label}</div>
+        {sub && <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>{sub}</div>}
+        {clickable && <div style={{ fontSize: "11px", color: "#60a5fa", marginTop: "3px" }}>Click to view members →</div>}
       </div>
     </div>
   );
@@ -62,7 +62,7 @@ function StatCard({ icon: Icon, label, value, color = "#60a5fa", sub, onClick, c
 function ChartCard({ title, height = 280, children }) {
   return (
     <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", padding: "20px 24px" }}>
-      <h3 style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "20px" }}>{title}</h3>
+      <h3 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "20px" }}>{title}</h3>
       <div style={{ height: `${height}px` }}>{children}</div>
     </div>
   );
@@ -219,20 +219,20 @@ export default function Reports({ onLogout }) {
                 }
               }}
             />
-            <div style={{ textAlign: "center", marginTop: "8px", fontSize: "10px", color: "var(--text-muted)" }}>Click a segment to see members</div>
+            <div style={{ textAlign: "center", marginTop: "8px", fontSize: "11px", color: "var(--text-muted)" }}>Click a segment to see members</div>
           </ChartCard>
         </div>
 
         <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
           <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--border-subtle)" }}>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Monthly Breakdown — Click any row</h3>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Monthly Breakdown — Click any row</h3>
           </div>
           <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border-subtle)" }}>
                 {["Month", "Revenue", "Transactions", "Avg per Transaction"].map(h => (
-                  <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{h}</th>
+                  <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -247,13 +247,13 @@ export default function Reports({ onLogout }) {
                     onMouseEnter={e => { if (count > 0) e.currentTarget.style.background = "var(--bg-elevated)"; }}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
-                    <td style={{ padding: "12px 20px", fontSize: "13px", fontWeight: 500 }}>
+                    <td style={{ padding: "12px 20px", fontSize: "15px", fontWeight: 500 }}>
                       <span style={{ color: count > 0 ? "var(--text-primary)" : "var(--text-muted)" }}>{m}</span>
-                      {count > 0 && <span style={{ marginLeft: "8px", fontSize: "10px", color: "var(--blue)", opacity: 0.7 }}>→ click for details</span>}
+                      {count > 0 && <span style={{ marginLeft: "8px", fontSize: "11px", color: "var(--blue)", opacity: 0.7 }}>→ click for details</span>}
                     </td>
-                    <td style={{ padding: "12px 20px", color: total > 0 ? "#34d399" : "var(--text-muted)", fontSize: "13px", fontWeight: 600 }}>₹{Number(total).toLocaleString("en-IN")}</td>
-                    <td style={{ padding: "12px 20px", color: "var(--text-secondary)", fontSize: "13px" }}>{count}</td>
-                    <td style={{ padding: "12px 20px", color: "var(--text-secondary)", fontSize: "13px" }}>{count > 0 ? `₹${Number(total / count).toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "—"}</td>
+                    <td style={{ padding: "12px 20px", color: total > 0 ? "#34d399" : "var(--text-muted)", fontSize: "15px", fontWeight: 600 }}>₹{Number(total).toLocaleString("en-IN")}</td>
+                    <td style={{ padding: "12px 20px", color: "var(--text-secondary)", fontSize: "15px" }}>{count}</td>
+                    <td style={{ padding: "12px 20px", color: "var(--text-secondary)", fontSize: "15px" }}>{count > 0 ? `₹${Number(total / count).toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "—"}</td>
                   </tr>
                 );
               })}
@@ -277,9 +277,9 @@ export default function Reports({ onLogout }) {
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
           <button
             onClick={() => setShowDateRange(true)}
-            style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 18px", background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.3)", borderRadius: "var(--radius-md)", color: "#60a5fa", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+            style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 18px", background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.3)", borderRadius: "var(--radius-md)", color: "#60a5fa", cursor: "pointer", fontSize: "15px", fontWeight: 600 }}
           >
-            <FaCalendarAlt style={{ fontSize: "13px" }} /> Date Range Filter
+            <FaCalendarAlt style={{ fontSize: "15px" }} /> Date Range Filter
           </button>
         </div>
 
@@ -333,21 +333,21 @@ export default function Reports({ onLogout }) {
                 }
               }}
             />
-            <div style={{ textAlign: "center", marginTop: "8px", fontSize: "10px", color: "var(--text-muted)" }}>Click a segment to see members</div>
+            <div style={{ textAlign: "center", marginTop: "8px", fontSize: "11px", color: "var(--text-muted)" }}>Click a segment to see members</div>
           </ChartCard>
         </div>
 
         {/* ── Monthly Joins Table — click row (UPDATED) ── */}
         <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
           <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Monthly Joins — Click any row</h3>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Monthly Joins — Click any row</h3>
           </div>
           <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border-subtle)" }}>
                 {["Month", "New Members"].map(h => (
-                  <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{h}</th>
+                  <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -362,11 +362,11 @@ export default function Reports({ onLogout }) {
                     onMouseEnter={e => { if (c > 0) e.currentTarget.style.background = "var(--bg-elevated)"; }}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
-                    <td style={{ padding: "12px 20px", color: c > 0 ? "var(--text-primary)" : "var(--text-muted)", fontSize: "13px" }}>
+                    <td style={{ padding: "12px 20px", color: c > 0 ? "var(--text-primary)" : "var(--text-muted)", fontSize: "15px" }}>
                       {m}
-                      {c > 0 && <span style={{ marginLeft: "8px", fontSize: "10px", color: "#60a5fa", opacity: 0.7 }}>→ click for details</span>}
+                      {c > 0 && <span style={{ marginLeft: "8px", fontSize: "11px", color: "#60a5fa", opacity: 0.7 }}>→ click for details</span>}
                     </td>
-                    <td style={{ padding: "12px 20px", color: c > 0 ? "#60a5fa" : "var(--text-muted)", fontSize: "13px", fontWeight: 600 }}>{c}</td>
+                    <td style={{ padding: "12px 20px", color: c > 0 ? "#60a5fa" : "var(--text-muted)", fontSize: "15px", fontWeight: 600 }}>{c}</td>
                   </tr>
                 );
               })}
@@ -390,9 +390,9 @@ export default function Reports({ onLogout }) {
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
           <button
             onClick={() => setShowAttendDateRange(true)}
-            style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 18px", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: "var(--radius-md)", color: "#a78bfa", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
+            style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 18px", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: "var(--radius-md)", color: "#a78bfa", cursor: "pointer", fontSize: "15px", fontWeight: 600 }}
           >
-            <FaCalendarAlt style={{ fontSize: "13px" }} /> Date Range Filter
+            <FaCalendarAlt style={{ fontSize: "15px" }} /> Date Range Filter
           </button>
         </div>
 
@@ -459,9 +459,9 @@ export default function Reports({ onLogout }) {
         {topMembers?.length > 0 && (
           <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
                 Top 5 Most Active Members
-                <span style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 400, marginLeft: "8px" }}>— Click any row for full history</span>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 400, marginLeft: "8px" }}>— Click any row for full history</span>
               </h3>
             </div>
             <div style={{ overflowX: "auto" }}>
@@ -469,7 +469,7 @@ export default function Reports({ onLogout }) {
               <thead>
                 <tr style={{ borderBottom: "1px solid var(--border-subtle)" }}>
                   {["Rank", "Member", "Membership", "Visits"].map(h => (
-                    <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{h}</th>
+                    <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -481,15 +481,15 @@ export default function Reports({ onLogout }) {
                     onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
-                    <td style={{ padding: "12px 20px", color: "var(--text-muted)", fontSize: "13px" }}>#{i + 1}</td>
-                    <td style={{ padding: "12px 20px", fontSize: "13px" }}>
+                    <td style={{ padding: "12px 20px", color: "var(--text-muted)", fontSize: "15px" }}>#{i + 1}</td>
+                    <td style={{ padding: "12px 20px", fontSize: "15px" }}>
                       <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{m.full_name}</span>
-                      <span style={{ marginLeft: "8px", fontSize: "10px", color: "#a78bfa", opacity: 0.7 }}>→ click for history</span>
+                      <span style={{ marginLeft: "8px", fontSize: "11px", color: "#a78bfa", opacity: 0.7 }}>→ click for history</span>
                     </td>
                     <td style={{ padding: "12px 20px" }}>
-                      <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 600, background: "rgba(96,165,250,0.1)", color: "#60a5fa" }}>{m.membership_type}</span>
+                      <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: 600, background: "rgba(96,165,250,0.1)", color: "#60a5fa" }}>{m.membership_type}</span>
                     </td>
-                    <td style={{ padding: "12px 20px", color: "#34d399", fontSize: "13px", fontWeight: 700 }}>{m.visits}</td>
+                    <td style={{ padding: "12px 20px", color: "#34d399", fontSize: "15px", fontWeight: 700 }}>{m.visits}</td>
                   </tr>
                 ))}
               </tbody>
@@ -505,25 +505,25 @@ export default function Reports({ onLogout }) {
   const DateRangeModal = () => (
     <div onClick={() => setShowDateRange(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1500, backdropFilter: "blur(4px)" }}>
       <div onClick={e => e.stopPropagation()} style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-lg)", padding: "20px 20px", width: "min(400px, 92vw)", boxShadow: "0 24px 60px rgba(0,0,0,0.6)" }}>
-        <h3 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 20px" }}>📅 Date Range Filter</h3>
-        <p style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "20px" }}>Is range mein join kiye members dekhein</p>
+        <h3 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 20px" }}>📅 Date Range Filter</h3>
+        <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "20px" }}>Is range mein join kiye members dekhein</p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "24px" }}>
           <div>
-            <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>From Date</label>
+            <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>From Date</label>
             <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-              style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+              style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "15px", outline: "none", boxSizing: "border-box" }} />
           </div>
           <div>
-            <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>To Date</label>
+            <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>To Date</label>
             <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
-              style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+              style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "15px", outline: "none", boxSizing: "border-box" }} />
           </div>
         </div>
 
         <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
           <button onClick={() => setShowDateRange(false)}
-            style={{ padding: "9px 18px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-muted)", cursor: "pointer", fontSize: "13px" }}>
+            style={{ padding: "9px 18px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-muted)", cursor: "pointer", fontSize: "15px" }}>
             Cancel
           </button>
           <button
@@ -533,7 +533,7 @@ export default function Reports({ onLogout }) {
               setShowDateRange(false);
               setMemberDrill({ mode: "daterange", from: dateFrom, to: dateTo, label: `${dateFrom} → ${dateTo}` });
             }}
-            style={{ padding: "9px 18px", background: "#60a5fa", border: "none", borderRadius: "var(--radius-md)", color: "#0a0a0a", cursor: "pointer", fontSize: "13px", fontWeight: 700 }}>
+            style={{ padding: "9px 18px", background: "#60a5fa", border: "none", borderRadius: "var(--radius-md)", color: "#0a0a0a", cursor: "pointer", fontSize: "15px", fontWeight: 700 }}>
             Show Members
           </button>
         </div>
@@ -550,17 +550,17 @@ export default function Reports({ onLogout }) {
           {/* Header */}
           <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-surface)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
             <div>
-              <h1 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Reports & Analytics</h1>
-              <p style={{ color: "var(--text-muted)", fontSize: "12px", margin: "3px 0 0" }}>Visual insights from your gym data</p>
+              <h1 style={{ fontFamily: "var(--font-display)", fontSize: "22px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Reports & Analytics</h1>
+              <p style={{ color: "var(--text-muted)", fontSize: "13px", margin: "3px 0 0" }}>Visual insights from your gym data</p>
             </div>
             <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-              <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ padding: "8px 12px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "13px", cursor: "pointer", outline: "none" }}>
+              <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ padding: "8px 12px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "15px", cursor: "pointer", outline: "none" }}>
                 {years.map(y => <option key={y} value={y}>{y}</option>)}
               </select>
-              <button onClick={exportPDF} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "var(--radius-md)", color: "#f87171", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}>
+              <button onClick={exportPDF} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: "var(--radius-md)", color: "#f87171", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}>
                 <FaFilePdf /> PDF
               </button>
-              <button onClick={exportExcel} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)", borderRadius: "var(--radius-md)", color: "#34d399", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}>
+              <button onClick={exportExcel} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)", borderRadius: "var(--radius-md)", color: "#34d399", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}>
                 <FaFileExcel /> Excel
               </button>
             </div>
@@ -570,8 +570,8 @@ export default function Reports({ onLogout }) {
             {/* Tabs */}
             <div style={{ display: "flex", gap: "4px", marginBottom: "20px", background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", padding: "6px", overflowX: "auto" }}>
               {TABS.map(({ key, label, icon: Icon }) => (
-                <button key={key} onClick={() => setActiveTab(key)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 16px", borderRadius: "var(--radius-md)", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 600, background: activeTab === key ? "var(--bg-active)" : "transparent", color: activeTab === key ? "var(--text-primary)" : "var(--text-muted)", transition: "all 0.15s", whiteSpace: "nowrap", flex: 1, justifyContent: "center" }}>
-                  <Icon style={{ fontSize: "12px" }} /> {label}
+                <button key={key} onClick={() => setActiveTab(key)} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 16px", borderRadius: "var(--radius-md)", border: "none", cursor: "pointer", fontSize: "13px", fontWeight: 600, background: activeTab === key ? "var(--bg-active)" : "transparent", color: activeTab === key ? "var(--text-primary)" : "var(--text-muted)", transition: "all 0.15s", whiteSpace: "nowrap", flex: 1, justifyContent: "center" }}>
+                  <Icon style={{ fontSize: "13px" }} /> {label}
                 </button>
               ))}
             </div>
@@ -613,23 +613,23 @@ export default function Reports({ onLogout }) {
       {showAttendDateRange && (
         <div onClick={() => setShowAttendDateRange(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1500, backdropFilter: "blur(4px)" }}>
           <div onClick={e => e.stopPropagation()} style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-lg)", padding: "20px 20px", width: "min(400px, 92vw)", boxShadow: "0 24px 60px rgba(0,0,0,0.6)" }}>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 20px" }}>📅 Attendance Date Range</h3>
-            <p style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "20px" }}>Is range mein check-in records dekhein</p>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 20px" }}>📅 Attendance Date Range</h3>
+            <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "20px" }}>Is range mein check-in records dekhein</p>
             <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "24px" }}>
               <div>
-                <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>From Date</label>
+                <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>From Date</label>
                 <input type="date" value={attendDateFrom} onChange={e => setAttendDateFrom(e.target.value)}
-                  style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+                  style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "15px", outline: "none", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>To Date</label>
+                <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: "6px" }}>To Date</label>
                 <input type="date" value={attendDateTo} onChange={e => setAttendDateTo(e.target.value)}
-                  style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+                  style={{ width: "100%", padding: "10px 14px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", fontSize: "15px", outline: "none", boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
               <button onClick={() => setShowAttendDateRange(false)}
-                style={{ padding: "9px 18px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-muted)", cursor: "pointer", fontSize: "13px" }}>
+                style={{ padding: "9px 18px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", color: "var(--text-muted)", cursor: "pointer", fontSize: "15px" }}>
                 Cancel
               </button>
               <button
@@ -639,7 +639,7 @@ export default function Reports({ onLogout }) {
                   setShowAttendDateRange(false);
                   setAttendDrill({ mode: "daterange", from: attendDateFrom, to: attendDateTo, label: `${attendDateFrom} to ${attendDateTo} Attendance` });
                 }}
-                style={{ padding: "9px 18px", background: "#a78bfa", border: "none", borderRadius: "var(--radius-md)", color: "#0a0a0a", cursor: "pointer", fontSize: "13px", fontWeight: 700 }}>
+                style={{ padding: "9px 18px", background: "#a78bfa", border: "none", borderRadius: "var(--radius-md)", color: "#0a0a0a", cursor: "pointer", fontSize: "15px", fontWeight: 700 }}>
                 Show Records
               </button>
             </div>
@@ -722,10 +722,10 @@ function MemberDrillDownModal({ drill, onClose, cachedGet }) {
         {/* Header */}
         <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-elevated)", borderRadius: "var(--radius-lg) var(--radius-lg) 0 0", flexShrink: 0 }}>
           <div>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--text-primary)" }}>👥 {drill.label}</div>
-            {!loading && <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{members.length} members</div>}
+            <div style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 800, color: "var(--text-primary)" }}>👥 {drill.label}</div>
+            {!loading && <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>{members.length} members</div>}
           </div>
-          <button onClick={onClose} style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}>✕</button>
+          <button onClick={onClose} style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px" }}>✕</button>
         </div>
 
         {/* Summary Strip */}
@@ -737,9 +737,9 @@ function MemberDrillDownModal({ drill, onClose, cachedGet }) {
               { icon: "👥", label: "Total", value: members.length, color: "#60a5fa" },
             ].map(c => (
               <div key={c.label} style={{ padding: "12px 18px", textAlign: "center", borderRight: "1px solid var(--border-subtle)", background: "var(--bg-elevated)" }}>
-                <div style={{ fontSize: "16px", marginBottom: "3px" }}>{c.icon}</div>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: c.color }}>{c.value}</div>
-                <div style={{ fontSize: "10px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c.label}</div>
+                <div style={{ fontSize: "18px", marginBottom: "3px" }}>{c.icon}</div>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: c.color }}>{c.value}</div>
+                <div style={{ fontSize: "11px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c.label}</div>
               </div>
             ))}
           </div>
@@ -749,9 +749,9 @@ function MemberDrillDownModal({ drill, onClose, cachedGet }) {
         {!loading && members.length > 0 && (
           <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border-subtle)", flexShrink: 0 }}>
             <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px" }}>🔍</span>
+              <span style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "12px" }}>🔍</span>
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, phone, or email..."
-                style={{ width: "100%", padding: "8px 12px 8px 30px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "12px", outline: "none", boxSizing: "border-box" }} />
+                style={{ width: "100%", padding: "8px 12px 8px 30px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
             </div>
           </div>
         )}
@@ -759,16 +759,16 @@ function MemberDrillDownModal({ drill, onClose, cachedGet }) {
         {/* Body */}
         <div style={{ flex: 1, overflowY: "auto" }}>
           {loading ? (
-            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "13px" }}>Loading members...</div>
+            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "15px" }}>Loading members...</div>
           ) : members.length === 0 ? (
-            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "13px" }}>Is filter mein koi member nahi mila</div>
+            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "15px" }}>Is filter mein koi member nahi mila</div>
           ) : (
             <>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
                 <thead>
                   <tr style={{ background: "var(--bg-elevated)", position: "sticky", top: 0, zIndex: 1 }}>
                     {["#", "Member", "Phone / Email", "Membership Type", "Status", "Join Date", "Expiry"].map(h => (
-                      <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap" }}>{h}</th>
+                      <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -780,33 +780,33 @@ function MemberDrillDownModal({ drill, onClose, cachedGet }) {
                         onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
                         onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                       >
-                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "11px" }}>{idx + 1}</td>
+                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "12px" }}>{idx + 1}</td>
                         <td style={{ padding: "11px 14px" }}>
-                          <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "13px" }}>{m.full_name}</div>
+                          <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "15px" }}>{m.full_name}</div>
                         </td>
                         <td style={{ padding: "11px 14px" }}>
-                          <div style={{ color: "var(--text-secondary)", fontSize: "12px" }}>{m.phone || "—"}</div>
-                          <div style={{ color: "var(--text-muted)", fontSize: "10px", marginTop: "1px" }}>{m.email || ""}</div>
+                          <div style={{ color: "var(--text-secondary)", fontSize: "13px" }}>{m.phone || "—"}</div>
+                          <div style={{ color: "var(--text-muted)", fontSize: "11px", marginTop: "1px" }}>{m.email || ""}</div>
                         </td>
                         <td style={{ padding: "11px 14px" }}>
-                          <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 600, background: "rgba(96,165,250,0.1)", color: "#60a5fa", whiteSpace: "nowrap" }}>
+                          <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: 600, background: "rgba(96,165,250,0.1)", color: "#60a5fa", whiteSpace: "nowrap" }}>
                             {m.membership_type || "—"}
                           </span>
                         </td>
                         <td style={{ padding: "11px 14px" }}>
-                          <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: 700, background: st.bg, color: st.color, textTransform: "capitalize" }}>
+                          <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: 700, background: st.bg, color: st.color, textTransform: "capitalize" }}>
                             {m.status}
                           </span>
                         </td>
-                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "11px", whiteSpace: "nowrap" }}>{fmtDate(m.created_at)}</td>
-                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "11px", whiteSpace: "nowrap" }}>{fmtDate(m.membership_end)}</td>
+                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "12px", whiteSpace: "nowrap" }}>{fmtDate(m.created_at)}</td>
+                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "12px", whiteSpace: "nowrap" }}>{fmtDate(m.membership_end)}</td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
               <div style={{ padding: "12px 20px", borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>Showing {filtered.length} of {members.length} members</span>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Showing {filtered.length} of {members.length} members</span>
               </div>
             </>
           )}
@@ -891,17 +891,17 @@ function AttendanceDrillDownModal({ drill, onClose, cachedGet }) {
         {/* Header */}
         <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-elevated)", borderRadius: "var(--radius-lg) var(--radius-lg) 0 0", flexShrink: 0 }}>
           <div>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800, color: "var(--text-primary)" }}>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 800, color: "var(--text-primary)" }}>
               🏋️ {drill.label}
             </div>
             {!loading && (
-              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>
                 {records.length} records
                 {isMemberMode && summary && ` • ${summary.present} present visits`}
               </div>
             )}
           </div>
-          <button onClick={onClose} style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}>✕</button>
+          <button onClick={onClose} style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px" }}>✕</button>
         </div>
 
         {/* Summary Strip */}
@@ -913,9 +913,9 @@ function AttendanceDrillDownModal({ drill, onClose, cachedGet }) {
               { icon: "📋", label: "Total Records", value: records.length, color: "#a78bfa" },
             ].map(c => (
               <div key={c.label} style={{ padding: "12px 18px", textAlign: "center", borderRight: "1px solid var(--border-subtle)", background: "var(--bg-elevated)" }}>
-                <div style={{ fontSize: "16px", marginBottom: "3px" }}>{c.icon}</div>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: c.color }}>{c.value}</div>
-                <div style={{ fontSize: "10px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c.label}</div>
+                <div style={{ fontSize: "18px", marginBottom: "3px" }}>{c.icon}</div>
+                <div style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: c.color }}>{c.value}</div>
+                <div style={{ fontSize: "11px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c.label}</div>
               </div>
             ))}
           </div>
@@ -925,9 +925,9 @@ function AttendanceDrillDownModal({ drill, onClose, cachedGet }) {
         {!loading && records.length > 0 && !isMemberMode && (
           <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border-subtle)", flexShrink: 0 }}>
             <div style={{ position: "relative" }}>
-              <span style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px" }}>🔍</span>
+              <span style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "12px" }}>🔍</span>
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by member name or phone..."
-                style={{ width: "100%", padding: "8px 12px 8px 30px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "12px", outline: "none", boxSizing: "border-box" }} />
+                style={{ width: "100%", padding: "8px 12px 8px 30px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
             </div>
           </div>
         )}
@@ -935,19 +935,19 @@ function AttendanceDrillDownModal({ drill, onClose, cachedGet }) {
         {/* Body */}
         <div style={{ flex: 1, overflowY: "auto" }}>
           {loading ? (
-            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "13px" }}>Loading attendance records...</div>
+            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "15px" }}>Loading attendance records...</div>
           ) : records.length === 0 ? (
-            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "13px" }}>Is filter mein koi record nahi mila</div>
+            <div style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)", fontSize: "15px" }}>Is filter mein koi record nahi mila</div>
           ) : (
             <>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
                 <thead>
                   <tr style={{ background: "var(--bg-elevated)", position: "sticky", top: 0, zIndex: 1 }}>
                     {(isMemberMode
                       ? ["#", "Date", "Check-In", "Check-Out", "Duration", "Status"]
                       : ["#", "Member", "Phone", "Membership", "Check-In", "Check-Out", "Duration", "Status"]
                     ).map(h => (
-                      <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: "10px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap" }}>{h}</th>
+                      <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: "11px", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--border-subtle)", whiteSpace: "nowrap" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -967,31 +967,31 @@ function AttendanceDrillDownModal({ drill, onClose, cachedGet }) {
                         onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
                         onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                       >
-                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "11px" }}>{idx + 1}</td>
+                        <td style={{ padding: "11px 14px", color: "var(--text-muted)", fontSize: "12px" }}>{idx + 1}</td>
 
                         {isMemberMode ? (
-                          <td style={{ padding: "11px 14px", color: "var(--text-primary)", fontSize: "12px", fontWeight: 600, whiteSpace: "nowrap" }}>
+                          <td style={{ padding: "11px 14px", color: "var(--text-primary)", fontSize: "13px", fontWeight: 600, whiteSpace: "nowrap" }}>
                             {fmtDate(r.date)}
                           </td>
                         ) : (
                           <>
                             <td style={{ padding: "11px 14px" }}>
-                              <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "13px" }}>{r.full_name}</div>
+                              <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "15px" }}>{r.full_name}</div>
                             </td>
-                            <td style={{ padding: "11px 14px", color: "var(--text-secondary)", fontSize: "12px" }}>{r.phone || "—"}</td>
+                            <td style={{ padding: "11px 14px", color: "var(--text-secondary)", fontSize: "13px" }}>{r.phone || "—"}</td>
                             <td style={{ padding: "11px 14px" }}>
-                              <span style={{ padding: "3px 8px", borderRadius: "20px", fontSize: "10px", fontWeight: 600, background: "rgba(96,165,250,0.1)", color: "#60a5fa", whiteSpace: "nowrap" }}>
+                              <span style={{ padding: "3px 8px", borderRadius: "20px", fontSize: "11px", fontWeight: 600, background: "rgba(96,165,250,0.1)", color: "#60a5fa", whiteSpace: "nowrap" }}>
                                 {r.membership_type || "—"}
                               </span>
                             </td>
                           </>
                         )}
 
-                        <td style={{ padding: "11px 14px", color: "#34d399", fontSize: "12px", fontWeight: 600, whiteSpace: "nowrap" }}>{fmtTime(r.check_in)}</td>
-                        <td style={{ padding: "11px 14px", color: r.check_out ? "#60a5fa" : "var(--text-muted)", fontSize: "12px", whiteSpace: "nowrap" }}>{r.check_out ? fmtTime(r.check_out) : "—"}</td>
-                        <td style={{ padding: "11px 14px", color: "#fbbf24", fontSize: "12px", whiteSpace: "nowrap" }}>{duration}</td>
+                        <td style={{ padding: "11px 14px", color: "#34d399", fontSize: "13px", fontWeight: 600, whiteSpace: "nowrap" }}>{fmtTime(r.check_in)}</td>
+                        <td style={{ padding: "11px 14px", color: r.check_out ? "#60a5fa" : "var(--text-muted)", fontSize: "13px", whiteSpace: "nowrap" }}>{r.check_out ? fmtTime(r.check_out) : "—"}</td>
+                        <td style={{ padding: "11px 14px", color: "#fbbf24", fontSize: "13px", whiteSpace: "nowrap" }}>{duration}</td>
                         <td style={{ padding: "11px 14px" }}>
-                          <span style={{ padding: "3px 10px", borderRadius: "99px", fontSize: "10px", fontWeight: 700, background: isPresent ? "rgba(52,211,153,0.12)" : "rgba(248,113,113,0.12)", color: isPresent ? "#34d399" : "#f87171", textTransform: "capitalize" }}>
+                          <span style={{ padding: "3px 10px", borderRadius: "99px", fontSize: "11px", fontWeight: 700, background: isPresent ? "rgba(52,211,153,0.12)" : "rgba(248,113,113,0.12)", color: isPresent ? "#34d399" : "#f87171", textTransform: "capitalize" }}>
                             {r.status}
                           </span>
                         </td>
@@ -1001,7 +1001,7 @@ function AttendanceDrillDownModal({ drill, onClose, cachedGet }) {
                 </tbody>
               </table>
               <div style={{ padding: "12px 20px", borderTop: "1px solid var(--border-subtle)" }}>
-                <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>
                   Showing {filtered.length} of {records.length} records
                 </span>
               </div>

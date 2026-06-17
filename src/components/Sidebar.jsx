@@ -71,7 +71,10 @@ export default function Sidebar({ onLogout }) {
       display: "flex",
       flexDirection: "column",
       fontFamily: "var(--font-body)",
-      overflowY: "hidden",
+      position: "fixed",
+      top: 0,
+      left: 0,
+      zIndex: 100,
     }}>
       {/* Logo */}
       <div style={{
@@ -89,11 +92,11 @@ export default function Sidebar({ onLogout }) {
             display: "flex", alignItems: "center", justifyContent: "center",
             flexShrink: 0
           }}>
-            <FaBolt style={{ color: "#0a0a0a", fontSize: "13px" }} />
+            <FaBolt style={{ color: "#0a0a0a", fontSize: "15px" }} />
           </div>
           <span style={{
             fontFamily: "var(--font-display)", fontWeight: 800,
-            fontSize: "15px", color: "var(--text-primary)",
+            fontSize: "17px", color: "var(--text-primary)",
             letterSpacing: "0.02em", lineHeight: 1.2
           }}>
             Workout World Gym
@@ -105,7 +108,7 @@ export default function Sidebar({ onLogout }) {
           style={{
             display: "none",
             background: "none", border: "none", cursor: "pointer",
-            color: "var(--text-muted)", fontSize: "16px", padding: "4px",
+            color: "var(--text-muted)", fontSize: "18px", padding: "4px",
             borderRadius: "6px", alignItems: "center", justifyContent: "center",
           }}
           className="sidebar-close-btn"
@@ -117,7 +120,7 @@ export default function Sidebar({ onLogout }) {
       {/* Nav */}
       <nav style={{ flex: 1, padding: "12px 10px", overflowY: "auto", minHeight: 0 }}>
         <p style={{
-          fontSize: "10px", fontWeight: 600,
+          fontSize: "11px", fontWeight: 600,
           color: "var(--text-muted)", textTransform: "uppercase",
           letterSpacing: "0.12em", padding: "8px 10px 6px", marginBottom: "4px"
         }}>Navigation</p>
@@ -135,19 +138,19 @@ export default function Sidebar({ onLogout }) {
                 marginBottom: "2px", cursor: "pointer",
                 background: active ? "var(--bg-active)" : "transparent",
                 color: active ? "var(--text-primary)" : "var(--text-muted)",
-                fontWeight: active ? 600 : 400, fontSize: "13.5px",
+                fontWeight: active ? 600 : 400, fontSize: "15px",
                 borderLeft: active ? "2px solid var(--accent)" : "2px solid transparent",
                 transition: "all 0.15s",
               }}
               onMouseEnter={e => { if (!active) { e.currentTarget.style.background = "var(--bg-hover)"; e.currentTarget.style.color = "var(--text-secondary)"; }}}
               onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--text-muted)"; }}}
             >
-              <Icon style={{ fontSize: "14px", flexShrink: 0, opacity: active ? 1 : 0.6 }} />
+              <Icon style={{ fontSize: "16px", flexShrink: 0, opacity: active ? 1 : 0.6 }} />
               <span style={{ flex: 1 }}>{label}</span>
               {showBadge && (
                 <span style={{
                   background: "#2f81f7", color: "#fff",
-                  fontSize: "10px", fontWeight: 700,
+                  fontSize: "11px", fontWeight: 700,
                   padding: "1px 6px", borderRadius: "99px",
                   minWidth: "18px", textAlign: "center"
                 }}>
@@ -177,14 +180,14 @@ export default function Sidebar({ onLogout }) {
             width: "30px", height: "30px", borderRadius: "50%",
             background: "var(--bg-active)", border: "1px solid var(--border-strong)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "11px", fontWeight: 700, color: "var(--text-primary)", flexShrink: 0
+            fontSize: "12px", fontWeight: 700, color: "var(--text-primary)", flexShrink: 0
           }}>{initials}</div>
           <div style={{ overflow: "hidden", flex: 1 }}>
             <div style={{
-              fontSize: "13px", fontWeight: 600, color: "var(--text-primary)",
+              fontSize: "15px", fontWeight: 600, color: "var(--text-primary)",
               whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
             }}>{admin.name || "Admin"}</div>
-            <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+            <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
               {admin.role?.replace("_", " ") || "admin"}
             </div>
           </div>
@@ -196,12 +199,12 @@ export default function Sidebar({ onLogout }) {
             display: "flex", alignItems: "center", gap: "10px",
             padding: "9px 10px", borderRadius: "var(--radius-sm)",
             cursor: "pointer", color: "var(--text-muted)",
-            fontSize: "13.5px", transition: "all 0.15s"
+            fontSize: "15px", transition: "all 0.15s"
           }}
           onMouseEnter={e => { e.currentTarget.style.background = "var(--red-bg)"; e.currentTarget.style.color = "var(--red)"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--text-muted)"; }}
         >
-          <FaSignOutAlt style={{ fontSize: "13px" }} /> Sign Out
+          <FaSignOutAlt style={{ fontSize: "15px" }} /> Sign Out
         </div>
       </div>
     </aside>
@@ -210,10 +213,11 @@ export default function Sidebar({ onLogout }) {
   return (
     <>
       <style>{`
-        /* ── Desktop: normal sidebar ── */
+        /* ── Desktop: spacer so main content shifts right ── */
         .sidebar-wrapper {
           display: flex;
           flex-shrink: 0;
+          width: 220px;
           min-height: 100vh;
         }
         .hamburger-btn {
@@ -304,7 +308,7 @@ export default function Sidebar({ onLogout }) {
         onClick={() => setMobileOpen(true)}
         aria-label="Open menu"
       >
-        <FaBars style={{ fontSize: "16px" }} />
+        <FaBars style={{ fontSize: "18px" }} />
       </button>
 
       {/* Mobile Drawer + Overlay */}

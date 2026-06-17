@@ -56,14 +56,14 @@ function StatCard({ icon: Icon, label, value, sub, color="#60a5fa" }) {
         width:"44px", height:"44px", borderRadius:"10px", flexShrink:0,
         background:`${color}18`, display:"flex", alignItems:"center", justifyContent:"center"
       }}>
-        <Icon style={{ color, fontSize:"18px" }} />
+        <Icon style={{ color, fontSize: "20px" }} />
       </div>
       <div>
-        <div style={{ fontSize:"22px", fontWeight:700, color:"var(--text-primary)", fontFamily:"var(--font-display)" }}>
+        <div style={{ fontSize: "25px", fontWeight:700, color:"var(--text-primary)", fontFamily:"var(--font-display)" }}>
           {value}
         </div>
-        <div style={{ fontSize:"12px", color:"var(--text-muted)" }}>{label}</div>
-        {sub && <div style={{ fontSize:"11px", color:"var(--text-muted)", marginTop:"2px" }}>{sub}</div>}
+        <div style={{ fontSize: "13px", color:"var(--text-muted)" }}>{label}</div>
+        {sub && <div style={{ fontSize: "12px", color:"var(--text-muted)", marginTop:"2px" }}>{sub}</div>}
       </div>
     </div>
   );
@@ -74,7 +74,7 @@ function Badge({ value, map }) {
   const s = map[value] || { bg:"rgba(156,163,175,0.12)", color:"#9ca3af" };
   return (
     <span style={{
-      padding:"3px 10px", borderRadius:"20px", fontSize:"11px",
+      padding:"3px 10px", borderRadius:"20px", fontSize: "12px",
       fontWeight:600, background:s.bg, color:s.color,
       textTransform:"capitalize", whiteSpace:"nowrap"
     }}>{value?.replace(/_/g," ")}</span>
@@ -107,7 +107,7 @@ function Modal({ title, onClose, children }) {
           </h3>
           <button onClick={onClose} style={{
             background:"none", border:"none", color:"var(--text-muted)",
-            cursor:"pointer", padding:"4px", fontSize:"16px"
+            cursor:"pointer", padding:"4px", fontSize: "18px"
           }}><FaTimes /></button>
         </div>
         <div style={{
@@ -124,7 +124,7 @@ function Field({ label, children }) {
   return (
     <div>
       <label style={{
-        display:"block", marginBottom:"6px", fontSize:"11px", fontWeight:600,
+        display:"block", marginBottom:"6px", fontSize: "12px", fontWeight:600,
         color:"var(--text-secondary)", textTransform:"uppercase", letterSpacing:"0.08em"
       }}>{label}</label>
       {children}
@@ -136,7 +136,7 @@ const inputStyle = {
   width:"100%", padding:"10px 12px",
   background:"var(--bg-elevated)", border:"1px solid var(--border-default)",
   borderRadius:"var(--radius-md)", color:"var(--text-primary)",
-  outline:"none", fontSize:"13px", boxSizing:"border-box"
+  outline:"none", fontSize: "15px", boxSizing:"border-box"
 };
 
 // ── Main Component ─────────────────────────────────────────────────────────────
@@ -236,7 +236,7 @@ export default function Equipment({ onLogout }) {
               Equipment
             </h1>
             {!isMobile && (
-              <p style={{ color:"var(--text-muted)", fontSize:"13px", margin:"4px 0 0" }}>
+              <p style={{ color:"var(--text-muted)", fontSize: "15px", margin:"4px 0 0" }}>
                 Track and manage all gym equipment
               </p>
             )}
@@ -246,7 +246,7 @@ export default function Equipment({ onLogout }) {
             padding: isMobile ? "8px 14px" : "10px 18px",
             background:"var(--text-primary)", color:"#0a0a0a",
             border:"none", borderRadius:"var(--radius-md)", cursor:"pointer",
-            fontFamily:"var(--font-display)", fontWeight:700, fontSize:"13px"
+            fontFamily:"var(--font-display)", fontWeight:700, fontSize: "15px"
           }}>
             <FaPlus /> {isMobile ? "Add" : "Add Equipment"}
           </button>
@@ -278,7 +278,7 @@ export default function Equipment({ onLogout }) {
             display:"flex", gap:"10px", flexWrap:"wrap", alignItems:"center"
           }}>
             <div style={{ position:"relative", flex:1, minWidth: isMobile ? "100%" : "200px" }}>
-              <FaSearch style={{ position:"absolute", left:"12px", top:"50%", transform:"translateY(-50%)", color:"var(--text-muted)", fontSize:"12px" }} />
+              <FaSearch style={{ position:"absolute", left:"12px", top:"50%", transform:"translateY(-50%)", color:"var(--text-muted)", fontSize: "13px" }} />
               <input
                 placeholder="Search equipment..."
                 value={search} onChange={e => setSearch(e.target.value)}
@@ -299,7 +299,7 @@ export default function Equipment({ onLogout }) {
               {(search || catFilter || stFilter) && (
                 <button onClick={() => { setSearch(""); setCatFilter(""); setStFilter(""); }} style={{
                   padding:"10px 14px", background:"var(--bg-elevated)", border:"1px solid var(--border-default)",
-                  borderRadius:"var(--radius-md)", color:"var(--text-muted)", cursor:"pointer", fontSize:"12px"
+                  borderRadius:"var(--radius-md)", color:"var(--text-muted)", cursor:"pointer", fontSize: "13px"
                 }}>✕</button>
               )}
             </div>
@@ -314,7 +314,7 @@ export default function Equipment({ onLogout }) {
               display:"flex", alignItems:"center", justifyContent:"space-between",
               padding:"14px 20px", borderBottom:"1px solid var(--border-subtle)"
             }}>
-              <span style={{ fontSize:"13px", color:"var(--text-muted)" }}>
+              <span style={{ fontSize: "15px", color:"var(--text-muted)" }}>
                 {loading ? "Loading..." : `${totalItems} item${totalItems !== 1 ? "s" : ""} found`}
               </span>
             </div>
@@ -331,7 +331,7 @@ export default function Equipment({ onLogout }) {
                   ))
                 ) : equipment.length === 0 ? (
                   <div style={{ padding:"40px", textAlign:"center", color:"var(--text-muted)" }}>
-                    <FaBoxOpen style={{ fontSize:"28px", marginBottom:"8px", opacity:0.3 }} />
+                    <FaBoxOpen style={{ fontSize: "31px", marginBottom:"8px", opacity:0.3 }} />
                     <div>No equipment found</div>
                   </div>
                 ) : equipment.map((eq, i) => (
@@ -343,38 +343,38 @@ export default function Equipment({ onLogout }) {
                     {/* Top row: name + actions */}
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"8px" }}>
                       <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontWeight:700, color:"var(--text-primary)", fontSize:"14px" }}>{eq.name}</div>
-                        {eq.serial_number && <div style={{ fontSize:"11px", color:"var(--text-muted)", marginTop:"2px" }}>S/N: {eq.serial_number}</div>}
+                        <div style={{ fontWeight:700, color:"var(--text-primary)", fontSize: "16px" }}>{eq.name}</div>
+                        {eq.serial_number && <div style={{ fontSize: "12px", color:"var(--text-muted)", marginTop:"2px" }}>S/N: {eq.serial_number}</div>}
                       </div>
                       <div style={{ display:"flex", gap:"6px", marginLeft:"10px", flexShrink:0 }}>
                         <button onClick={() => openEdit(eq)} style={{
                           padding:"6px 10px", background:"rgba(96,165,250,0.1)",
                           border:"1px solid rgba(96,165,250,0.2)", borderRadius:"6px",
-                          color:"#60a5fa", cursor:"pointer", fontSize:"12px"
+                          color:"#60a5fa", cursor:"pointer", fontSize: "13px"
                         }}><FaEdit /></button>
                         <button onClick={() => openDel(eq)} style={{
                           padding:"6px 10px", background:"rgba(248,113,113,0.1)",
                           border:"1px solid rgba(248,113,113,0.2)", borderRadius:"6px",
-                          color:"#f87171", cursor:"pointer", fontSize:"12px"
+                          color:"#f87171", cursor:"pointer", fontSize: "13px"
                         }}><FaTrash /></button>
                       </div>
                     </div>
                     {/* Meta row */}
                     <div style={{ display:"flex", gap:"6px", flexWrap:"wrap", alignItems:"center" }}>
-                      <span style={{ padding:"2px 8px", borderRadius:"12px", fontSize:"11px", fontWeight:600, background:"rgba(96,165,250,0.1)", color:"#60a5fa" }}>
+                      <span style={{ padding:"2px 8px", borderRadius:"12px", fontSize: "12px", fontWeight:600, background:"rgba(96,165,250,0.1)", color:"#60a5fa" }}>
                         {eq.category}
                       </span>
                       <Badge value={eq.condition_status} map={COND_COLOR} />
                       <Badge value={eq.status} map={STATUS_COLOR} />
                       {eq.location && (
-                        <span style={{ fontSize:"11px", color:"var(--text-muted)" }}>📍 {eq.location}</span>
+                        <span style={{ fontSize: "12px", color:"var(--text-muted)" }}>📍 {eq.location}</span>
                       )}
-                      <span style={{ fontSize:"11px", color:"var(--text-muted)", marginLeft:"auto" }}>
+                      <span style={{ fontSize: "12px", color:"var(--text-muted)", marginLeft:"auto" }}>
                         Qty: {eq.quantity}
                       </span>
                     </div>
                     {(eq.brand || eq.model) && (
-                      <div style={{ fontSize:"12px", color:"var(--text-secondary)", marginTop:"6px" }}>
+                      <div style={{ fontSize: "13px", color:"var(--text-secondary)", marginTop:"6px" }}>
                         {eq.brand}{eq.model ? ` / ${eq.model}` : ""}
                       </div>
                     )}
@@ -389,7 +389,7 @@ export default function Equipment({ onLogout }) {
                     <tr style={{ borderBottom:"1px solid var(--border-subtle)" }}>
                       {["#","Name","Category","Brand / Model","Location","Qty","Condition","Status","Actions"].map(h => (
                         <th key={h} style={{
-                          padding:"12px 16px", textAlign:"left", fontSize:"11px",
+                          padding:"12px 16px", textAlign:"left", fontSize: "12px",
                           fontWeight:600, color:"var(--text-muted)", textTransform:"uppercase",
                           letterSpacing:"0.08em", whiteSpace:"nowrap"
                         }}>{h}</th>
@@ -403,7 +403,7 @@ export default function Equipment({ onLogout }) {
                       </td></tr>
                     ) : equipment.length === 0 ? (
                       <tr><td colSpan={9} style={{ padding:"48px", textAlign:"center", color:"var(--text-muted)" }}>
-                        <FaBoxOpen style={{ fontSize:"32px", marginBottom:"8px", opacity:0.3 }} />
+                        <FaBoxOpen style={{ fontSize: "36px", marginBottom:"8px", opacity:0.3 }} />
                         <div>No equipment found</div>
                       </td></tr>
                     ) : equipment.map((eq, i) => (
@@ -414,26 +414,26 @@ export default function Equipment({ onLogout }) {
                         onMouseEnter={e => e.currentTarget.style.background = "var(--bg-hover)"}
                         onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                       >
-                        <td style={{ padding:"14px 16px", color:"var(--text-muted)", fontSize:"12px" }}>
+                        <td style={{ padding:"14px 16px", color:"var(--text-muted)", fontSize: "13px" }}>
                           {(page - 1) * 10 + i + 1}
                         </td>
                         <td style={{ padding:"14px 16px" }}>
-                          <div style={{ fontWeight:600, color:"var(--text-primary)", fontSize:"13px" }}>{eq.name}</div>
-                          {eq.serial_number && <div style={{ fontSize:"11px", color:"var(--text-muted)" }}>S/N: {eq.serial_number}</div>}
+                          <div style={{ fontWeight:600, color:"var(--text-primary)", fontSize: "15px" }}>{eq.name}</div>
+                          {eq.serial_number && <div style={{ fontSize: "12px", color:"var(--text-muted)" }}>S/N: {eq.serial_number}</div>}
                         </td>
                         <td style={{ padding:"14px 16px" }}>
                           <span style={{
-                            padding:"3px 10px", borderRadius:"20px", fontSize:"11px",
+                            padding:"3px 10px", borderRadius:"20px", fontSize: "12px",
                             fontWeight:600, background:"rgba(96,165,250,0.1)", color:"#60a5fa"
                           }}>{eq.category}</span>
                         </td>
-                        <td style={{ padding:"14px 16px", fontSize:"13px", color:"var(--text-secondary)" }}>
+                        <td style={{ padding:"14px 16px", fontSize: "15px", color:"var(--text-secondary)" }}>
                           {eq.brand || "—"}{eq.model ? ` / ${eq.model}` : ""}
                         </td>
-                        <td style={{ padding:"14px 16px", fontSize:"13px", color:"var(--text-secondary)" }}>
+                        <td style={{ padding:"14px 16px", fontSize: "15px", color:"var(--text-secondary)" }}>
                           {eq.location || "—"}
                         </td>
-                        <td style={{ padding:"14px 16px", fontSize:"14px", fontWeight:600, color:"var(--text-primary)" }}>
+                        <td style={{ padding:"14px 16px", fontSize: "16px", fontWeight:600, color:"var(--text-primary)" }}>
                           {eq.quantity}
                         </td>
                         <td style={{ padding:"14px 16px" }}>
@@ -447,12 +447,12 @@ export default function Equipment({ onLogout }) {
                             <button onClick={() => openEdit(eq)} style={{
                               padding:"6px 10px", background:"rgba(96,165,250,0.1)",
                               border:"1px solid rgba(96,165,250,0.2)", borderRadius:"6px",
-                              color:"#60a5fa", cursor:"pointer", fontSize:"12px"
+                              color:"#60a5fa", cursor:"pointer", fontSize: "13px"
                             }} title="Edit"><FaEdit /></button>
                             <button onClick={() => openDel(eq)} style={{
                               padding:"6px 10px", background:"rgba(248,113,113,0.1)",
                               border:"1px solid rgba(248,113,113,0.2)", borderRadius:"6px",
-                              color:"#f87171", cursor:"pointer", fontSize:"12px"
+                              color:"#f87171", cursor:"pointer", fontSize: "13px"
                             }} title="Delete"><FaTrash /></button>
                           </div>
                         </td>
@@ -469,7 +469,7 @@ export default function Equipment({ onLogout }) {
                 display:"flex", alignItems:"center", justifyContent:"space-between",
                 padding:"14px 20px", borderTop:"1px solid var(--border-subtle)"
               }}>
-                <span style={{ fontSize:"13px", color:"var(--text-muted)" }}>
+                <span style={{ fontSize: "15px", color:"var(--text-muted)" }}>
                   Page {page} of {totalPages}
                 </span>
                 <div style={{ display:"flex", gap:"8px" }}>
@@ -545,7 +545,7 @@ export default function Equipment({ onLogout }) {
             <div style={{
               padding:"10px 14px", borderRadius:"8px",
               background:"rgba(248,113,113,0.1)", border:"1px solid rgba(248,113,113,0.2)",
-              color:"#f87171", fontSize:"13px", marginTop:"16px"
+              color:"#f87171", fontSize: "15px", marginTop:"16px"
             }}>{error}</div>
           )}
 
@@ -553,12 +553,12 @@ export default function Equipment({ onLogout }) {
             <button onClick={closeModal} style={{
               padding:"10px 20px", background:"var(--bg-elevated)",
               border:"1px solid var(--border-default)", borderRadius:"var(--radius-md)",
-              color:"var(--text-secondary)", cursor:"pointer", fontSize:"13px"
+              color:"var(--text-secondary)", cursor:"pointer", fontSize: "15px"
             }}>Cancel</button>
             <button onClick={handleSave} disabled={saving} style={{
               padding:"10px 20px", background:"var(--text-primary)", color:"#0a0a0a",
               border:"none", borderRadius:"var(--radius-md)", cursor:saving?"not-allowed":"pointer",
-              fontWeight:700, fontSize:"13px", opacity:saving?0.7:1
+              fontWeight:700, fontSize: "15px", opacity:saving?0.7:1
             }}>{saving ? "Saving..." : modal === "add" ? "Add Equipment" : "Save Changes"}</button>
           </div>
         </Modal>
@@ -570,26 +570,26 @@ export default function Equipment({ onLogout }) {
           <p style={{ color:"var(--text-secondary)", marginBottom:"8px" }}>
             Are you sure you want to delete <strong style={{ color:"var(--text-primary)" }}>{selected.name}</strong>?
           </p>
-          <p style={{ color:"var(--text-muted)", fontSize:"13px", marginBottom:"24px" }}>
+          <p style={{ color:"var(--text-muted)", fontSize: "15px", marginBottom:"24px" }}>
             This action cannot be undone.
           </p>
           {error && (
             <div style={{
               padding:"10px 14px", borderRadius:"8px",
               background:"rgba(248,113,113,0.1)", border:"1px solid rgba(248,113,113,0.2)",
-              color:"#f87171", fontSize:"13px", marginBottom:"16px"
+              color:"#f87171", fontSize: "15px", marginBottom:"16px"
             }}>{error}</div>
           )}
           <div style={{ display:"flex", gap:"12px", justifyContent:"flex-end" }}>
             <button onClick={closeModal} style={{
               padding:"10px 20px", background:"var(--bg-elevated)",
               border:"1px solid var(--border-default)", borderRadius:"var(--radius-md)",
-              color:"var(--text-secondary)", cursor:"pointer", fontSize:"13px"
+              color:"var(--text-secondary)", cursor:"pointer", fontSize: "15px"
             }}>Cancel</button>
             <button onClick={handleDelete} disabled={saving} style={{
               padding:"10px 20px", background:"#ef4444", color:"#fff",
               border:"none", borderRadius:"var(--radius-md)", cursor:saving?"not-allowed":"pointer",
-              fontWeight:700, fontSize:"13px", opacity:saving?0.7:1
+              fontWeight:700, fontSize: "15px", opacity:saving?0.7:1
             }}>{saving ? "Deleting..." : "Yes, Delete"}</button>
           </div>
         </Modal>

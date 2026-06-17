@@ -41,26 +41,26 @@ const StatCard = ({ icon: Icon, label, value, color, bg, sub, onClick, trend, tr
     <div style={{ position: "absolute", top: 0, right: 0, width: "80px", height: "80px", borderRadius: "50%", background: bg, filter: "blur(20px)", opacity: 0.5 }} />
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px", position: "relative" }}>
       <div style={{ width: "38px", height: "38px", borderRadius: "10px", background: bg, border: `1px solid ${color}30`, display: "flex", alignItems: "center", justifyContent: "center", color }}>
-        <Icon style={{ fontSize: "15px" }} />
+        <Icon style={{ fontSize: "17px" }} />
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         {onToggleMask && (
           <button onClick={e => { e.stopPropagation(); onToggleMask(); }}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "12px", padding: "2px", display: "flex", alignItems: "center", opacity: 0.7 }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "13px", padding: "2px", display: "flex", alignItems: "center", opacity: 0.7 }}
             title={masked ? "Show value" : "Hide value"}>
             {masked ? <FaEye /> : <FaEyeSlash />}
           </button>
         )}
-        {onClick && <FaArrowRight style={{ color: "var(--text-muted)", fontSize: "10px", opacity: 0.5 }} />}
+        {onClick && <FaArrowRight style={{ color: "var(--text-muted)", fontSize: "11px", opacity: 0.5 }} />}
       </div>
     </div>
     <div style={{ fontFamily: "var(--font-display)", fontSize: masked ? "22px" : "30px", fontWeight: 700, color: masked ? "var(--text-muted)" : "var(--text-primary)", lineHeight: 1, marginBottom: "5px", position: "relative", letterSpacing: masked ? "0.15em" : "normal", userSelect: masked ? "none" : "auto" }}>
       {masked ? MASK : (value ?? "—")}
     </div>
-    <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 500, position: "relative" }}>{label}</div>
-    {sub && <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "3px", position: "relative" }}>{sub}</div>}
+    <div style={{ fontSize: "13px", color: "var(--text-secondary)", fontWeight: 500, position: "relative" }}>{label}</div>
+    {sub && <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "3px", position: "relative" }}>{sub}</div>}
     {!masked && trend !== undefined && (
-      <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "10px", fontSize: "11px", color: trend >= 0 ? "var(--green)" : "var(--red)", position: "relative" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "10px", fontSize: "12px", color: trend >= 0 ? "var(--green)" : "var(--red)", position: "relative" }}>
         {trend >= 0 ? <FaArrowUp style={{ fontSize: "9px" }} /> : <FaArrowDown style={{ fontSize: "9px" }} />}
         <span>{Math.abs(trend)} {trendLabel || "vs yesterday"}</span>
       </div>
@@ -76,10 +76,10 @@ const MiniStat = ({ icon: Icon, label, value, color, delay = 0, masked = false, 
     onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.background = "var(--bg-surface)"; e.currentTarget.style.transform = "translateY(0)"; }}
   >
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-      <Icon style={{ fontSize: "13px", color, marginBottom: "10px" }} />
+      <Icon style={{ fontSize: "15px", color, marginBottom: "10px" }} />
       <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
         {onToggleMask && (
-          <button onClick={onToggleMask} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "11px", padding: "0", opacity: 0.6 }} title={masked ? "Show" : "Hide"}>
+          <button onClick={onToggleMask} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "12px", padding: "0", opacity: 0.6 }} title={masked ? "Show" : "Hide"}>
             {masked ? <FaEye /> : <FaEyeSlash />}
           </button>
         )}
@@ -89,7 +89,7 @@ const MiniStat = ({ icon: Icon, label, value, color, delay = 0, masked = false, 
     <div style={{ fontFamily: "var(--font-display)", fontSize: masked ? "16px" : "19px", fontWeight: 700, color: masked ? "var(--text-muted)" : "var(--text-primary)", lineHeight: 1, marginBottom: "4px", letterSpacing: masked ? "0.15em" : "normal" }}>
       {masked ? MASK : value}
     </div>
-    <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{label}</div>
+    <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{label}</div>
   </div>
 );
 
@@ -98,8 +98,8 @@ const ChartTooltip = ({ active, payload, label, prefix = "", suffix = "" }) => {
   if (!active || !payload?.length) return null;
   return (
     <div style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-strong)", borderRadius: "10px", padding: "10px 14px", boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
-      <p style={{ color: "var(--text-muted)", fontSize: "11px", marginBottom: "4px" }}>{label}</p>
-      <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "14px" }}>
+      <p style={{ color: "var(--text-muted)", fontSize: "12px", marginBottom: "4px" }}>{label}</p>
+      <p style={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "16px" }}>
         {prefix}{typeof payload[0].value === "number" ? payload[0].value.toLocaleString("en-IN") : payload[0].value}{suffix}
       </p>
     </div>
@@ -118,13 +118,13 @@ const PaymentRow = ({ p }) => (
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
       <Avatar name={p.full_name} />
       <div>
-        <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
-        <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{p.payment_for?.replace("_", " ")} · {p.payment_method}</div>
+        <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text-primary)" }}>{p.full_name}</div>
+        <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{p.payment_for?.replace("_", " ")} · {p.payment_method}</div>
       </div>
     </div>
     <div style={{ textAlign: "right" }}>
-      <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--green)", fontFamily: "var(--font-display)" }}>{fmt(p.amount)}</div>
-      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{fmtDate(p.payment_date)}</div>
+      <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--green)", fontFamily: "var(--font-display)" }}>{fmt(p.amount)}</div>
+      <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{fmtDate(p.payment_date)}</div>
     </div>
   </div>
 );
@@ -139,8 +139,8 @@ const MemberRow = ({ m }) => {
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <Avatar name={m.full_name} />
         <div>
-          <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{m.full_name}</div>
-          <div style={{ fontSize: "11px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
+          <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text-primary)" }}>{m.full_name}</div>
+          <div style={{ fontSize: "12px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
             <span>{m.membership_type} · {phoneVis ? m.phone : maskedPhone}</span>
             {m.phone && (
               <button
@@ -148,13 +148,13 @@ const MemberRow = ({ m }) => {
                 style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0, display: "flex", alignItems: "center", opacity: 0.7 }}
                 title={phoneVis ? "Hide number" : "Show number"}
               >
-                {phoneVis ? <FaEyeSlash style={{ fontSize: "10px" }} /> : <FaEye style={{ fontSize: "10px" }} />}
+                {phoneVis ? <FaEyeSlash style={{ fontSize: "11px" }} /> : <FaEye style={{ fontSize: "11px" }} />}
               </button>
             )}
           </div>
         </div>
       </div>
-      <span style={{ padding: "3px 10px", borderRadius: "99px", fontSize: "11px", fontWeight: 600, background: statusBg, color: statusColor, textTransform: "capitalize" }}>{m.status}</span>
+      <span style={{ padding: "3px 10px", borderRadius: "99px", fontSize: "12px", fontWeight: 600, background: statusBg, color: statusColor, textTransform: "capitalize" }}>{m.status}</span>
     </div>
   );
 };
@@ -349,11 +349,11 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
         {/* Header */}
         <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexShrink: 0 }}>
           <div>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
-              <FaTimesCircle style={{ color: "var(--red)", fontSize: "16px" }} />
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+              <FaTimesCircle style={{ color: "var(--red)", fontSize: "18px" }} />
               Expired Members
             </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "4px" }}>{count} members with expired membership</p>
+            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>{count} members with expired membership</p>
           </div>
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <button
@@ -365,7 +365,7 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
                 border: "1px solid rgba(59,130,246,0.35)",
                 color: exporting ? "var(--text-muted)" : "var(--blue, #3b82f6)",
                 cursor: (exporting || loading || allExpired.length === 0) ? "not-allowed" : "pointer",
-                fontSize: "11px", fontWeight: 600,
+                fontSize: "12px", fontWeight: 600,
                 display: "flex", alignItems: "center", gap: "5px",
                 opacity: (loading || allExpired.length === 0) ? 0.5 : 1,
                 transition: "all 0.15s"
@@ -376,12 +376,12 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
             </button>
             <button
               onClick={() => { onClose(); navigate("/members"); }}
-              style={{ padding: "6px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "11px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}
+              style={{ padding: "6px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}
             >
               View All <FaArrowRight style={{ fontSize: "9px" }} />
             </button>
             <button onClick={onClose} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <FaTimes style={{ fontSize: "11px" }} />
+              <FaTimes style={{ fontSize: "12px" }} />
             </button>
           </div>
         </div>
@@ -401,7 +401,7 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
             ))
           ) : members.length === 0 ? (
             <div style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)" }}>
-              <FaCheckCircle style={{ fontSize: "28px", color: "var(--green)", marginBottom: "10px", display: "block", margin: "0 auto 10px" }} />
+              <FaCheckCircle style={{ fontSize: "31px", color: "var(--green)", marginBottom: "10px", display: "block", margin: "0 auto 10px" }} />
               No expired members found!
             </div>
           ) : (
@@ -414,21 +414,21 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
                   {/* Avatar */}
-                  <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, color: "var(--red)", flexShrink: 0 }}>
+                  <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, color: "var(--red)", flexShrink: 0 }}>
                     {m.full_name?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
                   </div>
 
                   {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: "13px", color: "var(--text-primary)" }}>{m.full_name}</div>
-                    <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+                    <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--text-primary)" }}>{m.full_name}</div>
+                    <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
                       <span>{isPhoneVis ? m.phone : m.phone ? "••••••" + m.phone.slice(-4) : "—"}</span>
                       {m.phone && (
                         <button
                           onClick={() => setPhoneVis(p => ({ ...p, [m.id]: !p[m.id] }))}
                           style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0, display: "flex", alignItems: "center" }}
                         >
-                          {isPhoneVis ? <FaEyeSlash style={{ fontSize: "10px" }} /> : <FaEye style={{ fontSize: "10px" }} />}
+                          {isPhoneVis ? <FaEyeSlash style={{ fontSize: "11px" }} /> : <FaEye style={{ fontSize: "11px" }} />}
                         </button>
                       )}
                       <span style={{ color: "var(--border-default)" }}>·</span>
@@ -440,11 +440,11 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
                     {/* Due badge */}
                     {due?.total > 0 && (
                       <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", marginTop: "5px", padding: "3px 8px", borderRadius: "99px", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)" }}>
-                        <span style={{ fontSize: "10px", fontWeight: 700, color: "#f59e0b" }}>Due ₹{Number(due.total).toLocaleString("en-IN")}</span>
+                        <span style={{ fontSize: "11px", fontWeight: 700, color: "#f59e0b" }}>Due ₹{Number(due.total).toLocaleString("en-IN")}</span>
                         <button
                           onClick={() => markDuePaid(m.id)}
                           disabled={due.marking}
-                          style={{ background: "none", border: "none", cursor: due.marking ? "not-allowed" : "pointer", color: due.marking ? "var(--text-muted)" : "var(--green)", fontSize: "10px", fontWeight: 700, padding: 0, display: "flex", alignItems: "center", gap: "3px" }}
+                          style={{ background: "none", border: "none", cursor: due.marking ? "not-allowed" : "pointer", color: due.marking ? "var(--text-muted)" : "var(--green)", fontSize: "11px", fontWeight: 700, padding: 0, display: "flex", alignItems: "center", gap: "3px" }}
                         >
                           <FaCheck style={{ fontSize: "8px" }} />
                           {due.marking ? "..." : "Mark Paid"}
@@ -454,7 +454,7 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
                   </div>
 
                   {/* Expired badge */}
-                  <span style={{ padding: "3px 8px", borderRadius: "99px", fontSize: "10px", fontWeight: 600, background: "var(--red-bg)", color: "var(--red)", flexShrink: 0, marginTop: "2px" }}>Expired</span>
+                  <span style={{ padding: "3px 8px", borderRadius: "99px", fontSize: "11px", fontWeight: 600, background: "var(--red-bg)", color: "var(--red)", flexShrink: 0, marginTop: "2px" }}>Expired</span>
                 </div>
               );
             })
@@ -464,12 +464,12 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
         {/* Pagination */}
         {totalPages > 1 && (
           <div style={{ padding: "12px 24px", borderTop: "1px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-            <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>Page {page} of {totalPages}</span>
+            <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Page {page} of {totalPages}</span>
             <div style={{ display: "flex", gap: "6px" }}>
               <button onClick={() => { setPage(p => p - 1); fetchExpired(page - 1); }} disabled={page === 1}
-                style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page === 1 ? "var(--text-muted)" : "var(--text-secondary)", cursor: page === 1 ? "not-allowed" : "pointer", fontSize: "12px" }}>‹</button>
+                style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page === 1 ? "var(--text-muted)" : "var(--text-secondary)", cursor: page === 1 ? "not-allowed" : "pointer", fontSize: "13px" }}>‹</button>
               <button onClick={() => { setPage(p => p + 1); fetchExpired(page + 1); }} disabled={page === totalPages}
-                style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page === totalPages ? "var(--text-muted)" : "var(--text-secondary)", cursor: page === totalPages ? "not-allowed" : "pointer", fontSize: "12px" }}>›</button>
+                style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: page === totalPages ? "var(--text-muted)" : "var(--text-secondary)", cursor: page === totalPages ? "not-allowed" : "pointer", fontSize: "13px" }}>›</button>
             </div>
           </div>
         )}
@@ -487,11 +487,11 @@ const SectionCard = ({ children, style = {} }) => (
 const SectionHeader = ({ title, sub, onNav }) => (
   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "18px" }}>
     <div>
-      <h3 style={{ fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>{title}</h3>
-      {sub && <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "3px" }}>{sub}</p>}
+      <h3 style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>{title}</h3>
+      {sub && <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "3px" }}>{sub}</p>}
     </div>
     {onNav && (
-      <button onClick={onNav} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "11px", transition: "all 0.15s" }}
+      <button onClick={onNav} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", transition: "all 0.15s" }}
         onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-muted)"; }}
       >View <FaArrowRight style={{ fontSize: "9px" }} /></button>
@@ -780,32 +780,32 @@ export default function Dashboard({ onLogout }) {
 
         {/* ── Header ── */}
         <div className="fade-up" style={{ marginBottom: "28px", position: "relative", zIndex: 100 }}>
-          <p style={{ color: "var(--text-muted)", fontSize: "12px", marginBottom: "4px", letterSpacing: "0.02em" }}>
+          <p style={{ color: "var(--text-muted)", fontSize: "13px", marginBottom: "4px", letterSpacing: "0.02em" }}>
             {greet},{" "}
             <span style={{ background: "var(--grad-blue-cyan)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontWeight: 600 }}>
               {admin?.name?.split(" ")[0] || "Admin"}
             </span> 👋
           </p>
           <div className="dash-header-row">
-            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>
+            <h1 style={{ fontFamily: "var(--font-display)", fontSize: "31px", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>
               Dashboard
             </h1>
             <div className="dash-header-actions">
               {/* ── Member Search ── */}
               <div style={{ position: "relative" }} onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) { setShowSearchDrop(false); } }}>
                 <div style={{ position: "relative", width: "220px" }}>
-                  <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "11px", pointerEvents: "none" }} />
+                  <FaSearch style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "12px", pointerEvents: "none" }} />
                   <input
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     onFocus={() => searchQuery.trim() && setShowSearchDrop(true)}
                     placeholder="Search member..."
-                    style={{ width: "100%", padding: "7px 28px 7px 30px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)", fontSize: "12px", outline: "none", fontFamily: "var(--font-body)", boxSizing: "border-box" }}
+                    style={{ width: "100%", padding: "7px 28px 7px 30px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)", fontSize: "13px", outline: "none", fontFamily: "var(--font-body)", boxSizing: "border-box" }}
                     onKeyDown={e => { if (e.key === "Escape") { setSearchQuery(""); setShowSearchDrop(false); } }}
                   />
                   {searchQuery && (
                     <button onClick={() => { setSearchQuery(""); setShowSearchDrop(false); }} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0, display: "flex", alignItems: "center" }}>
-                      <FaTimes style={{ fontSize: "10px" }} />
+                      <FaTimes style={{ fontSize: "11px" }} />
                     </button>
                   )}
                 </div>
@@ -813,9 +813,9 @@ export default function Dashboard({ onLogout }) {
                 {showSearchDrop && (
                   <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", boxShadow: "0 8px 24px rgba(0,0,0,0.5)", zIndex: 500, overflow: "hidden", minWidth: "260px" }}>
                     {searchLoading ? (
-                      <div style={{ padding: "14px 16px", fontSize: "12px", color: "var(--text-muted)", textAlign: "center" }}>Searching...</div>
+                      <div style={{ padding: "14px 16px", fontSize: "13px", color: "var(--text-muted)", textAlign: "center" }}>Searching...</div>
                     ) : searchResults.length === 0 ? (
-                      <div style={{ padding: "14px 16px", fontSize: "12px", color: "var(--text-muted)", textAlign: "center" }}>No members found</div>
+                      <div style={{ padding: "14px 16px", fontSize: "13px", color: "var(--text-muted)", textAlign: "center" }}>No members found</div>
                     ) : (
                       searchResults.map(m => {
                         const statusColor = m.status === "active" ? "var(--green)" : m.status === "expired" ? "var(--red)" : "var(--yellow)";
@@ -828,14 +828,14 @@ export default function Dashboard({ onLogout }) {
                             onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
                             onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                           >
-                            <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: "var(--bg-active)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, color: "var(--accent-bright)", flexShrink: 0 }}>
+                            <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: "var(--bg-active)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, color: "var(--accent-bright)", flexShrink: 0 }}>
                               {m.full_name?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.full_name}</div>
-                              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "1px" }}>{m.phone} · {m.membership_type || "—"}</div>
+                              <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.full_name}</div>
+                              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "1px" }}>{m.phone} · {m.membership_type || "—"}</div>
                             </div>
-                            <span style={{ fontSize: "10px", fontWeight: 600, padding: "2px 7px", borderRadius: "99px", background: m.status === "active" ? "var(--green-bg)" : m.status === "expired" ? "var(--red-bg)" : "var(--yellow-bg)", color: statusColor, flexShrink: 0, textTransform: "capitalize" }}>{m.status}</span>
+                            <span style={{ fontSize: "11px", fontWeight: 600, padding: "2px 7px", borderRadius: "99px", background: m.status === "active" ? "var(--green-bg)" : m.status === "expired" ? "var(--red-bg)" : "var(--yellow-bg)", color: statusColor, flexShrink: 0, textTransform: "capitalize" }}>{m.status}</span>
                           </div>
                         );
                       })
@@ -844,20 +844,20 @@ export default function Dashboard({ onLogout }) {
                 )}
               </div>
               {lastUpdated && (
-                <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>
                   Updated {lastUpdated.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
                 </span>
               )}
               <button onClick={() => fetchAll(true)} disabled={refreshing}
-                style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: refreshing ? "not-allowed" : "pointer", fontSize: "12px", transition: "all 0.15s" }}
+                style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: refreshing ? "not-allowed" : "pointer", fontSize: "13px", transition: "all 0.15s" }}
                 onMouseEnter={e => { if (!refreshing) { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; } }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
               >
-                <FaSync style={{ fontSize: "10px", animation: refreshing ? "spin 1s linear infinite" : "none" }} />
+                <FaSync style={{ fontSize: "11px", animation: refreshing ? "spin 1s linear infinite" : "none" }} />
                 {refreshing ? "Refreshing..." : "Refresh"}
               </button>
               <NotificationBell />
-              <div className="dash-role-pill" style={{ padding: "6px 12px", borderRadius: "99px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", fontSize: "11px", color: "var(--text-muted)", alignItems: "center", gap: "6px" }}>
+              <div className="dash-role-pill" style={{ padding: "6px 12px", borderRadius: "99px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", fontSize: "12px", color: "var(--text-muted)", alignItems: "center", gap: "6px" }}>
                 <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--green)", boxShadow: "0 0 6px var(--green)" }} />
                 {admin?.role?.replace("_", " ")}
               </div>
@@ -891,10 +891,10 @@ export default function Dashboard({ onLogout }) {
         {/* ── Revenue Drill Down Section ── */}
         <div className="fade-up" style={{ marginBottom: "20px", animationDelay: "0.22s", opacity: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
               Revenue Overview
             </h2>
-            <span style={{ fontSize: "10px", padding: "2px 8px", borderRadius: "99px", background: "var(--blue-bg, rgba(59,130,246,0.1))", color: "var(--blue)", border: "1px solid rgba(59,130,246,0.2)", fontWeight: 600 }}>
+            <span style={{ fontSize: "11px", padding: "2px 8px", borderRadius: "99px", background: "var(--blue-bg, rgba(59,130,246,0.1))", color: "var(--blue)", border: "1px solid rgba(59,130,246,0.2)", fontWeight: 600 }}>
               Click to drill down
             </span>
           </div>
@@ -968,7 +968,7 @@ export default function Dashboard({ onLogout }) {
                     <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "8px", fontSize: "12px" }} />
+                <Tooltip contentStyle={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "8px", fontSize: "13px" }} />
               </PieChart>
             </ResponsiveContainer>
             <div style={{ marginTop: "10px" }}>
@@ -976,9 +976,9 @@ export default function Dashboard({ onLogout }) {
                 <div key={item.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
                     <div style={{ width: "8px", height: "8px", borderRadius: "2px", background: PIE_COLORS[i], flexShrink: 0 }} />
-                    <span style={{ fontSize: "12px", color: "var(--text-secondary)", textTransform: "capitalize" }}>{item.name}</span>
+                    <span style={{ fontSize: "13px", color: "var(--text-secondary)", textTransform: "capitalize" }}>{item.name}</span>
                   </div>
-                  <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-primary)" }}>{item.value}</span>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)" }}>{item.value}</span>
                 </div>
               ))}
             </div>
@@ -988,7 +988,7 @@ export default function Dashboard({ onLogout }) {
             <SectionHeader title="Recent Payments" sub="Latest 5 transactions" onNav={() => navigate("/payments")} />
             {loading ? <SkeletonRows n={4} /> :
               recentPay.length === 0
-                ? <p style={{ color: "var(--text-muted)", fontSize: "13px", textAlign: "center", padding: "20px 0" }}>No payments yet</p>
+                ? <p style={{ color: "var(--text-muted)", fontSize: "15px", textAlign: "center", padding: "20px 0" }}>No payments yet</p>
                 : recentPay.map(p => <PaymentRow key={p.id} p={p} />)
             }
           </SectionCard>
@@ -997,7 +997,7 @@ export default function Dashboard({ onLogout }) {
             <SectionHeader title="Recent Members" sub="Latest 5 joined" onNav={() => navigate("/members")} />
             {loading ? <SkeletonRows n={4} /> :
               recentMem.length === 0
-                ? <p style={{ color: "var(--text-muted)", fontSize: "13px", textAlign: "center", padding: "20px 0" }}>No members yet</p>
+                ? <p style={{ color: "var(--text-muted)", fontSize: "15px", textAlign: "center", padding: "20px 0" }}>No members yet</p>
                 : recentMem.map(m => <MemberRow key={m.id} m={m} />)
             }
           </SectionCard>

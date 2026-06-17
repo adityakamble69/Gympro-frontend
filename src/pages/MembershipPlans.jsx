@@ -11,7 +11,7 @@ import {
 const Field = ({ label, children }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
     <label style={{
-      fontSize: "11px", fontWeight: 600, color: "var(--text-muted)",
+      fontSize: "12px", fontWeight: 600, color: "var(--text-muted)",
       textTransform: "uppercase", letterSpacing: "0.08em"
     }}>{label}</label>
     {children}
@@ -21,7 +21,7 @@ const Field = ({ label, children }) => (
 const inputStyle = {
   padding: "9px 12px", borderRadius: "var(--radius-sm)",
   background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
-  color: "var(--text-primary)", fontSize: "13.5px", outline: "none",
+  color: "var(--text-primary)", fontSize: "15px", outline: "none",
   width: "100%", transition: "border-color 0.15s", fontFamily: "var(--font-body)",
   boxSizing: "border-box"
 };
@@ -45,7 +45,7 @@ const durColor = {
 const DurBadge = ({ type }) => {
   const [c, bg] = durColor[type] || ["var(--text-muted)", "rgba(80,80,80,0.12)"];
   return (
-    <span style={{ fontSize: "11px", fontWeight: 600, padding: "2px 10px", borderRadius: "99px", background: bg, color: c, textTransform: "capitalize" }}>
+    <span style={{ fontSize: "12px", fontWeight: 600, padding: "2px 10px", borderRadius: "99px", background: bg, color: c, textTransform: "capitalize" }}>
       {DURATION_LABELS[type] || type}
     </span>
   );
@@ -55,7 +55,7 @@ const StatusBadge = ({ status }) => {
   const active = status === "active";
   return (
     <span style={{
-      fontSize: "11px", fontWeight: 600, padding: "2px 10px", borderRadius: "99px",
+      fontSize: "12px", fontWeight: 600, padding: "2px 10px", borderRadius: "99px",
       background: active ? "var(--green-bg)" : "rgba(80,80,80,0.12)",
       color: active ? "var(--green)" : "var(--text-muted)", textTransform: "capitalize"
     }}>{status}</span>
@@ -86,7 +86,7 @@ const PlanCard = ({ plan, onEdit, onDelete, onAssign }) => {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: "4px" }}>
         <div>
-          <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "16px", color: "var(--text-primary)", marginBottom: "6px" }}>
+          <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "18px", color: "var(--text-primary)", marginBottom: "6px" }}>
             {plan.name}
           </div>
           <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
@@ -95,10 +95,10 @@ const PlanCard = ({ plan, onEdit, onDelete, onAssign }) => {
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "22px", color: "var(--text-primary)" }}>
+          <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "25px", color: "var(--text-primary)" }}>
             {fmt(plan.price)}
           </div>
-          <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+          <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>
             {plan.duration_days} days
           </div>
         </div>
@@ -106,7 +106,7 @@ const PlanCard = ({ plan, onEdit, onDelete, onAssign }) => {
 
       {/* Description */}
       {plan.description && (
-        <p style={{ fontSize: "13px", color: "var(--text-muted)", margin: 0, lineHeight: 1.55 }}>
+        <p style={{ fontSize: "15px", color: "var(--text-muted)", margin: 0, lineHeight: 1.55 }}>
           {plan.description}
         </p>
       )}
@@ -115,8 +115,8 @@ const PlanCard = ({ plan, onEdit, onDelete, onAssign }) => {
       {featureList.length > 0 && (
         <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "6px" }}>
           {featureList.map((f, i) => (
-            <li key={i} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "var(--text-secondary)" }}>
-              <FaCheck style={{ fontSize: "10px", color: "var(--green)", flexShrink: 0 }} />
+            <li key={i} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "15px", color: "var(--text-secondary)" }}>
+              <FaCheck style={{ fontSize: "11px", color: "var(--green)", flexShrink: 0 }} />
               {f}
             </li>
           ))}
@@ -130,21 +130,21 @@ const PlanCard = ({ plan, onEdit, onDelete, onAssign }) => {
           style={{
             flex: 1, padding: "8px 12px", borderRadius: "var(--radius-sm)",
             background: "var(--bg-active)", border: "1px solid var(--border-strong)",
-            color: "var(--text-primary)", cursor: "pointer", fontSize: "12px",
+            color: "var(--text-primary)", cursor: "pointer", fontSize: "13px",
             fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
             transition: "opacity 0.15s"
           }}
           onMouseEnter={e => e.currentTarget.style.opacity = "0.8"}
           onMouseLeave={e => e.currentTarget.style.opacity = "1"}
         >
-          <FaUserPlus style={{ fontSize: "11px" }} /> Assign
+          <FaUserPlus style={{ fontSize: "12px" }} /> Assign
         </button>
         <button
           onClick={() => onEdit(plan)}
           style={{
             padding: "8px 12px", borderRadius: "var(--radius-sm)",
             background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
-            color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", transition: "color 0.15s"
+            color: "var(--text-muted)", cursor: "pointer", fontSize: "13px", transition: "color 0.15s"
           }}
           onMouseEnter={e => e.currentTarget.style.color = "var(--text-primary)"}
           onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
@@ -156,7 +156,7 @@ const PlanCard = ({ plan, onEdit, onDelete, onAssign }) => {
           style={{
             padding: "8px 12px", borderRadius: "var(--radius-sm)",
             background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
-            color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", transition: "color 0.15s"
+            color: "var(--text-muted)", cursor: "pointer", fontSize: "13px", transition: "color 0.15s"
           }}
           onMouseEnter={e => e.currentTarget.style.color = "var(--red)"}
           onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
@@ -329,10 +329,10 @@ export default function MembershipPlans({ onLogout }) {
         {/* Header */}
         <div className="fade-up" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <h1 className="mp-header-h1" style={{ fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>
+            <h1 className="mp-header-h1" style={{ fontFamily: "var(--font-display)", fontSize: "31px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.5px", margin: 0 }}>
               Membership Plans
             </h1>
-            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "15px", marginTop: "4px" }}>
               Define plans, set pricing, and assign to members
             </p>
           </div>
@@ -342,14 +342,14 @@ export default function MembershipPlans({ onLogout }) {
               display: "flex", alignItems: "center", gap: "8px",
               padding: "10px 18px", borderRadius: "var(--radius-sm)",
               background: "var(--text-primary)", color: "#0a0a0a",
-              border: "none", cursor: "pointer", fontSize: "13px",
+              border: "none", cursor: "pointer", fontSize: "15px",
               fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em",
               transition: "opacity 0.15s", whiteSpace: "nowrap"
             }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.85"}
             onMouseLeave={e => e.currentTarget.style.opacity = "1"}
           >
-            <FaPlus style={{ fontSize: "11px" }} /> NEW PLAN
+            <FaPlus style={{ fontSize: "12px" }} /> NEW PLAN
           </button>
         </div>
 
@@ -362,12 +362,12 @@ export default function MembershipPlans({ onLogout }) {
               display: "flex", flexDirection: "column", gap: "10px"
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: 500 }}>{label}</span>
+                <span style={{ fontSize: "13px", color: "var(--text-muted)", fontWeight: 500 }}>{label}</span>
                 <div style={{ width: "28px", height: "28px", borderRadius: "var(--radius-sm)", background: "var(--bg-active)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <Icon style={{ fontSize: "12px", color: "var(--text-primary)" }} />
+                  <Icon style={{ fontSize: "13px", color: "var(--text-primary)" }} />
                 </div>
               </div>
-              <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "18px", color: "var(--text-primary)", letterSpacing: "-0.3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "20px", color: "var(--text-primary)", letterSpacing: "-0.3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {value}
               </div>
             </div>
@@ -382,26 +382,26 @@ export default function MembershipPlans({ onLogout }) {
               background: filter === t ? "var(--bg-active)" : "var(--bg-elevated)",
               border: filter === t ? "1px solid var(--border-strong)" : "1px solid var(--border-default)",
               color: filter === t ? "var(--text-primary)" : "var(--text-muted)",
-              fontSize: "13px", fontWeight: filter === t ? 600 : 400,
+              fontSize: "15px", fontWeight: filter === t ? 600 : 400,
               textTransform: "capitalize", transition: "all 0.15s", whiteSpace: "nowrap"
             }}>
               {t === "all" ? "All Plans" : DURATION_LABELS[t]}
             </button>
           ))}
-          <span style={{ marginLeft: "auto", fontSize: "12px", color: "var(--text-muted)", alignSelf: "center", whiteSpace: "nowrap", flexShrink: 0 }}>
+          <span style={{ marginLeft: "auto", fontSize: "13px", color: "var(--text-muted)", alignSelf: "center", whiteSpace: "nowrap", flexShrink: 0 }}>
             {filtered.length} plan{filtered.length !== 1 ? "s" : ""}
           </span>
         </div>
 
         {/* Plans Grid */}
         {loading ? (
-          <div style={{ textAlign: "center", padding: "80px 0", color: "var(--text-muted)", fontSize: "14px" }}>
+          <div style={{ textAlign: "center", padding: "80px 0", color: "var(--text-muted)", fontSize: "16px" }}>
             Loading plans...
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "80px 0" }}>
-            <FaCalendarAlt style={{ fontSize: "32px", color: "var(--text-muted)", marginBottom: "12px" }} />
-            <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>No plans found. Create your first plan!</p>
+            <FaCalendarAlt style={{ fontSize: "36px", color: "var(--text-muted)", marginBottom: "12px" }} />
+            <p style={{ color: "var(--text-muted)", fontSize: "16px" }}>No plans found. Create your first plan!</p>
           </div>
         ) : (
           <div className="mp-plans-grid fade-up stagger-3">
@@ -426,15 +426,15 @@ export default function MembershipPlans({ onLogout }) {
             {/* Modal Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
               <div>
-                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "22px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
                   {editingId ? "Edit Plan" : "New Membership Plan"}
                 </h2>
-                <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "4px" }}>
+                <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>
                   {editingId ? "Update plan details" : "Create a new plan with pricing"}
                 </p>
               </div>
               <button onClick={() => setShowModal(false)} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <FaTimes style={{ fontSize: "12px" }} />
+                <FaTimes style={{ fontSize: "13px" }} />
               </button>
             </div>
 
@@ -481,7 +481,7 @@ export default function MembershipPlans({ onLogout }) {
                     placeholder="Gym Access, Locker Room, Personal Training"
                     onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} />
                 </Field>
-                <p style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "5px" }}>
+                <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "5px" }}>
                   Separate each feature with a comma. They'll appear as checkmarks on the card.
                 </p>
               </div>
@@ -494,21 +494,21 @@ export default function MembershipPlans({ onLogout }) {
                 background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
                 display: "flex", justifyContent: "space-between", alignItems: "center"
               }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Plan Preview</span>
-                <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "18px", color: "var(--text-primary)" }}>
+                <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Plan Preview</span>
+                <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "20px", color: "var(--text-primary)" }}>
                   {fmt(form.price)} / {DURATION_LABELS[form.duration_type]}
                 </span>
               </div>
             )}
 
             {formError && (
-              <div style={{ marginTop: "16px", padding: "11px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px" }}>
+              <div style={{ marginTop: "16px", padding: "11px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "15px" }}>
                 {formError}
               </div>
             )}
 
             <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "24px", paddingTop: "20px", borderTop: "1px solid var(--border-subtle)" }}>
-              <button onClick={() => setShowModal(false)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>
+              <button onClick={() => setShowModal(false)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px" }}>
                 Cancel
               </button>
               <button onClick={handleSave} disabled={saving} style={{
@@ -516,7 +516,7 @@ export default function MembershipPlans({ onLogout }) {
                 background: saving ? "var(--bg-elevated)" : "var(--text-primary)",
                 color: saving ? "var(--text-muted)" : "#0a0a0a",
                 border: "none", cursor: saving ? "not-allowed" : "pointer",
-                fontSize: "13px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em"
+                fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em"
               }}>
                 {saving ? "Saving..." : editingId ? "UPDATE" : "CREATE PLAN"}
               </button>
@@ -533,15 +533,15 @@ export default function MembershipPlans({ onLogout }) {
           <div className="fade-up" style={{ ...modalBox, maxWidth: "440px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
               <div>
-                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
                   Assign Plan to Member
                 </h2>
-                <p style={{ color: "var(--text-muted)", fontSize: "12px", marginTop: "4px" }}>
+                <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "4px" }}>
                   Plan: <strong style={{ color: "var(--text-secondary)" }}>{assignModal.name}</strong> — {fmt(assignModal.price)}
                 </p>
               </div>
               <button onClick={() => { setAssignModal(null); setAssignMsg(""); }} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <FaTimes style={{ fontSize: "12px" }} />
+                <FaTimes style={{ fontSize: "13px" }} />
               </button>
             </div>
 
@@ -550,12 +550,12 @@ export default function MembershipPlans({ onLogout }) {
             {/* Plan summary */}
             <div style={{ padding: "14px 16px", background: "var(--bg-elevated)", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-default)", marginBottom: "20px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Duration</span>
-                <span style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 600 }}>{assignModal.duration_days} days ({DURATION_LABELS[assignModal.duration_type]})</span>
+                <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Duration</span>
+                <span style={{ fontSize: "13px", color: "var(--text-secondary)", fontWeight: 600 }}>{assignModal.duration_days} days ({DURATION_LABELS[assignModal.duration_type]})</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Price</span>
-                <span style={{ fontSize: "14px", color: "var(--text-primary)", fontWeight: 800, fontFamily: "var(--font-display)" }}>{fmt(assignModal.price)}</span>
+                <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Price</span>
+                <span style={{ fontSize: "16px", color: "var(--text-primary)", fontWeight: 800, fontFamily: "var(--font-display)" }}>{fmt(assignModal.price)}</span>
               </div>
             </div>
 
@@ -574,12 +574,12 @@ export default function MembershipPlans({ onLogout }) {
                 background: assignMsg.startsWith("✅") ? "var(--green-bg)" : "var(--red-bg)",
                 border: assignMsg.startsWith("✅") ? "1px solid rgba(74,222,128,0.2)" : "1px solid rgba(248,113,113,0.2)",
                 color: assignMsg.startsWith("✅") ? "var(--green)" : "var(--red)",
-                fontSize: "13px"
+                fontSize: "15px"
               }}>{assignMsg}</div>
             )}
 
             <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "24px", paddingTop: "20px", borderTop: "1px solid var(--border-subtle)" }}>
-              <button onClick={() => { setAssignModal(null); setAssignMsg(""); }} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px" }}>
+              <button onClick={() => { setAssignModal(null); setAssignMsg(""); }} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px" }}>
                 Close
               </button>
               <button onClick={handleAssign} disabled={assigning} style={{
@@ -587,7 +587,7 @@ export default function MembershipPlans({ onLogout }) {
                 background: assigning ? "var(--bg-elevated)" : "var(--text-primary)",
                 color: assigning ? "var(--text-muted)" : "#0a0a0a",
                 border: "none", cursor: assigning ? "not-allowed" : "pointer",
-                fontSize: "13px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em"
+                fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em"
               }}>
                 {assigning ? "Assigning..." : "ASSIGN PLAN"}
               </button>
@@ -602,20 +602,20 @@ export default function MembershipPlans({ onLogout }) {
           onClick={e => { if (e.target === e.currentTarget) setDeleteTarget(null); }}
         >
           <div className="fade-up" style={{ ...modalBox, maxWidth: "380px", textAlign: "center" }}>
-            <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: "18px", color: "var(--red)" }}>
+            <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: "20px", color: "var(--red)" }}>
               <FaTrash />
             </div>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>
               Delete Plan?
             </h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "13px", marginBottom: "24px", lineHeight: 1.6 }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "15px", marginBottom: "24px", lineHeight: 1.6 }}>
               <strong style={{ color: "var(--text-secondary)" }}>{deleteTarget.name}</strong> will be permanently removed. Members assigned to this plan will be unlinked.
             </p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-              <button onClick={() => setDeleteTarget(null)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "13px", flex: 1 }}>
+              <button onClick={() => setDeleteTarget(null)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px", flex: 1 }}>
                 Cancel
               </button>
-              <button onClick={handleDelete} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--red)", cursor: "pointer", fontSize: "13px", fontWeight: 700, flex: 1 }}>
+              <button onClick={handleDelete} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--red)", cursor: "pointer", fontSize: "15px", fontWeight: 700, flex: 1 }}>
                 Delete
               </button>
             </div>

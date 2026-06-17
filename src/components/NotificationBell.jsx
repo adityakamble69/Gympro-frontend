@@ -167,12 +167,12 @@ export default function NotificationBell() {
         onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; e.currentTarget.style.color = "var(--text-primary)"; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
       >
-        <FaBell style={{ fontSize: "14px", animation: unreadCount > 0 ? "bellRing 2s ease infinite" : "none" }} />
+        <FaBell style={{ fontSize: "16px", animation: unreadCount > 0 ? "bellRing 2s ease infinite" : "none" }} />
         {unreadCount > 0 && (
           <span style={{
             position: "absolute", top: "-6px", right: "-6px",
             background: "var(--red)", color: "#fff",
-            fontSize: "10px", fontWeight: 700, minWidth: "18px", height: "18px",
+            fontSize: "11px", fontWeight: 700, minWidth: "18px", height: "18px",
             borderRadius: "99px", display: "flex", alignItems: "center", justifyContent: "center",
             padding: "0 4px", border: "2px solid var(--bg-base)"
           }}>
@@ -198,18 +198,18 @@ export default function NotificationBell() {
               {isMobile && (
                 <button onClick={() => setOpen(false)} style={{
                   background: "none", border: "none", cursor: "pointer",
-                  color: "var(--text-muted)", fontSize: "18px", padding: "0 8px 0 0",
+                  color: "var(--text-muted)", fontSize: "20px", padding: "0 8px 0 0",
                   display: "flex", alignItems: "center"
                 }}>←</button>
               )}
-              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "14px", color: "var(--text-primary)" }}>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "16px", color: "var(--text-primary)" }}>
                 Notifications
               </span>
               {unreadCount > 0 && (
                 <span style={{
                   padding: "2px 7px", borderRadius: "99px",
                   background: "var(--red-bg)", color: "var(--red)",
-                  fontSize: "11px", fontWeight: 600
+                  fontSize: "12px", fontWeight: 600
                 }}>{unreadCount} new</span>
               )}
             </div>
@@ -217,24 +217,24 @@ export default function NotificationBell() {
               {unreadCount > 0 && (
                 <button onClick={markAllRead} title="Mark all read" style={{
                   background: "none", border: "none", cursor: "pointer",
-                  color: "var(--text-muted)", fontSize: "12px", padding: "4px 6px",
+                  color: "var(--text-muted)", fontSize: "13px", padding: "4px 6px",
                   borderRadius: "4px", display: "flex", alignItems: "center", gap: "4px"
                 }}
                   onMouseEnter={e => e.currentTarget.style.color = "var(--text-primary)"}
                   onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
                 >
-                  <FaCheckDouble style={{ fontSize: "11px" }} /> All read
+                  <FaCheckDouble style={{ fontSize: "12px" }} /> All read
                 </button>
               )}
               <button onClick={clearRead} title="Clear read" style={{
                 background: "none", border: "none", cursor: "pointer",
-                color: "var(--text-muted)", fontSize: "12px", padding: "4px 6px",
+                color: "var(--text-muted)", fontSize: "13px", padding: "4px 6px",
                 borderRadius: "4px", display: "flex", alignItems: "center", gap: "4px"
               }}
                 onMouseEnter={e => e.currentTarget.style.color = "var(--red)"}
                 onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
               >
-                <FaTrash style={{ fontSize: "10px" }} /> Clear
+                <FaTrash style={{ fontSize: "11px" }} /> Clear
               </button>
             </div>
           </div>
@@ -253,8 +253,8 @@ export default function NotificationBell() {
               ))
             ) : notifications.length === 0 ? (
               <div style={{ padding: "36px 16px", textAlign: "center" }}>
-                <FaBell style={{ fontSize: "28px", color: "var(--text-muted)", opacity: 0.3, display: "block", margin: "0 auto 10px" }} />
-                <p style={{ color: "var(--text-muted)", fontSize: "13px", margin: 0 }}>No notifications</p>
+                <FaBell style={{ fontSize: "31px", color: "var(--text-muted)", opacity: 0.3, display: "block", margin: "0 auto 10px" }} />
+                <p style={{ color: "var(--text-muted)", fontSize: "15px", margin: 0 }}>No notifications</p>
               </div>
             ) : (
               notifications.map(n => {
@@ -280,46 +280,46 @@ export default function NotificationBell() {
                       background: meta.bg, display: "flex", alignItems: "center",
                       justifyContent: "center", color: meta.color, flexShrink: 0
                     }}>
-                      <Icon style={{ fontSize: "13px" }} />
+                      <Icon style={{ fontSize: "15px" }} />
                     </div>
 
                     {/* Content */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "6px" }}>
                         <span style={{
-                          fontSize: "13px", fontWeight: n.is_read ? 500 : 700,
+                          fontSize: "15px", fontWeight: n.is_read ? 500 : 700,
                           color: n.is_read ? "var(--text-secondary)" : "var(--text-primary)",
                           lineHeight: 1.3
                         }}>{n.title}</span>
-                        <span style={{ fontSize: "10px", color: "var(--text-muted)", whiteSpace: "nowrap", flexShrink: 0 }}>
+                        <span style={{ fontSize: "11px", color: "var(--text-muted)", whiteSpace: "nowrap", flexShrink: 0 }}>
                           {timeAgo(n.created_at)}
                         </span>
                       </div>
-                      <p style={{ fontSize: "12px", color: "var(--text-muted)", margin: "4px 0 8px", lineHeight: 1.5 }}>
+                      <p style={{ fontSize: "13px", color: "var(--text-muted)", margin: "4px 0 8px", lineHeight: 1.5 }}>
                         {n.message}
                       </p>
                       <div style={{ display: "flex", gap: "12px" }}>
                         {!n.is_read && (
                           <button onClick={(e) => markRead(n.id, e)} style={{
                             background: "none", border: "none", cursor: "pointer",
-                            color: "var(--text-muted)", fontSize: "11px", padding: 0,
+                            color: "var(--text-muted)", fontSize: "12px", padding: 0,
                             display: "flex", alignItems: "center", gap: "3px"
                           }}
                             onMouseEnter={e => e.currentTarget.style.color = "var(--green)"}
                             onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
                           >
-                            <FaCheckDouble style={{ fontSize: "10px" }} /> Mark read
+                            <FaCheckDouble style={{ fontSize: "11px" }} /> Mark read
                           </button>
                         )}
                         <button onClick={(e) => deleteOne(n.id, e)} style={{
                           background: "none", border: "none", cursor: "pointer",
-                          color: "var(--text-muted)", fontSize: "11px", padding: 0,
+                          color: "var(--text-muted)", fontSize: "12px", padding: 0,
                           display: "flex", alignItems: "center", gap: "3px"
                         }}
                           onMouseEnter={e => e.currentTarget.style.color = "var(--red)"}
                           onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
                         >
-                          <FaTrash style={{ fontSize: "10px" }} /> Remove
+                          <FaTrash style={{ fontSize: "11px" }} /> Remove
                         </button>
                       </div>
                     </div>
@@ -342,7 +342,7 @@ export default function NotificationBell() {
               disabled={syncing}
               style={{
                 background: "none", border: "none", cursor: syncing ? "not-allowed" : "pointer",
-                color: "var(--text-muted)", fontSize: "12px",
+                color: "var(--text-muted)", fontSize: "13px",
                 display: "flex", alignItems: "center", gap: "4px"
               }}
             >
@@ -352,7 +352,7 @@ export default function NotificationBell() {
               onClick={() => { setOpen(false); navigate("/notifications"); }}
               style={{
                 background: "none", border: "none", cursor: "pointer",
-                color: "var(--text-muted)", fontSize: "12px",
+                color: "var(--text-muted)", fontSize: "13px",
                 display: "flex", alignItems: "center", gap: "4px"
               }}
               onMouseEnter={e => e.currentTarget.style.color = "var(--text-primary)"}

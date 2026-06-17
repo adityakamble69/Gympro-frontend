@@ -102,7 +102,7 @@ function Modal({ title, onClose, children, width = "600px" }) {
             background: "var(--bg-elevated)", border: "none", borderRadius: "8px",
             width: "32px", height: "32px", cursor: "pointer", display: "flex",
             alignItems: "center", justifyContent: "center", color: "var(--text-muted)"
-          }}><FaTimes style={{ fontSize: "13px" }} /></button>
+          }}><FaTimes style={{ fontSize: "15px" }} /></button>
         </div>
 
         {/* Body */}
@@ -137,7 +137,7 @@ function Spinner() {
 // ── Empty State ───────────────────────────────────────────────────────────────
 function Empty({ msg = "No data found" }) {
   return (
-    <div style={{ textAlign: "center", padding: "40px 20px", color: "var(--text-muted)", fontSize: "13px" }}>
+    <div style={{ textAlign: "center", padding: "40px 20px", color: "var(--text-muted)", fontSize: "15px" }}>
       {msg}
     </div>
   );
@@ -150,7 +150,7 @@ function MethodBadge({ method }) {
   return (
     <span style={{
       display: "inline-flex", alignItems: "center", gap: "4px",
-      padding: "2px 8px", borderRadius: "6px", fontSize: "10px", fontWeight: 600,
+      padding: "2px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: 600,
       textTransform: "uppercase", letterSpacing: "0.05em",
       background: (colors[method?.toLowerCase()] || "#888") + "22",
       color: colors[method?.toLowerCase()] || "#888"
@@ -235,9 +235,9 @@ function TotalRevenueDrill({ onClose }) {
           display: "inline-flex", alignItems: "center", gap: "6px",
           background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
           borderRadius: "8px", padding: "6px 12px", cursor: "pointer",
-          color: "var(--text-secondary)", fontSize: "12px", marginBottom: "16px"
+          color: "var(--text-secondary)", fontSize: "13px", marginBottom: "16px"
         }}>
-          <FaChevronLeft style={{ fontSize: "10px" }} /> Back
+          <FaChevronLeft style={{ fontSize: "11px" }} /> Back
         </button>
       )}
 
@@ -261,13 +261,13 @@ function TotalRevenueDrill({ onClose }) {
                       background: "var(--blue-bg)", display: "flex", alignItems: "center",
                       justifyContent: "center"
                     }}>
-                      <FaCalendarAlt style={{ color: "var(--blue)", fontSize: "14px" }} />
+                      <FaCalendarAlt style={{ color: "var(--blue)", fontSize: "16px" }} />
                     </div>
-                    <span style={{ fontWeight: 700, fontSize: "16px", color: "var(--text-primary)" }}>{y.year}</span>
+                    <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--text-primary)" }}>{y.year}</span>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <span style={{ fontWeight: 700, fontSize: "15px", color: "var(--green)" }}>{rupee(y.total)}</span>
-                    <FaChevronRight style={{ fontSize: "11px", color: "var(--text-muted)" }} />
+                    <span style={{ fontWeight: 700, fontSize: "17px", color: "var(--green)" }}>{rupee(y.total)}</span>
+                    <FaChevronRight style={{ fontSize: "12px", color: "var(--text-muted)" }} />
                   </div>
                 </div>
               ))}
@@ -285,9 +285,9 @@ function TotalRevenueDrill({ onClose }) {
                     background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
                     transition: "all .15s"
                   }}>
-                  <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px" }}>{m.label} {selYear}</div>
-                  <div style={{ fontWeight: 700, fontSize: "18px", color: "var(--green)" }}>{rupee(m.total)}</div>
-                  <div style={{ fontSize: "11px", color: "var(--blue)", marginTop: "6px", display: "flex", alignItems: "center", gap: "4px" }}>
+                  <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "4px" }}>{m.label} {selYear}</div>
+                  <div style={{ fontWeight: 700, fontSize: "20px", color: "var(--green)" }}>{rupee(m.total)}</div>
+                  <div style={{ fontSize: "12px", color: "var(--blue)", marginTop: "6px", display: "flex", alignItems: "center", gap: "4px" }}>
                     View details <FaChevronRight style={{ fontSize: "9px" }} />
                   </div>
                 </div>
@@ -299,7 +299,7 @@ function TotalRevenueDrill({ onClose }) {
           {view === "members" && (
             <>
               <div style={{ position: "relative", marginBottom: "14px" }}>
-                <FaSearch style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", fontSize: "11px", color: "var(--text-muted)" }} />
+                <FaSearch style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", fontSize: "12px", color: "var(--text-muted)" }} />
                 <input
                   placeholder="Search member..." value={search}
                 />
@@ -316,8 +316,8 @@ function TotalRevenueDrill({ onClose }) {
                     flex: 1, padding: "10px 14px", borderRadius: "8px",
                     background: "var(--bg-elevated)", border: "1px solid var(--border-default)"
                   }}>
-                    <div style={{ fontSize: "10px", color: "var(--text-muted)", marginBottom: "2px" }}>{x.label}</div>
-                    <div style={{ fontWeight: 700, color: x.color, fontSize: "15px" }}>{x.val}</div>
+                    <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "2px" }}>{x.label}</div>
+                    <div style={{ fontWeight: 700, color: x.color, fontSize: "17px" }}>{x.val}</div>
                   </div>
                 ))}
               </div>
@@ -337,18 +337,18 @@ function TotalRevenueDrill({ onClose }) {
                           background: "var(--blue-bg)", display: "flex", alignItems: "center",
                           justifyContent: "center", flexShrink: 0
                         }}>
-                          <FaUser style={{ fontSize: "11px", color: "var(--blue)" }} />
+                          <FaUser style={{ fontSize: "12px", color: "var(--blue)" }} />
                         </div>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontWeight: 600, fontSize: "13px", color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {p.full_name}
                           </div>
-                          <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{fmt(p.payment_date)}</div>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{fmt(p.payment_date)}</div>
                         </div>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
                         <MethodBadge method={p.payment_method} />
-                        <span style={{ fontWeight: 700, color: "var(--green)", fontSize: "14px" }}>{rupee(p.amount)}</span>
+                        <span style={{ fontWeight: 700, color: "var(--green)", fontSize: "16px" }}>{rupee(p.amount)}</span>
                       </div>
                     </div>
                   ))}
@@ -399,7 +399,7 @@ function TodayRevenue({ onClose }) {
   const inputStyle = {
     width: "100%", padding: "8px 10px", borderRadius: "8px",
     border: "1px solid var(--border-default)", background: "var(--bg-elevated)",
-    color: "var(--text-primary)", fontSize: "12px", boxSizing: "border-box", outline: "none"
+    color: "var(--text-primary)", fontSize: "13px", boxSizing: "border-box", outline: "none"
   };
 
   return (
@@ -407,17 +407,17 @@ function TodayRevenue({ onClose }) {
       {/* Date pickers */}
       <div style={{ display: "flex", gap: "8px", marginBottom: "10px", flexWrap: "wrap", alignItems: "flex-end" }}>
         <div style={{ flex: "1 1 120px" }}>
-          <label style={{ display: "block", fontSize: "10px", color: "var(--text-muted)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>From</label>
+          <label style={{ display: "block", fontSize: "11px", color: "var(--text-muted)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>From</label>
           <input type="date" value={startDate} max={endDate} onChange={e => setStartDate(e.target.value)} style={inputStyle} />
         </div>
         <div style={{ flex: "1 1 120px" }}>
-          <label style={{ display: "block", fontSize: "10px", color: "var(--text-muted)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>To</label>
+          <label style={{ display: "block", fontSize: "11px", color: "var(--text-muted)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>To</label>
           <input type="date" value={endDate} min={startDate} max={todayStr} onChange={e => setEndDate(e.target.value)} style={inputStyle} />
         </div>
         <button onClick={() => fetchRange(startDate, endDate)} disabled={loading} style={{
           padding: "8px 16px", borderRadius: "8px", border: "none",
           background: "var(--grad-blue, var(--blue))", color: "#fff",
-          fontWeight: 700, fontSize: "12px", cursor: loading ? "not-allowed" : "pointer",
+          fontWeight: 700, fontSize: "13px", cursor: loading ? "not-allowed" : "pointer",
           opacity: loading ? 0.6 : 1
         }}>
           {loading ? "…" : "Apply"}
@@ -433,7 +433,7 @@ function TodayRevenue({ onClose }) {
           { label: "Last 30 days", get: () => [new Date(Date.now() - 29*86400000).toISOString().split("T")[0], todayStr] },
         ].map(p => (
           <button key={p.label} onClick={() => { const [s, e] = p.get(); setStartDate(s); setEndDate(e); fetchRange(s, e); }} style={{
-            padding: "5px 11px", borderRadius: "99px", fontSize: "11px",
+            padding: "5px 11px", borderRadius: "99px", fontSize: "12px",
             background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
             color: "var(--text-secondary)", cursor: "pointer"
           }}>{p.label}</button>
@@ -454,8 +454,8 @@ function TodayRevenue({ onClose }) {
                 flex: 1, padding: "12px 16px", borderRadius: "10px",
                 background: "var(--bg-elevated)", border: "1px solid var(--border-default)"
               }}>
-                <div style={{ fontSize: "10px", color: "var(--text-muted)", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{x.label}</div>
-                <div style={{ fontWeight: 700, color: x.color, fontSize: "20px" }}>{x.val}</div>
+                <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "3px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{x.label}</div>
+                <div style={{ fontWeight: 700, color: x.color, fontSize: "22px" }}>{x.val}</div>
               </div>
             ))}
           </div>
@@ -477,7 +477,7 @@ function TodayRevenue({ onClose }) {
                     display: "flex", gap: "6px", alignItems: "center"
                   }}>
                     <MethodBadge method={m} />
-                    <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-primary)" }}>{rupee(amt)}</span>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{rupee(amt)}</span>
                   </div>
                 ))}
               </div>
@@ -498,16 +498,16 @@ function TodayRevenue({ onClose }) {
                       width: "34px", height: "34px", borderRadius: "50%",
                       background: "var(--green-bg)", display: "flex", alignItems: "center", justifyContent: "center"
                     }}>
-                      <FaUser style={{ fontSize: "12px", color: "var(--green)" }} />
+                      <FaUser style={{ fontSize: "13px", color: "var(--green)" }} />
                     </div>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "13px", color: "var(--text-primary)" }}>{p.full_name}</div>
-                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{p.payment_for || "membership"}{!isSingleDay && <> · {fmt(p.payment_date)}</>}</div>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--text-primary)" }}>{p.full_name}</div>
+                      <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{p.payment_for || "membership"}{!isSingleDay && <> · {fmt(p.payment_date)}</>}</div>
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                     <MethodBadge method={p.payment_method} />
-                    <span style={{ fontWeight: 700, color: "var(--green)", fontSize: "14px" }}>{rupee(p.amount)}</span>
+                    <span style={{ fontWeight: 700, color: "var(--green)", fontSize: "16px" }}>{rupee(p.amount)}</span>
                   </div>
                 </div>
               ))}
@@ -556,21 +556,21 @@ function ThisMonthRevenue({ onClose }) {
                 flex: 1, padding: "10px 14px", borderRadius: "10px",
                 background: "var(--bg-elevated)", border: "1px solid var(--border-default)"
               }}>
-                <div style={{ fontSize: "10px", color: "var(--text-muted)", marginBottom: "2px" }}>{x.label}</div>
-                <div style={{ fontWeight: 700, color: x.color, fontSize: "16px" }}>{x.val}</div>
+                <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "2px" }}>{x.label}</div>
+                <div style={{ fontWeight: 700, color: x.color, fontSize: "18px" }}>{x.val}</div>
               </div>
             ))}
           </div>
 
           <div style={{ position: "relative", marginBottom: "14px" }}>
-            <FaSearch style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", fontSize: "11px", color: "var(--text-muted)" }} />
+            <FaSearch style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", fontSize: "12px", color: "var(--text-muted)" }} />
             <input
               placeholder="Search member..." value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
                 width: "100%", padding: "9px 12px 9px 32px", borderRadius: "8px",
                 border: "1px solid var(--border-default)", background: "var(--bg-elevated)",
-                color: "var(--text-primary)", fontSize: "13px", boxSizing: "border-box", outline: "none"
+                color: "var(--text-primary)", fontSize: "15px", boxSizing: "border-box", outline: "none"
               }}
             />
           </div>
@@ -589,16 +589,16 @@ function ThisMonthRevenue({ onClose }) {
                       width: "32px", height: "32px", borderRadius: "50%",
                       background: "var(--blue-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
                     }}>
-                      <FaUser style={{ fontSize: "11px", color: "var(--blue)" }} />
+                      <FaUser style={{ fontSize: "12px", color: "var(--blue)" }} />
                     </div>
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ fontWeight: 600, fontSize: "13px", color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.full_name}</div>
-                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{fmt(p.payment_date)} · {p.payment_for || "membership"}</div>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.full_name}</div>
+                      <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{fmt(p.payment_date)} · {p.payment_for || "membership"}</div>
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
                     <MethodBadge method={p.payment_method} />
-                    <span style={{ fontWeight: 700, color: "var(--green)", fontSize: "14px" }}>{rupee(p.amount)}</span>
+                    <span style={{ fontWeight: 700, color: "var(--green)", fontSize: "16px" }}>{rupee(p.amount)}</span>
                   </div>
                 </div>
               ))}
@@ -649,21 +649,21 @@ function PendingPaymentsCount({ onClose }) {
                 flex: 1, padding: "10px 14px", borderRadius: "10px",
                 background: "var(--bg-elevated)", border: "1px solid var(--border-default)"
               }}>
-                <div style={{ fontSize: "10px", color: "var(--text-muted)", marginBottom: "2px" }}>{x.label}</div>
-                <div style={{ fontWeight: 700, color: x.color, fontSize: "16px" }}>{x.val}</div>
+                <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "2px" }}>{x.label}</div>
+                <div style={{ fontWeight: 700, color: x.color, fontSize: "18px" }}>{x.val}</div>
               </div>
             ))}
           </div>
 
           <div style={{ position: "relative", marginBottom: "14px" }}>
-            <FaSearch style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", fontSize: "11px", color: "var(--text-muted)" }} />
+            <FaSearch style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", fontSize: "12px", color: "var(--text-muted)" }} />
             <input
               placeholder="Search member..." value={search}
               onChange={e => setSearch(e.target.value)}
               style={{
                 width: "100%", padding: "9px 12px 9px 32px", borderRadius: "8px",
                 border: "1px solid var(--border-default)", background: "var(--bg-elevated)",
-                color: "var(--text-primary)", fontSize: "13px", boxSizing: "border-box", outline: "none"
+                color: "var(--text-primary)", fontSize: "15px", boxSizing: "border-box", outline: "none"
               }}
             />
           </div>
@@ -685,15 +685,15 @@ function PendingPaymentsCount({ onClose }) {
                         width: "30px", height: "30px", borderRadius: "50%",
                         background: "rgba(239,68,68,0.12)", display: "flex", alignItems: "center", justifyContent: "center"
                       }}>
-                        <FaUser style={{ fontSize: "11px", color: "var(--red)" }} />
+                        <FaUser style={{ fontSize: "12px", color: "var(--red)" }} />
                       </div>
                       <div>
-                        <div style={{ fontWeight: 600, fontSize: "13px", color: "var(--text-primary)" }}>{m.full_name}</div>
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.payments.length} pending</div>
+                        <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--text-primary)" }}>{m.full_name}</div>
+                        <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{m.payments.length} pending</div>
                       </div>
                     </div>
                     <span style={{
-                      fontWeight: 700, color: "var(--red)", fontSize: "14px"
+                      fontWeight: 700, color: "var(--red)", fontSize: "16px"
                     }}>
                       {rupee(m.payments.reduce((s,p)=>s+Number(p.due_amount||p.amount),0))}
                     </span>
@@ -706,12 +706,12 @@ function PendingPaymentsCount({ onClose }) {
                       padding: "8px 14px 8px 52px", borderBottom: "1px solid var(--border-subtle)"
                     }}>
                       <div>
-                        <div style={{ fontSize: "12px", color: "var(--text-secondary)" }}>{p.payment_for || "membership"}</div>
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{fmt(p.payment_date)}</div>
+                        <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>{p.payment_for || "membership"}</div>
+                        <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{fmt(p.payment_date)}</div>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        <div style={{ fontSize: "12px", color: "var(--text-muted)", textDecoration: "line-through" }}>{rupee(p.amount)}</div>
-                        <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--red)" }}>Due: {rupee(p.due_amount || p.amount)}</div>
+                        <div style={{ fontSize: "13px", color: "var(--text-muted)", textDecoration: "line-through" }}>{rupee(p.amount)}</div>
+                        <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--red)" }}>Due: {rupee(p.due_amount || p.amount)}</div>
                       </div>
                     </div>
                   ))}
@@ -786,26 +786,26 @@ function PendingAmountDetail({ onClose }) {
             display: "flex", justifyContent: "space-between", alignItems: "center"
           }}>
             <div>
-              <div style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)", marginBottom: "2px" }}>Total Pending Amount</div>
-              <div style={{ fontSize: "22px", fontWeight: 800, color: "var(--red)" }}>{rupee(grandTotal)}</div>
+              <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)", marginBottom: "2px" }}>Total Pending Amount</div>
+              <div style={{ fontSize: "25px", fontWeight: 800, color: "var(--red)" }}>{rupee(grandTotal)}</div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: "10px", color: "var(--text-muted)", marginBottom: "2px" }}>Members</div>
-              <div style={{ fontSize: "22px", fontWeight: 800, color: "var(--text-primary)" }}>{memberList.length}</div>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "2px" }}>Members</div>
+              <div style={{ fontSize: "25px", fontWeight: 800, color: "var(--text-primary)" }}>{memberList.length}</div>
             </div>
           </div>
 
           {/* Search + Sort */}
           <div style={{ display: "flex", gap: "8px", marginBottom: "14px" }}>
             <div style={{ flex: 1, position: "relative" }}>
-              <FaSearch style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", fontSize: "11px", color: "var(--text-muted)" }} />
+              <FaSearch style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", fontSize: "12px", color: "var(--text-muted)" }} />
               <input
                 placeholder="Search member..." value={search}
                 onChange={e => setSearch(e.target.value)}
                 style={{
                   width: "100%", padding: "9px 12px 9px 32px", borderRadius: "8px",
                   border: "1px solid var(--border-default)", background: "var(--bg-elevated)",
-                  color: "var(--text-primary)", fontSize: "13px", boxSizing: "border-box", outline: "none"
+                  color: "var(--text-primary)", fontSize: "15px", boxSizing: "border-box", outline: "none"
                 }}
               />
             </div>
@@ -813,9 +813,9 @@ function PendingAmountDetail({ onClose }) {
               display: "flex", alignItems: "center", gap: "6px",
               padding: "9px 14px", borderRadius: "8px",
               background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
-              cursor: "pointer", color: "var(--text-secondary)", fontSize: "12px"
+              cursor: "pointer", color: "var(--text-secondary)", fontSize: "13px"
             }}>
-              {sort === "desc" ? <FaArrowDown style={{ fontSize: "10px" }} /> : <FaArrowUp style={{ fontSize: "10px" }} />}
+              {sort === "desc" ? <FaArrowDown style={{ fontSize: "11px" }} /> : <FaArrowUp style={{ fontSize: "11px" }} />}
               {sort === "desc" ? "Highest First" : "Lowest First"}
             </button>
           </div>
@@ -838,19 +838,19 @@ function PendingAmountDetail({ onClose }) {
                         background: idx === 0 ? "rgba(239,68,68,0.15)" : "var(--bg-elevated2, var(--bg-surface))",
                         border: `1px solid ${idx === 0 ? "rgba(239,68,68,0.4)" : "var(--border-subtle)"}`,
                         display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: "11px", fontWeight: 700,
+                        fontSize: "12px", fontWeight: 700,
                         color: idx === 0 ? "var(--red)" : "var(--text-muted)"
                       }}>
                         {idx + 1}
                       </div>
                       <div>
-                        <div style={{ fontWeight: 600, fontSize: "13px", color: "var(--text-primary)" }}>{m.full_name}</div>
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.phone || "—"}</div>
+                        <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--text-primary)" }}>{m.full_name}</div>
+                        <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{m.phone || "—"}</div>
                       </div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontWeight: 800, fontSize: "16px", color: "var(--red)" }}>{rupee(m.total_due)}</div>
-                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{m.payment_count} {m.payment_count === 1 ? "entry" : "entries"}</div>
+                      <div style={{ fontWeight: 800, fontSize: "18px", color: "var(--red)" }}>{rupee(m.total_due)}</div>
+                      <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>{m.payment_count} {m.payment_count === 1 ? "entry" : "entries"}</div>
                     </div>
                   </div>
 
@@ -861,12 +861,12 @@ function PendingAmountDetail({ onClose }) {
                     borderTop: "1px solid var(--border-subtle)",
                     background: "rgba(0,0,0,0.04)"
                   }}>
-                    <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+                    <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>
                       Total {rupee(m.total_amount)} · Paid {rupee(m.total_paid)}
                       {m.last_payment_date && <> · Last {fmt(m.last_payment_date)}</>}
                     </div>
                     <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                      <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--red)" }}>Due: {rupee(m.total_due)}</span>
+                      <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--red)" }}>Due: {rupee(m.total_due)}</span>
                     </div>
                   </div>
                 </div>
@@ -972,10 +972,10 @@ export default function RevenueDrillDown({ stats = {} }) {
                 width: "32px", height: "32px", borderRadius: "8px",
                 background: c.bg, display: "flex", alignItems: "center", justifyContent: "center"
               }}>
-                <Icon style={{ fontSize: "13px", color: c.color }} />
+                <Icon style={{ fontSize: "15px", color: c.color }} />
               </div>
 
-              <div style={{ fontSize: "10px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
                 {c.label}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -985,7 +985,7 @@ export default function RevenueDrillDown({ stats = {} }) {
                 {isMaskable && (
                   <button
                     onClick={(e) => toggleReveal(e, c.key)}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "12px", padding: "2px", opacity: 0.6, display: "flex", alignItems: "center", flexShrink: 0 }}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "13px", padding: "2px", opacity: 0.6, display: "flex", alignItems: "center", flexShrink: 0 }}
                     title={isHidden ? "Show value" : "Hide value"}
                   >
                     {isHidden
@@ -995,10 +995,10 @@ export default function RevenueDrillDown({ stats = {} }) {
                   </button>
                 )}
               </div>
-              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "4px" }}>
+              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>
                 {c.sub}
               </div>
-              <div style={{ fontSize: "10px", color: c.color, marginTop: "8px", opacity: 0.7, display: "flex", alignItems: "center", gap: "3px" }}>
+              <div style={{ fontSize: "11px", color: c.color, marginTop: "8px", opacity: 0.7, display: "flex", alignItems: "center", gap: "3px" }}>
                 🔍 {c.tip}
               </div>
             </div>

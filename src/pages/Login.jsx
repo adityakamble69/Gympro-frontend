@@ -288,10 +288,10 @@ export default function Login({ onLogin }) {
             {/* Logo */}
             <div style={{ display: "flex", alignItems: "center", gap: "13px", marginBottom: "60px" }}>
               <div className="logo-badge">
-                <FaDumbbell style={{ color: "#fff", fontSize: "17px" }} />
+                <FaDumbbell style={{ color: "#fff", fontSize: "19px" }} />
               </div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: "19px", color: "var(--text-primary)", letterSpacing: "0.01em" }}>
+                <div style={{ fontWeight: 700, fontSize: "21px", color: "var(--text-primary)", letterSpacing: "0.01em" }}>
                   Workout World Gym
                 </div>
                 <div style={{ fontSize: "9px", color: "var(--blue-bright)", letterSpacing: "0.14em", opacity: 0.7, marginTop: "2px" }}>
@@ -301,7 +301,7 @@ export default function Login({ onLogin }) {
             </div>
 
             {/* Headline */}
-            <div style={{ fontSize: "11px", color: "var(--blue-bright)", letterSpacing: "0.16em", fontWeight: 600, marginBottom: "14px", opacity: 0.7 }}>
+            <div style={{ fontSize: "12px", color: "var(--blue-bright)", letterSpacing: "0.16em", fontWeight: 600, marginBottom: "14px", opacity: 0.7 }}>
               ADMIN PORTAL
             </div>
             <h1 style={{
@@ -315,7 +315,7 @@ export default function Login({ onLogin }) {
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
               }}>Gym Smarter.</span>
             </h1>
-            <p style={{ color: "var(--text-sub)", fontSize: "14px", maxWidth: "340px", lineHeight: 1.8, marginBottom: "44px" }}>
+            <p style={{ color: "var(--text-sub)", fontSize: "16px", maxWidth: "340px", lineHeight: 1.8, marginBottom: "44px" }}>
               Members, attendance, payments, and analytics — all in one powerful dashboard.
             </p>
 
@@ -326,8 +326,8 @@ export default function Login({ onLogin }) {
               ["💳", "Payments & Membership Tracking"],
             ].map(([icon, text], i) => (
               <div key={text} className="feature-row" style={{ animationDelay: `${0.08 + i * 0.1}s` }}>
-                <span style={{ fontSize: "15px" }}>{icon}</span>
-                <span style={{ fontSize: "13px", color: "var(--text-sub)", fontWeight: 500 }}>{text}</span>
+                <span style={{ fontSize: "17px" }}>{icon}</span>
+                <span style={{ fontSize: "15px", color: "var(--text-sub)", fontWeight: 500 }}>{text}</span>
               </div>
             ))}
 
@@ -335,8 +335,8 @@ export default function Login({ onLogin }) {
             <div style={{ display: "flex", gap: "10px", marginTop: "36px" }}>
               {[["500+", "Members"], ["99%", "Uptime"], ["24/7", "Access"]].map(([val, label]) => (
                 <div key={label} className="stat-pill">
-                  <div style={{ fontSize: "21px", fontWeight: 800, color: "var(--blue-bright)", letterSpacing: "-0.5px" }}>{val}</div>
-                  <div style={{ color: "var(--text-muted)", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: "3px" }}>{label}</div>
+                  <div style={{ fontSize: "24px", fontWeight: 800, color: "var(--blue-bright)", letterSpacing: "-0.5px" }}>{val}</div>
+                  <div style={{ color: "var(--text-muted)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: "3px" }}>{label}</div>
                 </div>
               ))}
             </div>
@@ -350,10 +350,10 @@ export default function Login({ onLogin }) {
             {/* Mobile logo */}
             <div className="login-mobile-logo" style={{ alignItems: "center", gap: "10px", marginBottom: "32px" }}>
               <div className="logo-badge" style={{ width: "36px", height: "36px", borderRadius: "10px" }}>
-                <FaDumbbell style={{ color: "#fff", fontSize: "14px" }} />
+                <FaDumbbell style={{ color: "#fff", fontSize: "16px" }} />
               </div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: "16px", color: "var(--text-primary)" }}>Workout World Gym</div>
+                <div style={{ fontWeight: 700, fontSize: "18px", color: "var(--text-primary)" }}>Workout World Gym</div>
                 <div style={{ fontSize: "8px", color: "var(--blue-bright)", letterSpacing: "0.12em", opacity: 0.7 }}>MANAGEMENT SYSTEM</div>
               </div>
             </div>
@@ -367,15 +367,15 @@ export default function Login({ onLogin }) {
               marginBottom: "28px",
               boxShadow: "0 4px 20px rgba(59,130,246,0.12)"
             }}>
-              <FaDumbbell style={{ color: "var(--blue-bright)", fontSize: "19px" }} />
+              <FaDumbbell style={{ color: "var(--blue-bright)", fontSize: "21px" }} />
             </div>
 
             <h2 className="login-headline" style={{
-              fontSize: "28px", fontWeight: 800,
+              fontSize: "31px", fontWeight: 800,
               color: "var(--text-primary)", marginBottom: "6px",
               letterSpacing: "-0.7px"
             }}>Welcome back</h2>
-            <p style={{ color: "var(--text-sub)", marginBottom: "36px", fontSize: "14px" }}>
+            <p style={{ color: "var(--text-sub)", marginBottom: "36px", fontSize: "16px" }}>
               Sign in to your admin account
             </p>
 
@@ -392,7 +392,7 @@ export default function Login({ onLogin }) {
                 {/* Email */}
                 <div style={{ padding: "14px 16px 0" }}>
                   <label style={{
-                    display: "block", marginBottom: "6px", fontSize: "10px",
+                    display: "block", marginBottom: "6px", fontSize: "11px",
                     fontWeight: 700, color: "var(--text-muted)",
                     textTransform: "uppercase", letterSpacing: "0.12em"
                   }}>Email</label>
@@ -405,7 +405,7 @@ export default function Login({ onLogin }) {
                       border: "none",
                       borderRadius: 0,
                       padding: "2px 0 12px",
-                      fontSize: "15px",
+                      fontSize: "17px",
                       boxShadow: "none",
                     }}
                     onFocus={() => setFocusedField("email")}
@@ -419,7 +419,7 @@ export default function Login({ onLogin }) {
                 {/* Password */}
                 <div style={{ padding: "14px 16px 14px" }}>
                   <label style={{
-                    display: "block", marginBottom: "6px", fontSize: "10px",
+                    display: "block", marginBottom: "6px", fontSize: "11px",
                     fontWeight: 700, color: "var(--text-muted)",
                     textTransform: "uppercase", letterSpacing: "0.12em"
                   }}>Password</label>
@@ -434,7 +434,7 @@ export default function Login({ onLogin }) {
                         border: "none",
                         borderRadius: 0,
                         padding: "2px 40px 0 0",
-                        fontSize: "15px",
+                        fontSize: "17px",
                         boxShadow: "none",
                       }}
                       onFocus={() => setFocusedField("pass")}
@@ -446,7 +446,7 @@ export default function Login({ onLogin }) {
                       style={{
                         position: "absolute", right: "0", top: "2px",
                         background: "none", border: "none", cursor: "pointer",
-                        color: "var(--text-muted)", fontSize: "14px",
+                        color: "var(--text-muted)", fontSize: "16px",
                         display: "flex", alignItems: "center", padding: "0",
                         transition: "color 0.15s",
                       }}
@@ -461,7 +461,7 @@ export default function Login({ onLogin }) {
 
               {error && (
                 <div className="error-box">
-                  <span style={{ fontSize: "15px" }}>⚠️</span> {error}
+                  <span style={{ fontSize: "17px" }}>⚠️</span> {error}
                 </div>
               )}
 
@@ -474,7 +474,7 @@ export default function Login({ onLogin }) {
             </form>
 
             <p style={{
-              color: "#f0f0f0", fontSize: "10px",
+              color: "#f0f0f0", fontSize: "11px",
               marginTop: "32px", textAlign: "center",
               letterSpacing: "0.08em", fontWeight: 700
             }}>
@@ -486,6 +486,3 @@ export default function Login({ onLogin }) {
     </>
   );
 }
-
-
-
