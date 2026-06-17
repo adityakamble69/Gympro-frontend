@@ -17,9 +17,9 @@ import NotificationBell from "../components/NotificationBell";
 import RevenueDrillDown from "../components/Revenuedrilldown";
 import MemberProfileDrawer from "../components/MemberProfileDrawer";
 
-const fmt     = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
+const fmt = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
 const fmtDate = (d) => new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
-const MASK    = "••••••";
+const MASK = "••••••";
 
 // ── Stat Card ──────────────────────────────────────────────────────────────────
 const StatCard = ({ icon: Icon, label, value, color, bg, sub, onClick, trend, trendLabel, delay = 0, masked = false, onToggleMask }) => (
@@ -34,7 +34,7 @@ const StatCard = ({ icon: Icon, label, value, color, bg, sub, onClick, trend, tr
       position: "relative", overflow: "hidden",
       animationDelay: `${delay}s`, opacity: 0
     }}
-    onMouseEnter={e => { if (onClick) { e.currentTarget.style.borderColor = color; e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = `0 8px 32px ${color}20`; }}}
+    onMouseEnter={e => { if (onClick) { e.currentTarget.style.borderColor = color; e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = `0 8px 32px ${color}20`; } }}
     onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
   >
     <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: `linear-gradient(90deg, ${color}, transparent)`, opacity: 0.8 }} />
@@ -132,7 +132,7 @@ const PaymentRow = ({ p }) => (
 const MemberRow = ({ m }) => {
   const [phoneVis, setPhoneVis] = useState(false);
   const statusColor = m.status === "active" ? "var(--green)" : m.status === "expired" ? "var(--red)" : "var(--yellow)";
-  const statusBg    = m.status === "active" ? "var(--green-bg)" : m.status === "expired" ? "var(--red-bg)" : "var(--yellow-bg)";
+  const statusBg = m.status === "active" ? "var(--green-bg)" : m.status === "expired" ? "var(--red-bg)" : "var(--yellow-bg)";
   const maskedPhone = m.phone ? "••••••" + m.phone.slice(-4) : "—";
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid var(--border-subtle)" }}>
@@ -161,15 +161,15 @@ const MemberRow = ({ m }) => {
 
 // ── Expired Members Modal ──────────────────────────────────────────────────────
 function ExpiredMembersModal({ count, onClose, navigate }) {
-  const [members,     setMembers]     = useState([]);
-  const [allExpired,  setAllExpired]  = useState([]);   // full list for export
-  const [loading,     setLoading]     = useState(true);
-  const [exporting,   setExporting]   = useState(false);
-  const [phoneVis,    setPhoneVis]    = useState({});
-  const [dueMap,      setDueMap]      = useState({});
-  const [page,        setPage]        = useState(1);
-  const [totalPages,  setTotalPages]  = useState(1);
-  const [total,       setTotal]       = useState(0);
+  const [members, setMembers] = useState([]);
+  const [allExpired, setAllExpired] = useState([]);   // full list for export
+  const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const [phoneVis, setPhoneVis] = useState({});
+  const [dueMap, setDueMap] = useState({});
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
@@ -212,23 +212,23 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
     try {
       await Promise.all(info.payments.map(p => {
         const totalAmt = Number(p.amount) || Number(p.due_amount) || 1;
-        const payDate  = p.payment_date
+        const payDate = p.payment_date
           ? new Date(p.payment_date).toISOString().split("T")[0]
           : new Date().toISOString().split("T")[0];
         return api.put(`/payments/${p.id}`, {
-          member_id:      p.member_id,
-          amount:         totalAmt,
-          paid_amount:    totalAmt,
-          due_amount:     0,
-          payment_date:   payDate,
+          member_id: p.member_id,
+          amount: totalAmt,
+          paid_amount: totalAmt,
+          due_amount: 0,
+          payment_date: payDate,
           payment_method: p.payment_method || "cash",
-          payment_for:    p.payment_for    || "monthly",
-          status:         "paid",
+          payment_for: p.payment_for || "monthly",
+          status: "paid",
           months_covered: Number(p.months_covered) || 1,
-          notes:          p.notes      || null,
-          plan_name:      p.plan_name  || null,
-          plan_start:     p.plan_start ? new Date(p.plan_start).toISOString().split("T")[0] : null,
-          plan_end:       p.plan_end   ? new Date(p.plan_end).toISOString().split("T")[0]   : null,
+          notes: p.notes || null,
+          plan_name: p.plan_name || null,
+          plan_start: p.plan_start ? new Date(p.plan_start).toISOString().split("T")[0] : null,
+          plan_end: p.plan_end ? new Date(p.plan_end).toISOString().split("T")[0] : null,
         });
       }));
       setDueMap(prev => ({ ...prev, [memberId]: { total: 0, payments: [], marking: false } }));
@@ -240,7 +240,7 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
     setExporting(true);
     try {
       const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-              AlignmentType, WidthType, BorderStyle, ShadingType, HeadingLevel } = await import("docx");
+        AlignmentType, WidthType, BorderStyle, ShadingType, HeadingLevel } = await import("docx");
 
       const border = { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" };
       const borders = { top: border, bottom: border, left: border, right: border };
@@ -266,8 +266,8 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
         new TableRow({
           children: [
             m.full_name || "—",
-            m.phone     || "—",
-            m.email     || "—",
+            m.phone || "—",
+            m.email || "—",
             m.membership_type || "—",
             fmtDate(m.membership_end),
           ].map((val, i) =>
@@ -327,7 +327,7 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
       const url = URL.createObjectURL(buffer);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `expired-members-${new Date().toISOString().slice(0,10)}.docx`;
+      a.download = `expired-members-${new Date().toISOString().slice(0, 10)}.docx`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
@@ -514,6 +514,71 @@ const SkeletonRows = ({ n = 4 }) => [...Array(n)].map((_, i) => (
 
 // ── Mobile Responsive Styles ──────────────────────────────────────────────────
 const dashStyles = `
+
+/* ── AMOLED Theme Variables ── */
+  :root {
+    --bg-base:      #000000;
+    --bg-surface:   #0a0a0a;
+    --bg-card:      #111111;
+    --bg-elevated:  #1a1a1a;
+    --bg-active:    #1e3a5f;
+    --border-subtle: rgba(255,255,255,0.06);
+    --border-default: rgba(255,255,255,0.09);
+    --border-strong: rgba(255,255,255,0.13);
+    --text-primary:  #f0f0f0;
+    --text-secondary:#aaaaaa;
+    --text-muted:    #555555;
+    --accent:        #3b82f6;
+    --accent-bright: #60a5fa;
+    --accent-subtle: rgba(59,130,246,0.08);
+    --green:         #34d399;
+    --green-bg:      rgba(52,211,153,0.08);
+    --red:           #f87171;
+    --red-bg:        rgba(248,113,113,0.06);
+    --yellow:        #fbbf24;
+    --yellow-bg:     rgba(251,191,36,0.08);
+    --cyan:          #06b6d4;
+    --cyan-bg:       rgba(6,182,212,0.08);
+    --blue:          #3b82f6;
+    --blue-bg:       rgba(59,130,246,0.08);
+    --grad-blue-cyan: linear-gradient(135deg, #60a5fa, #06b6d4);
+    --font-body:     -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display:  -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    --radius-sm:     8px;
+    --radius-md:     10px;
+    --radius-lg:     14px;
+  }
+
+  /* ── Autofill fix ── */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #111111 inset !important;
+    -webkit-text-fill-color: #f0f0f0 !important;
+    caret-color: #f0f0f0;
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  .fade-up {
+    animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  .skeleton {
+    background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 6px;
+  }
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
   .dash-main {
     flex: 1;
     padding: 32px 36px;
@@ -621,24 +686,24 @@ export default function Dashboard({ onLogout }) {
   const navigate = useNavigate();
   const { admin } = useAuth();
 
-  const [attendStats,  setAttendStats]  = useState(null);
-  const [weekly,       setWeekly]       = useState([]);
-  const [payStats,     setPayStats]     = useState(null);
+  const [attendStats, setAttendStats] = useState(null);
+  const [weekly, setWeekly] = useState([]);
+  const [payStats, setPayStats] = useState(null);
   const [trainerStats, setTrainerStats] = useState(null);
-  const [recentPay,    setRecentPay]    = useState([]);
-  const [recentMem,    setRecentMem]    = useState([]);
-  const [loading,      setLoading]      = useState(true);
-  const [lastUpdated,  setLastUpdated]  = useState(null);
-  const [refreshing,   setRefreshing]   = useState(false);
+  const [recentPay, setRecentPay] = useState([]);
+  const [recentMem, setRecentMem] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [shown, setShown] = useState({ activeMembers: false, thisMonthRev: false });
   const toggle = (key) => setShown(s => ({ ...s, [key]: !s[key] }));
-  const [showExpired,     setShowExpired]     = useState(false);
-  const [searchQuery,     setSearchQuery]     = useState("");
-  const [searchResults,   setSearchResults]   = useState([]);
-  const [searchLoading,   setSearchLoading]   = useState(false);
-  const [showSearchDrop,  setShowSearchDrop]  = useState(false);
-  const [profileMember,   setProfileMember]   = useState(null);
+  const [showExpired, setShowExpired] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [showSearchDrop, setShowSearchDrop] = useState(false);
+  const [profileMember, setProfileMember] = useState(null);
   const searchTimer = useRef(null);
 
   const fetchAll = async (isRefresh = false) => {
@@ -650,7 +715,7 @@ export default function Dashboard({ onLogout }) {
         api.get("/payments/stats/summary"),
         api.get("/trainers/stats/summary"),
         api.get("/payments", { params: { limit: 5, page: 1 } }),
-        api.get("/members",  { params: { limit: 5, page: 1 } }),
+        api.get("/members", { params: { limit: 5, page: 1 } }),
       ]);
       setAttendStats(attendRes.data.data);
       setWeekly(weekRes.data.data.map(d => ({ ...d, label: new Date(d.day).toLocaleDateString("en-IN", { weekday: "short" }) })));
@@ -683,27 +748,27 @@ export default function Dashboard({ onLogout }) {
     return () => clearTimeout(searchTimer.current);
   }, [searchQuery]);
 
-  const hour  = new Date().getHours();
+  const hour = new Date().getHours();
   const greet = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   const statusBreakdown = attendStats?.statusBreakdown || [];
-  const activeMembers   = statusBreakdown.find(r => r.status === "active")?.count  || 0;
-  const expiredMembers  = statusBreakdown.find(r => r.status === "expired")?.count || 0;
-  const attendTrend     = attendStats ? (attendStats.todayCount - attendStats.yesterdayCount) : undefined;
-  const payTrend        = payStats    ? (Number(payStats.thisMonth) - Number(payStats.lastMonth)) : undefined;
+  const activeMembers = statusBreakdown.find(r => r.status === "active")?.count || 0;
+  const expiredMembers = statusBreakdown.find(r => r.status === "expired")?.count || 0;
+  const attendTrend = attendStats ? (attendStats.todayCount - attendStats.yesterdayCount) : undefined;
+  const payTrend = payStats ? (Number(payStats.thisMonth) - Number(payStats.lastMonth)) : undefined;
 
   const membershipPie = attendStats?.membershipBreakdown?.map(r => ({ name: r.membership_type, value: r.count })) || [];
-  const PIE_COLORS    = ["#3b82f6", "#06b6d4", "#8b5cf6", "#34d399", "#fbbf24"];
-  const revenueChart  = payStats?.monthly6 || [];
+  const PIE_COLORS = ["#3b82f6", "#06b6d4", "#8b5cf6", "#34d399", "#fbbf24"];
+  const revenueChart = payStats?.monthly6 || [];
 
   // ── Pass stats in the required format to RevenueDrillDown ──
   const drillStats = {
-    totalRevenue:    payStats?.totalRevenue    || 0,
-    todayRevenue:    payStats?.todayRevenue    || 0,
-    thisMonthRev:    payStats?.thisMonth       || 0,
-    pendingPayments: payStats?.pendingCount    || 0,
-    pendingAmount:   payStats?.pendingAmount   || 0,
-    totalCount:      payStats?.totalCount      || 0,
+    totalRevenue: payStats?.totalRevenue || 0,
+    todayRevenue: payStats?.todayRevenue || 0,
+    thisMonthRev: payStats?.thisMonth || 0,
+    pendingPayments: payStats?.pendingCount || 0,
+    pendingAmount: payStats?.pendingAmount || 0,
+    totalCount: payStats?.totalCount || 0,
   };
 
   return (
@@ -764,7 +829,7 @@ export default function Dashboard({ onLogout }) {
                             onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                           >
                             <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: "var(--bg-active)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, color: "var(--accent-bright)", flexShrink: 0 }}>
-                              {m.full_name?.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase()}
+                              {m.full_name?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.full_name}</div>
@@ -785,7 +850,7 @@ export default function Dashboard({ onLogout }) {
               )}
               <button onClick={() => fetchAll(true)} disabled={refreshing}
                 style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: refreshing ? "not-allowed" : "pointer", fontSize: "12px", transition: "all 0.15s" }}
-                onMouseEnter={e => { if (!refreshing) { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; }}}
+                onMouseEnter={e => { if (!refreshing) { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; } }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
               >
                 <FaSync style={{ fontSize: "10px", animation: refreshing ? "spin 1s linear infinite" : "none" }} />
@@ -835,18 +900,18 @@ export default function Dashboard({ onLogout }) {
           </div>
           {loading
             ? <div className="dash-drill-grid">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="skeleton" style={{ height: "100px", borderRadius: "12px" }} />
-                ))}
-              </div>
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="skeleton" style={{ height: "100px", borderRadius: "12px" }} />
+              ))}
+            </div>
             : <RevenueDrillDown stats={drillStats} />
           }
         </div>
 
         {/* ── Mini Stats (Week checkins + expired) ── */}
         <div className="dash-mini-grid">
-          <MiniStat icon={FaCheckCircle}         color="var(--green)"  label="Week Checkins"   value={loading ? "—" : attendStats?.weekCount ?? 0} delay={0.25} />
-          <MiniStat icon={FaTimesCircle}         color="var(--red)"    label="Expired Members" value={loading ? "—" : expiredMembers}              delay={0.28} onClick={() => !loading && expiredMembers > 0 && setShowExpired(true)} />
+          <MiniStat icon={FaCheckCircle} color="var(--green)" label="Week Checkins" value={loading ? "—" : attendStats?.weekCount ?? 0} delay={0.25} />
+          <MiniStat icon={FaTimesCircle} color="var(--red)" label="Expired Members" value={loading ? "—" : expiredMembers} delay={0.28} onClick={() => !loading && expiredMembers > 0 && setShowExpired(true)} />
         </div>
 
         {/* ── Charts Row ── */}
@@ -857,7 +922,7 @@ export default function Dashboard({ onLogout }) {
               <AreaChart data={weekly} margin={{ top: 5, right: 5, bottom: 0, left: -20 }}>
                 <defs>
                   <linearGradient id="attendGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.25} />
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.25} />
                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                   </linearGradient>
                 </defs>

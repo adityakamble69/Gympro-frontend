@@ -7,7 +7,7 @@
 import { useState, useEffect, useCallback } from "react";
 import ReactDOM from "react-dom";
 import {
-  FaTimes, FaRupeeSign, FaCalendarAlt, FaChevronRight,
+  FaTimes, FaCalendarAlt, FaChevronRight,
   FaChevronLeft, FaUser, FaClock, FaCheckCircle,
   FaExclamationCircle, FaMobileAlt, FaCreditCard,
   FaMoneyBillWave, FaUniversity, FaArrowUp, FaArrowDown,
@@ -363,35 +363,91 @@ function TotalRevenueDrill({ onClose }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// 2. TODAY'S REVENUE POPUP
+// 2. TODAY'S REVENUE POPUP (with date range picker)
 // ══════════════════════════════════════════════════════════════════════════════
 function TodayRevenue({ onClose }) {
-  const [data,    setData]    = useState([]);
-  const [loading, setLoading] = useState(true);
+  const todayStr = new Date().toISOString().split("T")[0];
 
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    api.get(`/payments?limit=9999&status=paid`).then(res => {
+  const [startDate, setStartDate] = useState(todayStr);
+  const [endDate,   setEndDate]   = useState(todayStr);
+  const [data,      setData]      = useState([]);
+  const [loading,   setLoading]   = useState(true);
+
+  const fetchRange = async (from, to) => {
+    setLoading(true);
+    try {
+      const res = await api.get(`/payments?limit=9999&status=paid`);
+      const start = new Date(from); start.setHours(0,0,0,0);
+      const end   = new Date(to);   end.setHours(23,59,59,999);
       const rows = (res.data.data || []).filter(p => {
-        const d = p.payment_date?.split("T")[0] || p.payment_date;
-        return d === today;
+        const d = new Date(p.payment_date);
+        return d >= start && d <= end;
       });
-      setData(rows); setLoading(false);
-    }).catch(() => setLoading(false));
-  }, []);
+      setData(rows);
+    } catch { setData([]); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { fetchRange(startDate, endDate); }, []);
 
   const total = data.reduce((s, p) => s + Number(p.amount), 0);
+  const isSingleDay = startDate === endDate;
+  const rangeLabel = isSingleDay
+    ? (startDate === todayStr ? "Today's Revenue" : fmt(startDate))
+    : `${fmt(startDate)} – ${fmt(endDate)}`;
+
+  const inputStyle = {
+    width: "100%", padding: "8px 10px", borderRadius: "8px",
+    border: "1px solid var(--border-default)", background: "var(--bg-elevated)",
+    color: "var(--text-primary)", fontSize: "12px", boxSizing: "border-box", outline: "none"
+  };
 
   return (
-    <Modal title="Today's Payments" onClose={onClose} width="580px">
+    <Modal title="Revenue" onClose={onClose} width="580px">
+      {/* Date pickers */}
+      <div style={{ display: "flex", gap: "8px", marginBottom: "10px", flexWrap: "wrap", alignItems: "flex-end" }}>
+        <div style={{ flex: "1 1 120px" }}>
+          <label style={{ display: "block", fontSize: "10px", color: "var(--text-muted)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>From</label>
+          <input type="date" value={startDate} max={endDate} onChange={e => setStartDate(e.target.value)} style={inputStyle} />
+        </div>
+        <div style={{ flex: "1 1 120px" }}>
+          <label style={{ display: "block", fontSize: "10px", color: "var(--text-muted)", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>To</label>
+          <input type="date" value={endDate} min={startDate} max={todayStr} onChange={e => setEndDate(e.target.value)} style={inputStyle} />
+        </div>
+        <button onClick={() => fetchRange(startDate, endDate)} disabled={loading} style={{
+          padding: "8px 16px", borderRadius: "8px", border: "none",
+          background: "var(--grad-blue, var(--blue))", color: "#fff",
+          fontWeight: 700, fontSize: "12px", cursor: loading ? "not-allowed" : "pointer",
+          opacity: loading ? 0.6 : 1
+        }}>
+          {loading ? "…" : "Apply"}
+        </button>
+      </div>
+
+      {/* Quick presets */}
+      <div style={{ display: "flex", gap: "6px", marginBottom: "16px", flexWrap: "wrap" }}>
+        {[
+          { label: "Today",        get: () => [todayStr, todayStr] },
+          { label: "Yesterday",    get: () => { const d = new Date(Date.now() - 86400000).toISOString().split("T")[0]; return [d, d]; } },
+          { label: "Last 7 days",  get: () => [new Date(Date.now() - 6*86400000).toISOString().split("T")[0], todayStr] },
+          { label: "Last 30 days", get: () => [new Date(Date.now() - 29*86400000).toISOString().split("T")[0], todayStr] },
+        ].map(p => (
+          <button key={p.label} onClick={() => { const [s, e] = p.get(); setStartDate(s); setEndDate(e); fetchRange(s, e); }} style={{
+            padding: "5px 11px", borderRadius: "99px", fontSize: "11px",
+            background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
+            color: "var(--text-secondary)", cursor: "pointer"
+          }}>{p.label}</button>
+        ))}
+      </div>
+
       {loading ? <Spinner /> : (
         <>
-          {/* Today summary */}
+          {/* Summary */}
           <div style={{
             display: "flex", gap: "10px", marginBottom: "16px"
           }}>
             {[
-              { label: "Today's Revenue", val: rupee(total), color: "var(--green)" },
+              { label: rangeLabel, val: rupee(total), color: "var(--green)" },
               { label: "Transactions", val: data.length, color: "var(--blue)" },
             ].map(x => (
               <div key={x.label} style={{
@@ -428,7 +484,7 @@ function TodayRevenue({ onClose }) {
             );
           })()}
 
-          {data.length === 0 ? <Empty msg="No payments received today" /> :
+          {data.length === 0 ? <Empty msg="No payments received in this range" /> :
             <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
               {data.map(p => (
                 <div key={p.id} className="drill-row" style={{
@@ -446,7 +502,7 @@ function TodayRevenue({ onClose }) {
                     </div>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: "13px", color: "var(--text-primary)" }}>{p.full_name}</div>
-                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{p.payment_for || "membership"}</div>
+                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{p.payment_for || "membership"}{!isSingleDay && <> · {fmt(p.payment_date)}</>}</div>
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -827,7 +883,7 @@ function PendingAmountDetail({ onClose }) {
 // MAIN EXPORT — Revenue Stats Cards (Drop-in replacement)
 // ══════════════════════════════════════════════════════════════════════════════
 const MASK = "••••••";
-const MASKED_KEYS = new Set(["total", "today", "month"]);
+const MASKED_KEYS = new Set(["today", "month"]);
 
 export default function RevenueDrillDown({ stats = {} }) {
   const [modal, setModal] = useState(null);
@@ -840,17 +896,6 @@ export default function RevenueDrillDown({ stats = {} }) {
   };
 
   const cards = [
-    {
-      key:     "total",
-      label:   "Total Revenue",
-      value:   rupee(stats.totalRevenue || 0),
-      sub:     `${stats.totalCount || "—"} payments`,
-      color:   "var(--green)",
-      bg:      "var(--green-bg)",
-      icon:    FaRupeeSign,
-      modal:   "total",
-      tip:     "Drill by Year / Month"
-    },
     {
       key:     "today",
       label:   "Today's Revenue",
@@ -962,7 +1007,6 @@ export default function RevenueDrillDown({ stats = {} }) {
       </div>
 
       {/* Modals */}
-      {modal === "total"        && <TotalRevenueDrill   onClose={() => setModal(null)} />}
       {modal === "today"        && <TodayRevenue         onClose={() => setModal(null)} />}
       {modal === "month"        && <ThisMonthRevenue     onClose={() => setModal(null)} />}
       {modal === "pendingCount" && <PendingPaymentsCount onClose={() => setModal(null)} />}

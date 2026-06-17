@@ -3,25 +3,25 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* ── Core Dark Blue-Black Palette ── */
-  --bg-base:        #080c14;
-  --bg-surface:     #0d1117;
-  --bg-elevated:    #131a24;
-  --bg-hover:       #1a2233;
-  --bg-active:      #1e2a3d;
-  --bg-card:        #111827;
+  /* ── Core AMOLED Black Palette ── */
+  --bg-base:        #000000;
+  --bg-surface:     #0a0a0a;
+  --bg-elevated:    #1a1a1a;
+  --bg-hover:       #1f1f1f;
+  --bg-active:      #1e3a5f;
+  --bg-card:        #111111;
 
-  /* ── Borders (blue-tinted) ── */
-  --border-subtle:  #151f2e;
-  --border-default: #1e2d42;
-  --border-strong:  #2a3f5f;
-  --border-blue:    #2563eb40;
+  /* ── Borders ── */
+  --border-subtle:  rgba(255,255,255,0.06);
+  --border-default: rgba(255,255,255,0.09);
+  --border-strong:  rgba(255,255,255,0.13);
+  --border-blue:    rgba(59,130,246,0.25);
 
   /* ── Text ── */
-  --text-primary:   #e8edf5;
-  --text-secondary: #8b9bb4;
-  --text-muted:     #4a5568;
-  --text-disabled:  #2d3748;
+  --text-primary:   #f0f0f0;
+  --text-secondary: #aaaaaa;
+  --text-muted:     #555555;
+  --text-disabled:  #333333;
 
   /* ── Blue Accent System ── */
   --accent:         #3b82f6;
@@ -75,9 +75,14 @@ html, body, #root {
   background: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Scales the ENTIRE app (including all hardcoded inline px sizes) */
+html {
+  zoom: 1.15;
 }
 
 /* ── Scrollbar ── */
@@ -89,9 +94,18 @@ html, body, #root {
 /* ── Input Reset ── */
 input, select, textarea {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 15px;
 }
-button { font-family: var(--font-body); }
+button { font-family: var(--font-body); font-size: 15px; }
+
+/* ── Autofill fix (kills browser's white autofill background) ── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px var(--bg-card) inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  caret-color: var(--text-primary);
+}
 
 /* ── Animations ── */
 @keyframes fadeUp {
