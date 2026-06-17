@@ -67,11 +67,11 @@ export default function Sidebar({ onLogout }) {
       width: "220px",
       background: "var(--bg-surface)",
       borderRight: "1px solid var(--border-subtle)",
-      height: "100%",
+      height: "100vh",
       display: "flex",
       flexDirection: "column",
       fontFamily: "var(--font-body)",
-      overflowY: "auto",
+      overflowY: "hidden",
     }}>
       {/* Logo */}
       <div style={{
@@ -115,7 +115,7 @@ export default function Sidebar({ onLogout }) {
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: "12px 10px", overflowY: "auto" }}>
+      <nav style={{ flex: 1, padding: "12px 10px", overflowY: "auto", minHeight: 0 }}>
         <p style={{
           fontSize: "10px", fontWeight: 600,
           color: "var(--text-muted)", textTransform: "uppercase",
