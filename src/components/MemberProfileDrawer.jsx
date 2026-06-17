@@ -80,6 +80,111 @@ const EmptyState = ({ text }) => (
   </div>
 );
 
+// ── Aadhaar Viewer (inside TabProfile) ───────────────────────────────────────
+function AadharViewer({ aadhar_card }) {
+  const [activeSide, setActiveSide] = useState("front");
+  const [lightbox, setLightbox]     = useState(null); // URL to show fullscreen
+
+  let parsed = null;
+  if (aadhar_card) {
+    try { parsed = JSON.parse(aadhar_card); } catch { parsed = null; }
+  }
+
+  const hasFront = parsed?.front;
+  const hasBack  = parsed?.back;
+
+  if (!parsed && !aadhar_card) {
+    return (
+      <div style={{
+        background: "var(--bg-elevated)", borderRadius: "var(--radius-sm)",
+        padding: "18px", textAlign: "center", border: "1px dashed var(--border-default)"
+      }}>
+        <div style={{ fontSize: "28px", marginBottom: "6px" }}>🪪</div>
+        <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>No Aadhaar card uploaded</div>
+      </div>
+    );
+  }
+
+  const currentImg = activeSide === "front" ? hasFront : hasBack;
+
+  return (
+    <>
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          onClick={() => setLightbox(null)}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.92)",
+            zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "zoom-out", padding: "20px"
+          }}
+        >
+          <img src={lightbox} style={{ maxWidth: "100%", maxHeight: "90vh", borderRadius: "10px", boxShadow: "0 0 60px rgba(0,0,0,0.8)" }} alt="Aadhaar" />
+          <div style={{ position: "absolute", top: "16px", right: "16px", color: "#fff", fontSize: "24px", cursor: "pointer" }}>✕</div>
+        </div>
+      )}
+
+      <div style={{ background: "var(--bg-elevated)", borderRadius: "var(--radius-sm)", padding: "14px", border: "1px solid var(--border-subtle)" }}>
+        {/* Side tabs */}
+        <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
+          {["front", "back"].map(side => (
+            <button key={side} onClick={() => setActiveSide(side)} style={{
+              flex: 1, padding: "6px 10px", borderRadius: "6px", border: "none", cursor: "pointer",
+              background: activeSide === side ? "var(--bg-active)" : "var(--bg-surface)",
+              color: activeSide === side ? "var(--text-primary)" : "var(--text-muted)",
+              fontSize: "12px", fontWeight: activeSide === side ? 700 : 500,
+              borderBottom: activeSide === side ? "2px solid var(--accent)" : "2px solid transparent",
+              transition: "all 0.15s"
+            }}>
+              {side === "front" ? (hasFront ? "✅ " : "❌ ") : (hasBack ? "✅ " : "❌ ")}
+              {side.charAt(0).toUpperCase() + side.slice(1)} Side
+            </button>
+          ))}
+        </div>
+
+        {/* Image area */}
+        {currentImg ? (
+          <div
+            onClick={() => setLightbox(currentImg)}
+            style={{
+              width: "100%", height: "140px", borderRadius: "8px", overflow: "hidden",
+              cursor: "zoom-in", border: "1px solid var(--border-default)", position: "relative"
+            }}
+          >
+            <img src={currentImg} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt={`Aadhaar ${activeSide}`} />
+            <div style={{
+              position: "absolute", inset: 0, background: "rgba(0,0,0,0)", display: "flex",
+              alignItems: "center", justifyContent: "center",
+              transition: "background 0.2s"
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,0.4)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(0,0,0,0)"}
+            >
+              <span style={{ color: "#fff", fontSize: "12px", fontWeight: 600, opacity: 0, transition: "opacity 0.2s" }}
+                onMouseEnter={e => e.currentTarget.style.opacity = "1"}
+                onMouseLeave={e => e.currentTarget.style.opacity = "0"}
+              >🔍 Click to enlarge</span>
+            </div>
+          </div>
+        ) : (
+          <div style={{
+            width: "100%", height: "100px", borderRadius: "8px",
+            background: "var(--bg-surface)", border: "1px dashed var(--border-default)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "var(--text-muted)", fontSize: "13px"
+          }}>
+            {activeSide.charAt(0).toUpperCase() + activeSide.slice(1)} side not uploaded
+          </div>
+        )}
+
+        <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "8px", textAlign: "center" }}>
+          🔒 Stored securely for verification purposes
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ── Tab: Profile ──────────────────────────────────────────────────────────────
 function TabProfile({ member, days, progressPct }) {
   const statusColor = member.status === "active" ? "var(--green)"  :
@@ -98,6 +203,12 @@ function TabProfile({ member, days, progressPct }) {
         <InfoRow icon={FaBirthdayCake}label="Date of Birth"value={fmtLong(member.date_of_birth)} />
         <InfoRow icon={FaMapMarkerAlt}label="Address"      value={member.address} />
         <InfoRow icon={FaCalendarAlt} label="Joined On"    value={fmt(member.created_at)} />
+      </div>
+
+      {/* Aadhaar Card */}
+      <div style={{ marginBottom: "20px" }}>
+        <SectionLabel>Aadhaar Card</SectionLabel>
+        <AadharViewer aadhar_card={member.aadhar_card} />
       </div>
 
       {/* Membership Card */}

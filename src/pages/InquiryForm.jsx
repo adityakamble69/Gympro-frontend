@@ -5,20 +5,30 @@ export default function InquiryForm() {
   const [form, setForm] = useState({
     full_name: "", email: "", phone: "", gender: "",
     date_of_birth: "", address: "", message: "",
-    membership_interest: "not_sure", preferred_time: "anytime", photo: ""
+    membership_interest: "not_sure", preferred_time: "anytime",
+    photo: "", aadhar_card: ""
   });
-  const [plans, setPlans]         = useState([]);
+  const [plans, setPlans]               = useState([]);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [cameraOpen, setCameraOpen]     = useState(false);
   const [stream, setStream]             = useState(null);
   const [photoStatus, setPhotoStatus]   = useState("No photo taken yet");
-  const [alert, setAlert]               = useState({ type: "", msg: "" });
-  const [submitting, setSubmitting]     = useState(false);
 
-  const videoRef  = useRef(null);
-  const canvasRef = useRef(null);
+  // Aadhaar state
+  const [aadharPreview, setAadharPreview]   = useState(null);
+  const [aadharStatus, setAadharStatus]     = useState("No Aadhaar uploaded yet");
+  const [aadharSide, setAadharSide]         = useState("front"); // "front" | "back"
+  const [aadharFront, setAadharFront]       = useState(null);
+  const [aadharBack, setAadharBack]         = useState(null);
 
-  // ── Load Plans ─────────────────────────────────────────────────────────────
+  const [alert, setAlert]             = useState({ type: "", msg: "" });
+  const [submitting, setSubmitting]   = useState(false);
+
+  const videoRef    = useRef(null);
+  const canvasRef   = useRef(null);
+  const aadharFrontRef = useRef(null);
+  const aadharBackRef  = useRef(null);
+
   useEffect(() => {
     fetch(`${API}/membership-plans/public`)
       .then(r => r.json())
@@ -90,6 +100,38 @@ export default function InquiryForm() {
     reader.readAsDataURL(file);
   };
 
+  // ── Aadhaar Upload ─────────────────────────────────────────────────────────
+  const handleAadharUpload = (side) => (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { setAadharStatus("⚠️ File too large. Max 5MB."); return; }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataURL = ev.target.result;
+      if (side === "front") {
+        setAadharFront(dataURL);
+        setAadharStatus(aadharBack ? "✅ Both sides uploaded!" : "Front uploaded. Now upload Back side.");
+      } else {
+        setAadharBack(dataURL);
+        setAadharStatus(aadharFront ? "✅ Both sides uploaded!" : "Back uploaded. Now upload Front side.");
+      }
+      // Store as JSON object with both sides
+      const combined = side === "front"
+        ? { front: dataURL, back: aadharBack }
+        : { front: aadharFront, back: dataURL };
+      setForm(p => ({ ...p, aadhar_card: JSON.stringify(combined) }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeAadhar = () => {
+    setAadharFront(null);
+    setAadharBack(null);
+    setForm(p => ({ ...p, aadhar_card: "" }));
+    setAadharStatus("No Aadhaar uploaded yet");
+  };
+
   // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -108,8 +150,9 @@ export default function InquiryForm() {
       const json = await res.json();
       if (json.success) {
         setAlert({ type: "success", msg: "✅ Thank you! We will contact you within 24 hours." });
-        setForm({ full_name:"", email:"", phone:"", gender:"", date_of_birth:"", address:"", message:"", membership_interest:"not_sure", preferred_time:"anytime", photo:"" });
+        setForm({ full_name:"", email:"", phone:"", gender:"", date_of_birth:"", address:"", message:"", membership_interest:"not_sure", preferred_time:"anytime", photo:"", aadhar_card:"" });
         removePhoto();
+        removeAadhar();
       } else throw new Error(json.message);
     } catch (err) {
       setAlert({ type: "error", msg: "❌ " + (err.message || "Something went wrong.") });
@@ -123,37 +166,56 @@ export default function InquiryForm() {
     return `${days} Days`;
   };
 
-  // ── Styles ─────────────────────────────────────────────────────────────────
+  // ── Styles — Pure Black & Gray Theme ──────────────────────────────────────
   const S = {
-    page: { minHeight:"100vh", background:"#060910", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 20px", fontFamily:"'DM Sans', sans-serif", color:"#e6edf3", position:"relative" },
-    bg:   { position:"fixed", inset:0, backgroundImage:"radial-gradient(ellipse 80% 50% at 50% -20%, rgba(47,129,247,0.12), transparent)", opacity:0.4, pointerEvents:"none", zIndex:0 },
+    page: { minHeight:"100vh", background:"#0a0a0a", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 20px", fontFamily:"'DM Sans', sans-serif", color:"#d4d4d4", position:"relative" },
+    bg:   { position:"fixed", inset:0, backgroundImage:"radial-gradient(ellipse 70% 40% at 50% 0%, rgba(255,255,255,0.03), transparent)", pointerEvents:"none", zIndex:0 },
     wrap: { position:"relative", zIndex:1, width:"100%", maxWidth:"580px" },
     header: { textAlign:"center", marginBottom:"32px" },
     logo: { display:"inline-flex", alignItems:"center", gap:"10px", marginBottom:"20px" },
-    logoIcon: { width:"40px", height:"40px", background:"#2f81f7", borderRadius:"10px", display:"flex", alignItems:"center", justifyContent:"center", fontSize: "20px", boxShadow:"0 0 20px rgba(47,129,247,0.4)" },
-    logoText: { fontFamily:"'Syne', sans-serif", fontSize: "22px", fontWeight:800, color:"#e6edf3" },
-    h1: { fontFamily:"'Syne', sans-serif", fontSize: "36px", fontWeight:800, letterSpacing:"-0.5px", lineHeight:1.2, marginBottom:"10px" },
-    subtitle: { color:"#8b949e", fontSize: "17px", lineHeight:1.6 },
-    card: { background:"#0d1117", border:"1px solid #21262d", borderRadius:"16px", padding:"32px", boxShadow:"0 8px 40px rgba(0,0,0,0.6)" },
+    logoIcon: { width:"40px", height:"40px", background:"#1f1f1f", border:"1px solid #333", borderRadius:"10px", display:"flex", alignItems:"center", justifyContent:"center", fontSize: "20px" },
+    logoText: { fontFamily:"'Syne', sans-serif", fontSize: "22px", fontWeight:800, color:"#f0f0f0" },
+    h1: { fontFamily:"'Syne', sans-serif", fontSize: "36px", fontWeight:800, letterSpacing:"-0.5px", lineHeight:1.2, marginBottom:"10px", color:"#f0f0f0" },
+    subtitle: { color:"#6b6b6b", fontSize: "17px", lineHeight:1.6 },
+    card: { background:"#111111", border:"1px solid #222222", borderRadius:"16px", padding:"32px", boxShadow:"0 8px 60px rgba(0,0,0,0.8)" },
     grid: { display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px" },
     field: { display:"flex", flexDirection:"column", gap:"6px" },
-    label: { fontSize: "12px", fontWeight:600, color:"#8b949e", textTransform:"uppercase", letterSpacing:"0.08em" },
-    input: { background:"#161b22", border:"1px solid #21262d", borderRadius:"8px", color:"#e6edf3", fontFamily:"'DM Sans', sans-serif", fontSize: "16px", padding:"11px 14px", outline:"none", width:"100%", boxSizing:"border-box" },
+    label: { fontSize: "12px", fontWeight:600, color:"#555", textTransform:"uppercase", letterSpacing:"0.1em" },
+    input: { background:"#191919", border:"1px solid #2a2a2a", borderRadius:"8px", color:"#d4d4d4", fontFamily:"'DM Sans', sans-serif", fontSize: "16px", padding:"11px 14px", outline:"none", width:"100%", boxSizing:"border-box", transition:"border-color 0.15s" },
     section: { marginTop:"20px" },
-    sectionTitle: { fontSize: "15px", fontWeight:600, color:"#8b949e", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:"12px" },
-    photoSection: { background:"#161b22", border:"1px solid #30363d", borderRadius:"12px", padding:"20px", display:"flex", flexDirection:"column", alignItems:"center", gap:"14px" },
-    photoWrap: { width:"120px", height:"120px", borderRadius:"50%", overflow:"hidden", border:"2px solid #30363d", background:"#060910", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 },
-    camBtn: { padding:"9px 16px", borderRadius:"8px", border:"1px solid #30363d", background:"#161b22", color:"#e6edf3", cursor:"pointer", fontSize: "15px", fontWeight:500 },
-    camBtnPrimary: { padding:"9px 16px", borderRadius:"8px", border:"none", background:"#2f81f7", color:"#fff", cursor:"pointer", fontSize: "15px", fontWeight:600 },
-    camBtnDanger: { padding:"9px 16px", borderRadius:"8px", border:"none", background:"rgba(248,81,73,0.15)", color:"#f85149", cursor:"pointer", fontSize: "15px", fontWeight:500 },
-    planCard: { display:"flex", alignItems:"center", gap:"12px", padding:"14px 16px", borderRadius:"10px", border:"1px solid #21262d", background:"#161b22", cursor:"pointer", marginBottom:"8px", transition:"all 0.15s" },
-    planCardActive: { border:"1px solid #2f81f7", background:"rgba(47,129,247,0.06)" },
-    pill: { padding:"8px 16px", borderRadius:"99px", border:"1px solid #21262d", background:"#161b22", color:"#8b949e", cursor:"pointer", fontSize: "15px", fontWeight:500 },
-    pillActive: { border:"1px solid #2f81f7", background:"rgba(47,129,247,0.1)", color:"#2f81f7" },
-    submitBtn: { width:"100%", padding:"14px", background:"#2f81f7", color:"#fff", border:"none", borderRadius:"10px", fontSize: "17px", fontWeight:700, cursor:"pointer", marginTop:"24px", fontFamily:"'Syne', sans-serif", letterSpacing:"0.05em" },
-    alert: (type) => ({ padding:"14px 18px", borderRadius:"10px", fontSize: "16px", marginBottom:"16px", background: type === "success" ? "rgba(63,185,80,0.1)" : "rgba(248,81,73,0.1)", border:`1px solid ${type === "success" ? "rgba(63,185,80,0.3)" : "rgba(248,81,73,0.3)"}`, color: type === "success" ? "#3fb950" : "#f85149" }),
-    divider: { height:"1px", background:"#21262d", margin:"20px 0" },
+    sectionTitle: { fontSize: "15px", fontWeight:600, color:"#555", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:"12px", display:"flex", alignItems:"center", gap:"8px" },
+    photoSection: { background:"#191919", border:"1px solid #2a2a2a", borderRadius:"12px", padding:"20px", display:"flex", flexDirection:"column", alignItems:"center", gap:"14px" },
+    photoWrap: { width:"120px", height:"120px", borderRadius:"50%", overflow:"hidden", border:"2px solid #2a2a2a", background:"#0a0a0a", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 },
+    camBtn: { padding:"9px 16px", borderRadius:"8px", border:"1px solid #2a2a2a", background:"#191919", color:"#aaa", cursor:"pointer", fontSize: "15px", fontWeight:500 },
+    camBtnPrimary: { padding:"9px 16px", borderRadius:"8px", border:"1px solid #444", background:"#2a2a2a", color:"#f0f0f0", cursor:"pointer", fontSize: "15px", fontWeight:600 },
+    camBtnDanger: { padding:"9px 16px", borderRadius:"8px", border:"none", background:"rgba(248,81,73,0.12)", color:"#f85149", cursor:"pointer", fontSize: "15px", fontWeight:500 },
+    planCard: { display:"flex", alignItems:"center", gap:"12px", padding:"14px 16px", borderRadius:"10px", border:"1px solid #222", background:"#191919", cursor:"pointer", marginBottom:"8px", transition:"all 0.15s" },
+    planCardActive: { border:"1px solid #555", background:"#222" },
+    pill: { padding:"8px 16px", borderRadius:"99px", border:"1px solid #222", background:"#191919", color:"#666", cursor:"pointer", fontSize: "15px", fontWeight:500, transition:"all 0.15s" },
+    pillActive: { border:"1px solid #888", background:"#2a2a2a", color:"#f0f0f0" },
+    submitBtn: { width:"100%", padding:"14px", background:"#e0e0e0", color:"#0a0a0a", border:"none", borderRadius:"10px", fontSize: "17px", fontWeight:800, cursor:"pointer", marginTop:"24px", fontFamily:"'Syne', sans-serif", letterSpacing:"0.06em" },
+    alert: (type) => ({ padding:"14px 18px", borderRadius:"10px", fontSize: "16px", marginBottom:"16px", background: type === "success" ? "rgba(63,185,80,0.08)" : "rgba(248,81,73,0.08)", border:`1px solid ${type === "success" ? "rgba(63,185,80,0.25)" : "rgba(248,81,73,0.25)"}`, color: type === "success" ? "#3fb950" : "#f85149" }),
+    divider: { height:"1px", background:"#1e1e1e", margin:"20px 0" },
     video: { width:"100%", borderRadius:"8px", display: cameraOpen ? "block" : "none" },
+
+    // Aadhaar styles
+    aadharSection: { background:"#161b22", border:"1px solid #30363d", borderRadius:"12px", padding:"20px", display:"flex", flexDirection:"column", gap:"16px" },
+    aadharSideTabs: { display:"flex", gap:"8px" },
+    aadharSideTab: (active) => ({
+      flex:1, padding:"8px", borderRadius:"8px", border:`1px solid ${active ? "#2f81f7" : "#30363d"}`,
+      background: active ? "rgba(47,129,247,0.1)" : "#0d1117",
+      color: active ? "#2f81f7" : "#8b949e",
+      cursor:"pointer", fontSize:"14px", fontWeight:600, textAlign:"center", transition:"all 0.15s"
+    }),
+    aadharCardWrap: (uploaded) => ({
+      width:"100%", height:"140px", borderRadius:"10px",
+      border:`2px dashed ${uploaded ? "#3fb950" : "#30363d"}`,
+      background:"#0d1117",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      overflow:"hidden", position:"relative", cursor:"pointer",
+      transition:"border-color 0.2s"
+    }),
+    aadharOverlay: { position:"absolute", inset:0, background:"rgba(0,0,0,0.5)", display:"flex", alignItems:"center", justifyContent:"center", opacity:0, transition:"opacity 0.2s" },
   };
 
   return (
@@ -245,6 +307,96 @@ export default function InquiryForm() {
                 <p style={{ fontSize: "13px", color: photoPreview ? "#3fb950" : "#f0883e" }}>{photoStatus}</p>
               </div>
               <canvas ref={canvasRef} style={{ display:"none" }} />
+
+              <div style={S.divider} />
+
+              {/* ── Aadhaar Card ────────────────────────────────────────────── */}
+              <p style={S.sectionTitle}>🪪 Aadhaar Card <span style={{ color:"#484f58", fontWeight:400, textTransform:"none", fontSize:"12px", letterSpacing:0 }}>(optional)</span></p>
+              <div style={S.aadharSection}>
+
+                {/* Side tabs */}
+                <div style={S.aadharSideTabs}>
+                  <div style={S.aadharSideTab(aadharSide === "front")} onClick={() => setAadharSide("front")}>
+                    {aadharFront ? "✅ " : ""}Front Side
+                  </div>
+                  <div style={S.aadharSideTab(aadharSide === "back")} onClick={() => setAadharSide("back")}>
+                    {aadharBack ? "✅ " : ""}Back Side
+                  </div>
+                </div>
+
+                {/* Upload box */}
+                <div>
+                  {aadharSide === "front" ? (
+                    <label>
+                      <div
+                        style={S.aadharCardWrap(!!aadharFront)}
+                        onMouseEnter={e => { if (aadharFront) e.currentTarget.querySelector(".aadhar-overlay").style.opacity = "1"; }}
+                        onMouseLeave={e => { if (aadharFront) e.currentTarget.querySelector(".aadhar-overlay").style.opacity = "0"; }}
+                      >
+                        {aadharFront ? (
+                          <>
+                            <img src={aadharFront} style={{ width:"100%", height:"100%", objectFit:"cover" }} alt="Aadhaar Front" />
+                            <div className="aadhar-overlay" style={{ ...S.aadharOverlay, opacity:0 }}>
+                              <span style={{ color:"#fff", fontSize:"14px", fontWeight:600 }}>🔄 Change</span>
+                            </div>
+                          </>
+                        ) : (
+                          <div style={{ textAlign:"center", color:"#484f58" }}>
+                            <div style={{ fontSize:"36px", marginBottom:"8px" }}>🪪</div>
+                            <div style={{ fontSize:"13px", fontWeight:600, color:"#8b949e" }}>Upload Front Side</div>
+                            <div style={{ fontSize:"11px", marginTop:"4px" }}>JPG, PNG up to 5MB</div>
+                          </div>
+                        )}
+                      </div>
+                      <input type="file" accept="image/*,application/pdf" style={{ display:"none" }} onChange={handleAadharUpload("front")} />
+                    </label>
+                  ) : (
+                    <label>
+                      <div
+                        style={S.aadharCardWrap(!!aadharBack)}
+                        onMouseEnter={e => { if (aadharBack) e.currentTarget.querySelector(".aadhar-overlay").style.opacity = "1"; }}
+                        onMouseLeave={e => { if (aadharBack) e.currentTarget.querySelector(".aadhar-overlay").style.opacity = "0"; }}
+                      >
+                        {aadharBack ? (
+                          <>
+                            <img src={aadharBack} style={{ width:"100%", height:"100%", objectFit:"cover" }} alt="Aadhaar Back" />
+                            <div className="aadhar-overlay" style={{ ...S.aadharOverlay, opacity:0 }}>
+                              <span style={{ color:"#fff", fontSize:"14px", fontWeight:600 }}>🔄 Change</span>
+                            </div>
+                          </>
+                        ) : (
+                          <div style={{ textAlign:"center", color:"#484f58" }}>
+                            <div style={{ fontSize:"36px", marginBottom:"8px" }}>🪪</div>
+                            <div style={{ fontSize:"13px", fontWeight:600, color:"#8b949e" }}>Upload Back Side</div>
+                            <div style={{ fontSize:"11px", marginTop:"4px" }}>JPG, PNG up to 5MB</div>
+                          </div>
+                        )}
+                      </div>
+                      <input type="file" accept="image/*,application/pdf" style={{ display:"none" }} onChange={handleAadharUpload("back")} />
+                    </label>
+                  )}
+                </div>
+
+                {/* Status + Remove */}
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <p style={{ fontSize:"13px", color: (aadharFront && aadharBack) ? "#3fb950" : aadharFront || aadharBack ? "#f0883e" : "#484f58", margin:0 }}>
+                    {aadharStatus}
+                  </p>
+                  {(aadharFront || aadharBack) && (
+                    <button type="button" onClick={removeAadhar} style={{ ...S.camBtnDanger, padding:"6px 12px", fontSize:"12px" }}>
+                      🗑️ Remove All
+                    </button>
+                  )}
+                </div>
+
+                {/* Privacy note */}
+                <div style={{ background:"rgba(47,129,247,0.06)", border:"1px solid rgba(47,129,247,0.15)", borderRadius:"8px", padding:"10px 14px", display:"flex", gap:"8px", alignItems:"flex-start" }}>
+                  <span style={{ fontSize:"14px", flexShrink:0 }}>🔒</span>
+                  <p style={{ margin:0, fontSize:"12px", color:"#8b949e", lineHeight:1.5 }}>
+                    Your Aadhaar details are stored securely and used only for gym membership verification.
+                  </p>
+                </div>
+              </div>
 
               <div style={S.divider} />
 
