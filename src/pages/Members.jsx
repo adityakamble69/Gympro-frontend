@@ -26,10 +26,18 @@ const inputStyle = {
 };
 
 const EMPTY = {
-  full_name: "", phone: "", address: "",
+  full_name: "", email: "", phone: "", address: "", photo: "",
   gender: "", date_of_birth: "", membership_type: "",
   membership_start: "", membership_end: "", status: "active"
 };
+
+// Convert a selected file into a base64 data URI (stored directly in DB text columns)
+const fileToBase64 = (file) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = reject;
+  reader.readAsDataURL(file);
+});
 
 const fmt = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 const fmtLong = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" }) : "—";
@@ -821,6 +829,8 @@ export default function Members({ onLogout }) {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY);
+  const [aadharFront, setAadharFront] = useState("");
+  const [aadharBack, setAadharBack] = useState("");
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
   const [notifyMember, setNotifyMember] = useState(null);
@@ -949,10 +959,41 @@ export default function Members({ onLogout }) {
     }
   };
 
-  const openAdd = () => { setForm(EMPTY); setEditingId(null); setFormError(""); setShowModal(true); };
+  const openAdd = () => { setForm(EMPTY); setAadharFront(""); setAadharBack(""); setEditingId(null); setFormError(""); setShowModal(true); };
   const openEdit = (m) => {
-    setForm({ full_name: m.full_name || "", email: m.email || "", phone: m.phone || "", address: m.address || "", gender: m.gender || "", date_of_birth: m.date_of_birth?.split("T")[0] || "", membership_type: m.membership_type || "", membership_start: m.membership_start?.split("T")[0] || "", membership_end: m.membership_end?.split("T")[0] || "", status: m.status || "active" });
+    setForm({
+      full_name: m.full_name || "", email: m.email || "", phone: m.phone || "",
+      address: m.address || "", photo: m.photo || "",
+      gender: m.gender || "", date_of_birth: m.date_of_birth?.split("T")[0] || "",
+      membership_type: m.membership_type || "", membership_start: m.membership_start?.split("T")[0] || "",
+      membership_end: m.membership_end?.split("T")[0] || "", status: m.status || "active"
+    });
+    // Existing Aadhaar is stored as JSON string {front, back} — parse it so it isn't lost on save
+    let parsedAadhar = null;
+    if (m.aadhar_card) { try { parsedAadhar = JSON.parse(m.aadhar_card); } catch { parsedAadhar = null; } }
+    setAadharFront(parsedAadhar?.front || "");
+    setAadharBack(parsedAadhar?.back || "");
     setEditingId(m.id); setFormError(""); setShowModal(true);
+  };
+
+  const MAX_IMG_SIZE = 2 * 1024 * 1024; // 2MB
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > MAX_IMG_SIZE) { setFormError("Photo size 2MB se kam honi chahiye"); return; }
+    try { setF("photo", await fileToBase64(file)); }
+    catch { setFormError("Photo load nahi ho payi, dobara try karo"); }
+  };
+  const handleAadharChange = async (side, e) => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > MAX_IMG_SIZE) { setFormError("Image size 2MB se kam honi chahiye"); return; }
+    try {
+      const base64 = await fileToBase64(file);
+      if (side === "front") setAadharFront(base64); else setAadharBack(base64);
+    } catch { setFormError("Image load nahi ho payi, dobara try karo"); }
   };
 
   const handleSave = async () => {
@@ -960,8 +1001,14 @@ export default function Members({ onLogout }) {
     if (!form.full_name || !form.email || !form.phone) { setFormError("Name, email, and phone are required."); return; }
     setSaving(true);
     try {
-      if (editingId) await api.put(`/members/${editingId}`, form);
-      else await api.post("/members", form);
+      const payload = {
+        ...form,
+        aadhar_card: (aadharFront || aadharBack)
+          ? JSON.stringify({ front: aadharFront || null, back: aadharBack || null })
+          : null,
+      };
+      if (editingId) await api.put(`/members/${editingId}`, payload);
+      else await api.post("/members", payload);
       setShowModal(false);
       setMembers([]); setHasMore(true); setCurrentPage(1);
       fetchMembers(1, search, false);
@@ -1203,9 +1250,49 @@ export default function Members({ onLogout }) {
             <div className="modal-form-grid">
               <div style={{ gridColumn: "1 / -1" }}><Field label="Full Name *"><input style={inputStyle} value={form.full_name} onChange={e => setF("full_name", e.target.value)} placeholder="Enter full name" onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field></div>
               <div style={{ gridColumn: "1 / -1" }}><Field label="Phone Number *"><input style={inputStyle} value={form.phone} onChange={e => setF("phone", e.target.value)} placeholder="9876543210" onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field></div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <Field label="Photo">
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <div style={{ width: "56px", height: "56px", borderRadius: "50%", overflow: "hidden", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      {form.photo
+                        ? <img src={form.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        : <FaUser style={{ color: "var(--text-muted)", fontSize: "20px" }} />}
+                    </div>
+                    <label style={{ padding: "7px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", fontSize: "13px", cursor: "pointer", fontWeight: 600 }}>
+                      {form.photo ? "Change Photo" : "Upload Photo"}
+                      <input type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhotoChange} />
+                    </label>
+                    {form.photo && (
+                      <button onClick={() => setF("photo", "")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", textDecoration: "underline" }}>Remove</button>
+                    )}
+                  </div>
+                </Field>
+              </div>
               <Field label="Gender"><select style={inputStyle} value={form.gender} onChange={e => setF("gender", e.target.value)}><option value="">Select gender</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></Field>
               <Field label="Date of Birth"><input style={inputStyle} type="date" value={form.date_of_birth} onChange={e => setF("date_of_birth", e.target.value)} onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field>
               <div style={{ gridColumn: "1 / -1" }}><Field label="Address"><input style={inputStyle} value={form.address} onChange={e => setF("address", e.target.value)} placeholder="Enter address" onFocus={e => e.target.style.borderColor = "var(--border-strong)"} onBlur={e => e.target.style.borderColor = "var(--border-default)"} /></Field></div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <Field label="Aadhaar Card (Front & Back)">
+                  <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
+                    {[["front", aadharFront, setAadharFront], ["back", aadharBack, setAadharBack]].map(([side, val, setVal]) => (
+                      <div key={side} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <div style={{ width: "110px", height: "68px", borderRadius: "6px", overflow: "hidden", background: "var(--bg-elevated)", border: "1px dashed var(--border-default)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          {val
+                            ? <img src={val} alt={side} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            : <span style={{ fontSize: "11px", color: "var(--text-muted)", textTransform: "capitalize" }}>{side} side</span>}
+                        </div>
+                        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                          <label style={{ padding: "4px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", fontSize: "11px", cursor: "pointer", fontWeight: 600 }}>
+                            {val ? "Change" : "Upload"}
+                            <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleAadharChange(side, e)} />
+                          </label>
+                          {val && <button onClick={() => setVal("")} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: "11px", textDecoration: "underline" }}>Remove</button>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Field>
+              </div>
               <div style={{ gridColumn: "1 / -1" }}>
                 <Field label="Membership Plan">
                   <select style={inputStyle} value={form.membership_type} onChange={e => handlePlanSelect(e.target.value)}>

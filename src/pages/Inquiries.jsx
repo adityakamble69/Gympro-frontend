@@ -135,7 +135,8 @@ function ConvertToMemberModal({ inquiry, onClose, onConverted }) {
         address:          inquiry.address   || "",
         gender:           inquiry.gender    || "",
         date_of_birth:    inquiry.date_of_birth ? String(inquiry.date_of_birth).split("T")[0] : "",
-        photo:            inquiry.photo     || null,
+        photo:            inquiry.photo       || null,
+        aadhar_card:      inquiry.aadhar_card || null,
       });
       const memberId = mRes.data.id;
 
