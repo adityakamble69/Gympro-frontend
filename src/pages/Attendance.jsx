@@ -5,7 +5,8 @@ import { useAuth } from "../hooks/useAuth";
 import {
   FaSearch, FaUserCheck, FaUserClock, FaCalendarAlt,
   FaTimes, FaTrash, FaChevronLeft, FaChevronRight,
-  FaClipboardCheck, FaClock
+  FaClipboardCheck, FaClock, FaFingerprint, FaSyncAlt,
+  FaPlug, FaPowerOff, FaSpinner
 } from "react-icons/fa";
 
 
@@ -261,6 +262,8 @@ const AttendanceCard = ({ r, isToday, canMark, isSuper, onCheckout, onDelete }) 
 );
 
 const attendanceStyles = `
+  .spin { animation: attend-spin 0.9s linear infinite; }
+  @keyframes attend-spin { to { transform: rotate(360deg); } }
   .attend-main {
     flex: 1; padding: 32px 36px; overflow-y: auto; min-width: 0;
   }
@@ -302,8 +305,46 @@ export default function Attendance({ onLogout }) {
   const [showModal, setShowModal]   = useState(false);
   const [deleteId, setDeleteId]     = useState(null);
   const [search, setSearch]         = useState("");
+  const [device, setDevice]         = useState({ connected: false, device: "", ip: "" });
+  const [deviceBusy, setDeviceBusy] = useState(false);
+  const [syncing, setSyncing]       = useState(false);
+  const [syncMsg, setSyncMsg]       = useState("");
 
+  useEffect(() => { fetchDeviceStatus(); }, []);
   useEffect(() => { fetchAttendance(); }, [date]);
+
+  const fetchDeviceStatus = async () => {
+    try {
+      const res = await api.get("/fingerprint/status");
+      setDevice({ connected: !!res.data?.connected, device: res.data?.device || "", ip: res.data?.ip || "" });
+    } catch (e) { console.error(e); }
+  };
+
+  const handleToggleDevice = async () => {
+    setDeviceBusy(true);
+    try {
+      if (device.connected) await api.post("/fingerprint/disconnect");
+      else await api.post("/fingerprint/connect");
+      await fetchDeviceStatus();
+    } catch (e) {
+      console.error(e);
+    } finally { setDeviceBusy(false); }
+  };
+
+  const handleSync = async () => {
+    setSyncing(true); setSyncMsg("");
+    try {
+      const res = await api.post("/fingerprint/sync");
+      setSyncMsg(res.data?.message || "Synced");
+      fetchAttendance();
+    } catch (e) {
+      setSyncMsg(e.response?.data?.message || "Sync failed — check device connection.");
+    } finally {
+      setSyncing(false);
+      setTimeout(() => setSyncMsg(""), 4000);
+    }
+  };
+
 
   const fetchAttendance = async () => {
     setLoading(true);
@@ -378,6 +419,68 @@ export default function Attendance({ onLogout }) {
               <FaUserCheck style={{ fontSize: "15px" }} /> MARK CHECK-IN
             </button>
           )}
+        </div>
+
+        {/* Fingerprint Device Status */}
+        <div className="fade-up" style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px",
+          background: "var(--bg-surface)", border: "1px solid var(--border-subtle)",
+          borderRadius: "var(--radius-md)", padding: "12px 18px", marginBottom: "20px"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{
+              width: "34px", height: "34px", borderRadius: "8px",
+              background: device.connected ? "var(--green-bg)" : "var(--red-bg)",
+              border: device.connected ? "1px solid rgba(74,222,128,0.3)" : "1px solid rgba(248,113,113,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: device.connected ? "var(--green)" : "var(--red)"
+            }}>
+              <FaFingerprint style={{ fontSize: "16px" }} />
+            </div>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: device.connected ? "var(--green)" : "var(--red)", display: "inline-block" }} />
+                <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>
+                  {device.connected ? "Device Connected" : "Device Disconnected"}
+                </span>
+              </div>
+              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>
+                {device.device || "fingerprint device"}{device.ip ? ` · ${device.ip}` : ""}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            {syncMsg && <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>{syncMsg}</span>}
+            <button onClick={handleSync} disabled={syncing || !device.connected}
+              title={!device.connected ? "Connect the device first" : "Pull latest scans from the device"}
+              style={{
+                display: "flex", alignItems: "center", gap: "7px",
+                padding: "8px 14px", borderRadius: "var(--radius-sm)",
+                background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)",
+                color: (!device.connected || syncing) ? "var(--text-muted)" : "var(--blue)",
+                cursor: (syncing || !device.connected) ? "not-allowed" : "pointer",
+                fontSize: "13px", fontWeight: 600
+              }}>
+              <FaSyncAlt className={syncing ? "spin" : ""} style={{ fontSize: "12px" }} />
+              {syncing ? "Syncing..." : "Sync Now"}
+            </button>
+            {isSuper && (
+              <button onClick={handleToggleDevice} disabled={deviceBusy}
+                style={{
+                  display: "flex", alignItems: "center", gap: "7px",
+                  padding: "8px 14px", borderRadius: "var(--radius-sm)",
+                  background: device.connected ? "var(--red-bg)" : "var(--green-bg)",
+                  border: device.connected ? "1px solid rgba(248,113,113,0.3)" : "1px solid rgba(74,222,128,0.3)",
+                  color: deviceBusy ? "var(--text-muted)" : (device.connected ? "var(--red)" : "var(--green)"),
+                  cursor: deviceBusy ? "not-allowed" : "pointer",
+                  fontSize: "13px", fontWeight: 600
+                }}>
+                {deviceBusy ? <FaSpinner className="spin" style={{ fontSize: "12px" }} /> : device.connected ? <FaPowerOff style={{ fontSize: "12px" }} /> : <FaPlug style={{ fontSize: "12px" }} />}
+                {deviceBusy ? "Please wait..." : device.connected ? "Disconnect" : "Connect"}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Mini stat strip */}

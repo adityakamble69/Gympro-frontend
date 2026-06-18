@@ -6,7 +6,7 @@ import {
   FaUsers, FaUser,
   FaWhatsapp, FaCheck, FaPaperPlane, FaSyncAlt, FaTrash,
   FaEye, FaEyeSlash, FaFileInvoiceDollar, FaEdit, FaSave,
-  FaEnvelope
+  FaEnvelope, FaFingerprint, FaSpinner
 } from "react-icons/fa";
 import MemberProfileDrawer from "../components/MemberProfileDrawer";
 
@@ -635,8 +635,87 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
   );
 }
 
+// ─── Enroll Fingerprint Modal ──────────────────────────────────────────────────
+function EnrollFingerprintModal({ member, onClose, onEnrolled }) {
+  const [status, setStatus] = useState("idle"); // idle | enrolling | success | error
+  const [message, setMessage] = useState("");
+
+  const startEnroll = async () => {
+    setStatus("enrolling");
+    setMessage("");
+    try {
+      const res = await api.post(`/fingerprint/enroll/${member.id}`);
+      if (res.data?.success === false) throw new Error(res.data?.message || "Enrollment failed");
+      setStatus("success");
+      setMessage(res.data?.message || "Fingerprint enrolled successfully!");
+      onEnrolled?.(member.id);
+    } catch (e) {
+      setStatus("error");
+      setMessage(e.response?.data?.message || e.response?.data?.error || e.message || "Enrollment failed. Check device connection.");
+    }
+  };
+
+  if (!member) return null;
+
+  return (
+    <div className="fade-in" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200, padding: "20px", backdropFilter: "blur(4px)" }}
+      onClick={e => { if (e.target === e.currentTarget && status !== "enrolling") onClose(); }}>
+      <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", width: "100%", maxWidth: "420px", padding: "28px", boxShadow: "var(--shadow-lg)", textAlign: "center" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button onClick={onClose} disabled={status === "enrolling"} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: status === "enrolling" ? "not-allowed" : "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <FaTimes style={{ fontSize: "13px" }} />
+          </button>
+        </div>
+
+        <div style={{
+          width: "64px", height: "64px", borderRadius: "50%", margin: "0 auto 18px",
+          background: status === "success" ? "var(--green-bg)" : status === "error" ? "var(--red-bg)" : "rgba(96,165,250,0.1)",
+          border: `1px solid ${status === "success" ? "rgba(74,222,128,0.3)" : status === "error" ? "rgba(248,113,113,0.3)" : "rgba(96,165,250,0.25)"}`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: status === "success" ? "var(--green)" : status === "error" ? "var(--red)" : "var(--blue)"
+        }}>
+          <FaFingerprint className={status === "enrolling" ? "pulse" : ""} style={{ fontSize: "28px" }} />
+        </div>
+
+        <h2 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 6px" }}>
+          {status === "success" ? "Enrolled!" : status === "error" ? "Enrollment Failed" : "Enroll Fingerprint"}
+        </h2>
+        <p style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "20px" }}>
+          {status === "idle" && <>For <strong style={{ color: "var(--text-secondary)" }}>{member.full_name}</strong> — ask the member to be ready at the scanner.</>}
+          {status === "enrolling" && <>Ask <strong style={{ color: "var(--text-secondary)" }}>{member.full_name}</strong> to place their finger on the scanner now. Scan 2-3 times if prompted by the device.</>}
+          {status !== "idle" && status !== "enrolling" && message}
+        </p>
+
+        {status === "idle" && (
+          <button onClick={startEnroll} style={{ padding: "10px 24px", borderRadius: "var(--radius-sm)", background: "var(--text-primary)", color: "#0a0a0a", border: "none", cursor: "pointer", fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+            <FaFingerprint style={{ fontSize: "14px" }} /> START ENROLLMENT
+          </button>
+        )}
+
+        {status === "enrolling" && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", color: "var(--blue)", fontSize: "14px", fontWeight: 600 }}>
+            <FaSpinner className="spin" style={{ fontSize: "14px" }} /> Waiting for scan...
+          </div>
+        )}
+
+        {status === "error" && (
+          <button onClick={startEnroll} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--red)", cursor: "pointer", fontSize: "14px", fontWeight: 700 }}>
+            Try Again
+          </button>
+        )}
+
+        {status === "success" && (
+          <button onClick={onClose} style={{ padding: "9px 24px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.3)", color: "var(--green)", cursor: "pointer", fontSize: "14px", fontWeight: 700 }}>
+            Done
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Mobile Member Card ────────────────────────────────────────────────────────
-const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone }) => {
+const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone, onEnroll, enrolled }) => {
   const days = daysLeft(m.membership_end);
   const warn = days !== null && days <= 7 && days >= 0;
   return (
@@ -685,6 +764,7 @@ const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDele
         <button onClick={() => onRenew(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.25)", color: "var(--green)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaSyncAlt style={{ fontSize: "11px" }} /> Renew</button>
         <button onClick={() => onViewBill(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", color: "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaFileInvoiceDollar style={{ fontSize: "11px" }} /> Bill</button>
         <button onClick={() => onNotify(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)", border: warn ? "1px solid rgba(245,158,11,0.35)" : "1px solid var(--border-default)", color: warn ? "#f59e0b" : "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}><FaEnvelope style={{ fontSize: "11px" }} /> Notify</button>
+        <button onClick={() => onEnroll(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: enrolled ? "var(--green-bg)" : "rgba(96,165,250,0.08)", border: enrolled ? "1px solid rgba(74,222,128,0.3)" : "1px solid rgba(96,165,250,0.25)", color: enrolled ? "var(--green)" : "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaFingerprint style={{ fontSize: "11px" }} /> {enrolled ? "Enrolled" : "Enroll Finger"}</button>
         <button onClick={() => onDelete(m.id)} style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center" }}><FaTrash style={{ fontSize: "11px" }} /></button>
       </div>
     </div>
@@ -693,6 +773,10 @@ const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDele
 
 // ─── Styles ────────────────────────────────────────────────────────────────────
 const membersStyles = `
+  .spin { animation: members-spin 0.9s linear infinite; }
+  @keyframes members-spin { to { transform: rotate(360deg); } }
+  .pulse { animation: members-pulse 1.1s ease-in-out infinite; }
+  @keyframes members-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.12); } }
   .members-main {
     flex: 1;
     padding: 32px 36px;
@@ -741,6 +825,8 @@ export default function Members({ onLogout }) {
   const [saving, setSaving] = useState(false);
   const [notifyMember, setNotifyMember] = useState(null);
   const [profileMember, setProfileMember] = useState(null);
+  const [enrollMember, setEnrollMember] = useState(null);
+  const [enrolledIds, setEnrolledIds] = useState(new Set());
   const [renewMember, setRenewMember] = useState(null);
   const [viewBillMember, setViewBillMember] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -1020,6 +1106,10 @@ export default function Members({ onLogout }) {
                               onMouseLeave={e => { e.currentTarget.style.background = warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)"; e.currentTarget.style.borderColor = warn ? "rgba(245,158,11,0.35)" : "var(--border-default)"; e.currentTarget.style.color = warn ? "#f59e0b" : "var(--text-secondary)"; }}>
                               <FaEnvelope style={{ fontSize: "11px" }} /> Notify
                             </button>
+                            <button onClick={() => setEnrollMember(m)} title="Enroll Fingerprint"
+                              style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: enrolledIds.has(m.id) ? "var(--green-bg)" : "rgba(96,165,250,0.08)", border: enrolledIds.has(m.id) ? "1px solid rgba(74,222,128,0.3)" : "1px solid rgba(96,165,250,0.25)", color: enrolledIds.has(m.id) ? "var(--green)" : "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, transition: "all 0.15s" }}>
+                              <FaFingerprint style={{ fontSize: "11px" }} /> {enrolledIds.has(m.id) ? "Enrolled" : "Enroll Finger"}
+                            </button>
                             <button onClick={() => setDeleteId(m.id)} title="Delete"
                               style={{ padding: "5px 8px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", transition: "all 0.15s" }}
                               onMouseEnter={e => { e.currentTarget.style.background = "var(--red-bg)"; e.currentTarget.style.borderColor = "rgba(248,113,113,0.4)"; e.currentTarget.style.color = "var(--red)"; }}
@@ -1057,6 +1147,7 @@ export default function Members({ onLogout }) {
                   onProfile={setProfileMember} onRenew={setRenewMember}
                   onViewBill={setViewBillMember}
                   onNotify={setNotifyMember} onDelete={setDeleteId}
+                  onEnroll={setEnrollMember} enrolled={enrolledIds.has(m.id)}
                   dueInfo={dueMap[m.id]} onMarkPaid={markDuePaid}
                   phoneVisible={phoneVisible}
                   onTogglePhone={(id) => setPhoneVisible(prev => ({ ...prev, [id]: !prev[id] }))}
@@ -1082,6 +1173,14 @@ export default function Members({ onLogout }) {
 
       {/* Modals */}
       {notifyMember && <NotifyModal member={notifyMember} onClose={() => setNotifyMember(null)} />}
+
+      {enrollMember && (
+        <EnrollFingerprintModal
+          member={enrollMember}
+          onClose={() => setEnrollMember(null)}
+          onEnrolled={(id) => setEnrolledIds(prev => new Set(prev).add(id))}
+        />
+      )}
 
       <MemberProfileDrawer
         member={profileMember}
