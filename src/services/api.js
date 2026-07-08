@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const api = axios.create({ baseURL: "https://gympro-backend-production-2c21.up.railway.app/api" });
+// Backend URL environment variable se aa raha hai (Vite project ke liye VITE_ prefix zaroori hai)
+const BASE_URL = import.meta.env.VITE_API_URL || "https://gympro-backend-production-320e.up.railway.app/api";
+
+const api = axios.create({ baseURL: BASE_URL });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("gym_token");
