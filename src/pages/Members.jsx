@@ -722,6 +722,92 @@ function EnrollFingerprintModal({ member, onClose, onEnrolled }) {
   );
 }
 
+// ─── Enrollment Assistant Modal (device pe manually enroll karne ka guide) ────
+function EnrollmentGuideModal({ member, alreadyEnrolled, onClose, onMarked }) {
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState("");
+
+  const markEnrolled = async () => {
+    setSaving(true); setErr("");
+    try {
+      await api.post(`/fingerprint/mark-enrolled/${member.id}`);
+      onMarked?.(member.id);
+      onClose();
+    } catch (e) {
+      setErr(e.response?.data?.message || "Kuch galat ho gaya, dobara try karo.");
+    } finally { setSaving(false); }
+  };
+
+  const unmarkEnrolled = async () => {
+    setSaving(true); setErr("");
+    try {
+      await api.post(`/fingerprint/unmark-enrolled/${member.id}`);
+      onMarked?.(member.id, true);
+      onClose();
+    } catch (e) {
+      setErr(e.response?.data?.message || "Kuch galat ho gaya, dobara try karo.");
+    } finally { setSaving(false); }
+  };
+
+  if (!member) return null;
+
+  const steps = [
+    "Device ki screen pe: Menu → User Management → Add User jao",
+    `User ID field me neeche di gayi ID (${member.id}) exactly wahi type karo`,
+    "Member ka naam daalo (optional)",
+    "Enroll Fingerprint select karo, ungli 2–3 baar scan karwao",
+    "Save karo — ab is member ka punch app me apne aap dikhega",
+  ];
+
+  return (
+    <div className="fade-in" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200, padding: "20px", backdropFilter: "blur(4px)" }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", width: "100%", maxWidth: "460px", padding: "28px", boxShadow: "var(--shadow-lg)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "19px", fontWeight: 800, color: "var(--text-primary)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+            <FaFingerprint style={{ color: "var(--blue)" }} /> Enrollment Guide
+          </h2>
+          <button onClick={onClose} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <FaTimes style={{ fontSize: "13px" }} />
+          </button>
+        </div>
+        <p style={{ color: "var(--text-muted)", fontSize: "14px", margin: "0 0 18px" }}>
+          For <strong style={{ color: "var(--text-secondary)" }}>{member.full_name}</strong> — actual fingerprint scan device ki screen pe hi hoga.
+        </p>
+
+        {/* Bada, clearly readable Member ID */}
+        <div style={{ textAlign: "center", padding: "18px", borderRadius: "var(--radius-lg)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", marginBottom: "18px" }}>
+          <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--blue)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>Device pe yeh User ID daalo</div>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: "48px", fontWeight: 900, color: "var(--text-primary)", lineHeight: 1 }}>{member.id}</div>
+        </div>
+
+        <ol style={{ margin: "0 0 18px", padding: "0 0 0 20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+          {steps.map((s, i) => (
+            <li key={i} style={{ fontSize: "14px", color: "var(--text-secondary)", lineHeight: 1.4 }}>{s}</li>
+          ))}
+        </ol>
+
+        {err && <div style={{ marginBottom: "14px", padding: "10px 12px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px" }}>{err}</div>}
+
+        <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+          {alreadyEnrolled ? (
+            <button onClick={unmarkEnrolled} disabled={saving} style={{ padding: "9px 18px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: saving ? "not-allowed" : "pointer", fontSize: "14px", fontWeight: 600 }}>
+              {saving ? "..." : "Undo (Mark as Not Enrolled)"}
+            </button>
+          ) : (
+            <button onClick={markEnrolled} disabled={saving} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.3)", color: "var(--green)", cursor: saving ? "not-allowed" : "pointer", fontSize: "14px", fontWeight: 700, display: "flex", alignItems: "center", gap: "6px" }}>
+              <FaCheck style={{ fontSize: "12px" }} /> {saving ? "Saving..." : "Mark as Enrolled"}
+            </button>
+          )}
+        </div>
+        <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "12px", marginBottom: 0 }}>
+          💡 Yeh apne aap bhi ho jayega jab member pehli baar device pe punch karega.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Mobile Member Card ────────────────────────────────────────────────────────
 const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone, onEnroll, enrolled }) => {
   const days = daysLeft(m.membership_end);
@@ -837,6 +923,8 @@ export default function Members({ onLogout }) {
   const [profileMember, setProfileMember] = useState(null);
   const [enrollMember, setEnrollMember] = useState(null);
   const [enrolledIds, setEnrolledIds] = useState(new Set());
+  const [enrollGuideMember, setEnrollGuideMember] = useState(null); // Enrollment Assistant modal
+  const [enrollFilter, setEnrollFilter] = useState("all"); // "all" | "enrolled" | "not_enrolled"
   const [renewMember, setRenewMember] = useState(null);
   const [viewBillMember, setViewBillMember] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -873,7 +961,13 @@ export default function Members({ onLogout }) {
   };
 
   // Initial load
-  useEffect(() => { fetchMembers(1, "", false, "all"); fetchPlans(); }, []);
+  useEffect(() => {
+    fetchMembers(1, "", false, "all"); fetchPlans();
+    // Enrollment Assistant: sab enrolled member IDs backend se le aao
+    api.get("/fingerprint/enrollment-status")
+      .then(r => setEnrolledIds(new Set(r.data?.enrolledIds || [])))
+      .catch(() => {});
+  }, []);
 
   // Search + filter change — reset list
   useEffect(() => {
