@@ -305,18 +305,33 @@ export default function Attendance({ onLogout }) {
   const [showModal, setShowModal]   = useState(false);
   const [deleteId, setDeleteId]     = useState(null);
   const [search, setSearch]         = useState("");
-  const [device, setDevice]         = useState({ connected: false, device: "", ip: "" });
+  const [device, setDevice]         = useState({ connected: false, device: "", ip: "", mode: "direct", lastSeen: null });
   const [deviceBusy, setDeviceBusy] = useState(false);
   const [syncing, setSyncing]       = useState(false);
   const [syncMsg, setSyncMsg]       = useState("");
 
-  useEffect(() => { fetchDeviceStatus(); }, []);
-  useEffect(() => { fetchAttendance(); }, [date]);
+  useEffect(() => {
+    fetchDeviceStatus();
+    const t = setInterval(fetchDeviceStatus, 20000); // bridge heartbeat ~20s me refresh
+    return () => clearInterval(t);
+  }, []);
+  useEffect(() => {
+    fetchAttendance();
+    if (!isToday) return; // sirf aaj ke din live-refresh chahiye
+    const t = setInterval(fetchAttendance, 20000);
+    return () => clearInterval(t);
+  }, [date]);
 
   const fetchDeviceStatus = async () => {
     try {
       const res = await api.get("/fingerprint/status");
-      setDevice({ connected: !!res.data?.connected, device: res.data?.device || "", ip: res.data?.ip || "" });
+      setDevice({
+        connected: !!res.data?.connected,
+        device:    res.data?.device || "",
+        ip:        res.data?.ip || "",
+        mode:      res.data?.mode || "direct",
+        lastSeen:  res.data?.lastSeen || null
+      });
     } catch (e) { console.error(e); }
   };
 
@@ -446,12 +461,22 @@ export default function Attendance({ onLogout }) {
               </div>
               <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>
                 {device.device || "fingerprint device"}{device.ip ? ` · ${device.ip}` : ""}
+                {device.mode === "bridge" && (
+                  device.connected
+                    ? " · via local bridge"
+                    : device.lastSeen ? ` · last seen ${fmtTime(device.lastSeen)}` : " · bridge not running"
+                )}
               </div>
             </div>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
             {syncMsg && <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>{syncMsg}</span>}
+            {device.mode === "bridge" ? (
+              <span style={{ fontSize: "12px", color: "var(--text-muted)", fontStyle: "italic" }}>
+                Auto-synced by local bridge — no manual action needed
+              </span>
+            ) : (
             <button onClick={handleSync} disabled={syncing || !device.connected}
               title={!device.connected ? "Connect the device first" : "Pull latest scans from the device"}
               style={{
@@ -465,7 +490,8 @@ export default function Attendance({ onLogout }) {
               <FaSyncAlt className={syncing ? "spin" : ""} style={{ fontSize: "12px" }} />
               {syncing ? "Syncing..." : "Sync Now"}
             </button>
-            {isSuper && (
+            )}
+            {isSuper && device.mode !== "bridge" && (
               <button onClick={handleToggleDevice} disabled={deviceBusy}
                 style={{
                   display: "flex", alignItems: "center", gap: "7px",
