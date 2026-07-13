@@ -809,7 +809,7 @@ function EnrollmentGuideModal({ member, alreadyEnrolled, onClose, onMarked }) {
 }
 
 // ─── Mobile Member Card ────────────────────────────────────────────────────────
-const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone, onEnroll, enrolled }) => {
+const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone, onEnroll, onEnrollGuide, enrolled }) => {
   const days = daysLeft(m.membership_end);
   const warn = days !== null && days <= 7 && days >= 0;
   return (
@@ -859,6 +859,7 @@ const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDele
         <button onClick={() => onViewBill(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", color: "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaFileInvoiceDollar style={{ fontSize: "11px" }} /> Bill</button>
         <button onClick={() => onNotify(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)", border: warn ? "1px solid rgba(245,158,11,0.35)" : "1px solid var(--border-default)", color: warn ? "#f59e0b" : "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}><FaEnvelope style={{ fontSize: "11px" }} /> Notify</button>
         <button onClick={() => onEnroll(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: enrolled ? "var(--green-bg)" : "rgba(96,165,250,0.08)", border: enrolled ? "1px solid rgba(74,222,128,0.3)" : "1px solid rgba(96,165,250,0.25)", color: enrolled ? "var(--green)" : "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaFingerprint style={{ fontSize: "11px" }} /> {enrolled ? "Enrolled" : "Enroll Finger"}</button>
+        <button onClick={() => onEnrollGuide(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>📋 Guide</button>
         <button onClick={() => onDelete(m.id)} style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center" }}><FaTrash style={{ fontSize: "11px" }} /></button>
       </div>
     </div>
@@ -1125,6 +1126,13 @@ export default function Members({ onLogout }) {
   const plansByType = plans.reduce((a, p) => { if (!a[p.duration_type]) a[p.duration_type] = []; a[p.duration_type].push(p); return a; }, {});
   const TYPE_LABEL = { monthly: "Monthly Plans", quarterly: "Quarterly Plans", yearly: "Yearly Plans" };
 
+  // Enrollment Assistant: currently-loaded members list ko filter karo (client-side)
+  const filteredMembers = members.filter(m => {
+    if (enrollFilter === "enrolled") return enrolledIds.has(m.id);
+    if (enrollFilter === "not_enrolled") return !enrolledIds.has(m.id);
+    return true;
+  });
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg-base)", fontFamily: "var(--font-body)" }}>
       <style>{membersStyles}</style>
@@ -1148,12 +1156,22 @@ export default function Members({ onLogout }) {
         <div className="fade-up stagger-1" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-xl)", overflow: "hidden" }}>
 
           {/* Search */}
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)", display: "flex", gap: "10px", alignItems: "center" }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
             <div style={{ position: "relative", flex: 1, maxWidth: "360px" }}>
               <FaSearch style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "13px" }} />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, email, phone…" style={{ ...inputStyle, paddingLeft: "34px", width: "100%", boxSizing: "border-box" }} />
             </div>
             {search && <button onClick={() => setSearch("")} style={{ padding: "8px", background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer" }}><FaTimes style={{ fontSize: "13px" }} /></button>}
+
+            {/* Enrollment Assistant filter */}
+            <div style={{ display: "flex", gap: "4px", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", padding: "3px", marginLeft: "auto" }}>
+              {[["all", "All"], ["not_enrolled", "Not Enrolled"], ["enrolled", "Enrolled"]].map(([key, label]) => (
+                <button key={key} onClick={() => setEnrollFilter(key)}
+                  style={{ padding: "5px 10px", borderRadius: "4px", border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 600, background: enrollFilter === key ? "var(--text-primary)" : "transparent", color: enrollFilter === key ? "#0a0a0a" : "var(--text-muted)", whiteSpace: "nowrap" }}>
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Desktop Table */}
@@ -1177,13 +1195,13 @@ export default function Members({ onLogout }) {
                       ))}
                     </tr>
                   ))
-                ) : members.length === 0 ? (
+                ) : filteredMembers.length === 0 ? (
                   <tr><td colSpan={7} style={{ padding: "60px", textAlign: "center", color: "var(--text-muted)" }}>
                     <FaUsers style={{ fontSize: "36px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />
-                    {search ? `No members match "${search}"` : "No members yet. Add your first one!"}
+                    {search ? `No members match "${search}"` : enrollFilter !== "all" ? "No members match this filter." : "No members yet. Add your first one!"}
                   </td></tr>
                 ) : (
-                  members.map(m => {
+                  filteredMembers.map(m => {
                     const days = daysLeft(m.membership_end);
                     const warn = days !== null && days <= 7 && days >= 0;
                     return (
@@ -1251,6 +1269,10 @@ export default function Members({ onLogout }) {
                               style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: enrolledIds.has(m.id) ? "var(--green-bg)" : "rgba(96,165,250,0.08)", border: enrolledIds.has(m.id) ? "1px solid rgba(74,222,128,0.3)" : "1px solid rgba(96,165,250,0.25)", color: enrolledIds.has(m.id) ? "var(--green)" : "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, transition: "all 0.15s" }}>
                               <FaFingerprint style={{ fontSize: "11px" }} /> {enrolledIds.has(m.id) ? "Enrolled" : "Enroll Finger"}
                             </button>
+                            <button onClick={() => setEnrollGuideMember(m)} title="Enrollment Guide"
+                              style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>
+                              📋 Guide
+                            </button>
                             <button onClick={() => setDeleteId(m.id)} title="Delete"
                               style={{ padding: "5px 8px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", transition: "all 0.15s" }}
                               onMouseEnter={e => { e.currentTarget.style.background = "var(--red-bg)"; e.currentTarget.style.borderColor = "rgba(248,113,113,0.4)"; e.currentTarget.style.color = "var(--red)"; }}
@@ -1277,18 +1299,19 @@ export default function Members({ onLogout }) {
                   <div className="skeleton" style={{ height: "11px", width: "45%" }} />
                 </div>
               ))
-            ) : members.length === 0 ? (
+            ) : filteredMembers.length === 0 ? (
               <div style={{ padding: "40px 16px", textAlign: "center", color: "var(--text-muted)" }}>
                 <FaUsers style={{ fontSize: "36px", opacity: 0.3, display: "block", margin: "0 auto 12px" }} />
-                {search ? `No members match "${search}"` : "No members yet."}
+                {search ? `No members match "${search}"` : enrollFilter !== "all" ? "No members match this filter." : "No members yet."}
               </div>
             ) : (
-              members.map(m => (
+              filteredMembers.map(m => (
                 <MemberCard key={m.id} m={m} plans={plans}
                   onProfile={setProfileMember} onRenew={setRenewMember}
                   onViewBill={setViewBillMember}
                   onNotify={setNotifyMember} onDelete={setDeleteId}
                   onEnroll={setEnrollMember} enrolled={enrolledIds.has(m.id)}
+                  onEnrollGuide={setEnrollGuideMember}
                   dueInfo={dueMap[m.id]} onMarkPaid={markDuePaid}
                   phoneVisible={phoneVisible}
                   onTogglePhone={(id) => setPhoneVisible(prev => ({ ...prev, [id]: !prev[id] }))}
@@ -1320,6 +1343,21 @@ export default function Members({ onLogout }) {
           member={enrollMember}
           onClose={() => setEnrollMember(null)}
           onEnrolled={(id) => setEnrolledIds(prev => new Set(prev).add(id))}
+        />
+      )}
+
+      {enrollGuideMember && (
+        <EnrollmentGuideModal
+          member={enrollGuideMember}
+          alreadyEnrolled={enrolledIds.has(enrollGuideMember.id)}
+          onClose={() => setEnrollGuideMember(null)}
+          onMarked={(id, unmarked) => {
+            setEnrolledIds(prev => {
+              const next = new Set(prev);
+              if (unmarked) next.delete(id); else next.add(id);
+              return next;
+            });
+          }}
         />
       )}
 
