@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Backend URL environment variable se aa raha hai (Vite project ke liye VITE_ prefix zaroori hai)
-const BASE_URL = import.meta.env.VITE_API_URL || "https://gympro-backend-production-320e.up.railway.app/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "";
 
 const api = axios.create({ baseURL: BASE_URL });
 
