@@ -176,10 +176,8 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
   const fetchExpired = async (pg = 1) => {
     setLoading(true);
     try {
-      // Fetch all members with large limit and filter by status client-side
-      // (backend search is by name/email/phone, not status)
-      const r = await api.get(`/members?page=1&limit=200`);
-      const all = (r.data.data || []).filter(m => m.status === "expired");
+      const r = await api.get(`/members?page=1&limit=200&status=expired`);
+      const all = r.data.data || [];
       if (pg === 1) setAllExpired(all); // store full list for export
       const perPage = 8;
       const start = (pg - 1) * perPage;

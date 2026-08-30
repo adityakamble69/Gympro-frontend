@@ -644,9 +644,12 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
 }
 
 // ─── Enroll Fingerprint Modal ──────────────────────────────────────────────────
-function EnrollFingerprintModal({ member, onClose, onEnrolled }) {
+function EnrollFingerprintModal({ member, alreadyEnrolled, onClose, onEnrolled }) {
   const [status, setStatus] = useState("idle"); // idle | enrolling | success | error
   const [message, setMessage] = useState("");
+  const [activeTab, setActiveTab] = useState("auto"); // auto | manual
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState("");
 
   const startEnroll = async () => {
     setStatus("enrolling");
@@ -656,82 +659,18 @@ function EnrollFingerprintModal({ member, onClose, onEnrolled }) {
       if (res.data?.success === false) throw new Error(res.data?.message || "Enrollment failed");
       setStatus("success");
       setMessage(res.data?.message || "Fingerprint enrolled successfully!");
-      onEnrolled?.(member.id);
+      onEnrolled?.(member.id, false);
     } catch (e) {
       setStatus("error");
       setMessage(e.response?.data?.message || e.response?.data?.error || e.message || "Enrollment failed. Check device connection.");
     }
   };
 
-  if (!member) return null;
-
-  return (
-    <div className="fade-in" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200, padding: "20px", backdropFilter: "blur(4px)" }}
-      onClick={e => { if (e.target === e.currentTarget && status !== "enrolling") onClose(); }}>
-      <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", width: "100%", maxWidth: "420px", padding: "28px", boxShadow: "var(--shadow-lg)", textAlign: "center" }}>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <button onClick={onClose} disabled={status === "enrolling"} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: status === "enrolling" ? "not-allowed" : "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <FaTimes style={{ fontSize: "13px" }} />
-          </button>
-        </div>
-
-        <div style={{
-          width: "64px", height: "64px", borderRadius: "50%", margin: "0 auto 18px",
-          background: status === "success" ? "var(--green-bg)" : status === "error" ? "var(--red-bg)" : "rgba(96,165,250,0.1)",
-          border: `1px solid ${status === "success" ? "rgba(74,222,128,0.3)" : status === "error" ? "rgba(248,113,113,0.3)" : "rgba(96,165,250,0.25)"}`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: status === "success" ? "var(--green)" : status === "error" ? "var(--red)" : "var(--blue)"
-        }}>
-          <FaFingerprint className={status === "enrolling" ? "pulse" : ""} style={{ fontSize: "28px" }} />
-        </div>
-
-        <h2 style={{ fontFamily: "var(--font-display)", fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 6px" }}>
-          {status === "success" ? "Enrolled!" : status === "error" ? "Enrollment Failed" : "Enroll Fingerprint"}
-        </h2>
-        <p style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "20px" }}>
-          {status === "idle" && <>For <strong style={{ color: "var(--text-secondary)" }}>{member.full_name}</strong> — ask the member to be ready at the scanner.</>}
-          {status === "enrolling" && <>Ask <strong style={{ color: "var(--text-secondary)" }}>{member.full_name}</strong> to place their finger on the scanner now. Scan 2-3 times if prompted by the device.</>}
-          {status !== "idle" && status !== "enrolling" && message}
-        </p>
-
-        {status === "idle" && (
-          <button onClick={startEnroll} style={{ padding: "10px 24px", borderRadius: "var(--radius-sm)", background: "var(--text-primary)", color: "#0a0a0a", border: "none", cursor: "pointer", fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em", display: "inline-flex", alignItems: "center", gap: "8px" }}>
-            <FaFingerprint style={{ fontSize: "14px" }} /> START ENROLLMENT
-          </button>
-        )}
-
-        {status === "enrolling" && (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", color: "var(--blue)", fontSize: "14px", fontWeight: 600 }}>
-            <FaSpinner className="spin" style={{ fontSize: "14px" }} /> Waiting for scan...
-          </div>
-        )}
-
-        {status === "error" && (
-          <button onClick={startEnroll} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--red)", cursor: "pointer", fontSize: "14px", fontWeight: 700 }}>
-            Try Again
-          </button>
-        )}
-
-        {status === "success" && (
-          <button onClick={onClose} style={{ padding: "9px 24px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.3)", color: "var(--green)", cursor: "pointer", fontSize: "14px", fontWeight: 700 }}>
-            Done
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─── Enrollment Assistant Modal (device pe manually enroll karne ka guide) ────
-function EnrollmentGuideModal({ member, alreadyEnrolled, onClose, onMarked }) {
-  const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState("");
-
   const markEnrolled = async () => {
     setSaving(true); setErr("");
     try {
       await api.post(`/fingerprint/mark-enrolled/${member.id}`);
-      onMarked?.(member.id);
+      onEnrolled?.(member.id, false);
       onClose();
     } catch (e) {
       setErr(e.response?.data?.message || "Kuch galat ho gaya, dobara try karo.");
@@ -742,7 +681,7 @@ function EnrollmentGuideModal({ member, alreadyEnrolled, onClose, onMarked }) {
     setSaving(true); setErr("");
     try {
       await api.post(`/fingerprint/unmark-enrolled/${member.id}`);
-      onMarked?.(member.id, true);
+      onEnrolled?.(member.id, true);
       onClose();
     } catch (e) {
       setErr(e.response?.data?.message || "Kuch galat ho gaya, dobara try karo.");
@@ -761,55 +700,140 @@ function EnrollmentGuideModal({ member, alreadyEnrolled, onClose, onMarked }) {
 
   return (
     <div className="fade-in" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200, padding: "20px", backdropFilter: "blur(4px)" }}
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      onClick={e => { if (e.target === e.currentTarget && status !== "enrolling") onClose(); }}>
       <div className="fade-up" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", width: "100%", maxWidth: "460px", padding: "28px", boxShadow: "var(--shadow-lg)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+        
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "19px", fontWeight: 800, color: "var(--text-primary)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
-            <FaFingerprint style={{ color: "var(--blue)" }} /> Enrollment Guide
+            <FaFingerprint style={{ color: "var(--blue)" }} /> Fingerprint Enrollment
           </h2>
-          <button onClick={onClose} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <button onClick={onClose} disabled={status === "enrolling"} style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: status === "enrolling" ? "not-allowed" : "pointer", borderRadius: "var(--radius-sm)", width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <FaTimes style={{ fontSize: "13px" }} />
           </button>
         </div>
-        <p style={{ color: "var(--text-muted)", fontSize: "14px", margin: "0 0 18px" }}>
-          For <strong style={{ color: "var(--text-secondary)" }}>{member.full_name}</strong> — actual fingerprint scan device ki screen pe hi hoga.
-        </p>
 
-        {/* Bada, clearly readable Member ID */}
-        <div style={{ textAlign: "center", padding: "18px", borderRadius: "var(--radius-lg)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", marginBottom: "18px" }}>
-          <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--blue)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>Device pe yeh User ID daalo</div>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: "48px", fontWeight: 900, color: "var(--text-primary)", lineHeight: 1 }}>{member.id}</div>
+        {/* Tab Headers */}
+        <div style={{ display: "flex", background: "var(--bg-elevated)", borderRadius: "var(--radius-md)", padding: "4px", marginBottom: "22px" }}>
+          <button 
+            type="button"
+            onClick={() => { if (status !== "enrolling") setActiveTab("auto"); }}
+            disabled={status === "enrolling"}
+            style={{ 
+              flex: 1, padding: "8px 12px", border: "none", cursor: status === "enrolling" ? "not-allowed" : "pointer", fontSize: "13px", fontWeight: 600, borderRadius: "var(--radius-sm)",
+              background: activeTab === "auto" ? "var(--bg-surface)" : "transparent",
+              color: activeTab === "auto" ? "var(--text-primary)" : "var(--text-secondary)",
+              boxShadow: activeTab === "auto" ? "0 1px 3px rgba(0,0,0,0.2)" : "none",
+              transition: "all 0.15s"
+            }}
+          >
+            ⚡ Auto Scan
+          </button>
+          <button 
+            type="button"
+            onClick={() => { if (status !== "enrolling") setActiveTab("manual"); }}
+            disabled={status === "enrolling"}
+            style={{ 
+              flex: 1, padding: "8px 12px", border: "none", cursor: status === "enrolling" ? "not-allowed" : "pointer", fontSize: "13px", fontWeight: 600, borderRadius: "var(--radius-sm)",
+              background: activeTab === "manual" ? "var(--bg-surface)" : "transparent",
+              color: activeTab === "manual" ? "var(--text-primary)" : "var(--text-secondary)",
+              boxShadow: activeTab === "manual" ? "0 1px 3px rgba(0,0,0,0.2)" : "none",
+              transition: "all 0.15s"
+            }}
+          >
+            📋 Manual Guide
+          </button>
         </div>
 
-        <ol style={{ margin: "0 0 18px", padding: "0 0 0 20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-          {steps.map((s, i) => (
-            <li key={i} style={{ fontSize: "14px", color: "var(--text-secondary)", lineHeight: 1.4 }}>{s}</li>
-          ))}
-        </ol>
+        {activeTab === "auto" ? (
+          <div style={{ textAlign: "center" }}>
+            <div style={{
+              width: "64px", height: "64px", borderRadius: "50%", margin: "0 auto 18px",
+              background: status === "success" ? "var(--green-bg)" : status === "error" ? "var(--red-bg)" : "rgba(96,165,250,0.1)",
+              border: `1px solid ${status === "success" ? "rgba(74,222,128,0.3)" : status === "error" ? "rgba(248,113,113,0.3)" : "rgba(96,165,250,0.25)"}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: status === "success" ? "var(--green)" : status === "error" ? "var(--red)" : "var(--blue)"
+            }}>
+              <FaFingerprint className={status === "enrolling" ? "pulse" : ""} style={{ fontSize: "28px" }} />
+            </div>
 
-        {err && <div style={{ marginBottom: "14px", padding: "10px 12px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px" }}>{err}</div>}
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 6px" }}>
+              {status === "success" ? "Enrolled!" : status === "error" ? "Enrollment Failed" : "Start Auto Scan"}
+            </h3>
+            <p style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "20px", lineHeight: 1.4 }}>
+              {status === "idle" && <>Send enrollment request to the biometric device. Ask <strong style={{ color: "var(--text-secondary)" }}>{member.full_name}</strong> to be ready at the scanner.</>}
+              {status === "enrolling" && <>Ask <strong style={{ color: "var(--text-secondary)" }}>{member.full_name}</strong> to place their finger on the scanner now. Scan 2-3 times as prompted.</>}
+              {status !== "idle" && status !== "enrolling" && message}
+            </p>
 
-        <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-          {alreadyEnrolled ? (
-            <button onClick={unmarkEnrolled} disabled={saving} style={{ padding: "9px 18px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: saving ? "not-allowed" : "pointer", fontSize: "14px", fontWeight: 600 }}>
-              {saving ? "..." : "Undo (Mark as Not Enrolled)"}
-            </button>
-          ) : (
-            <button onClick={markEnrolled} disabled={saving} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.3)", color: "var(--green)", cursor: saving ? "not-allowed" : "pointer", fontSize: "14px", fontWeight: 700, display: "flex", alignItems: "center", gap: "6px" }}>
-              <FaCheck style={{ fontSize: "12px" }} /> {saving ? "Saving..." : "Mark as Enrolled"}
-            </button>
-          )}
-        </div>
-        <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "12px", marginBottom: 0 }}>
-          💡 Yeh apne aap bhi ho jayega jab member pehli baar device pe punch karega.
-        </p>
+            {status === "idle" && (
+              <button onClick={startEnroll} style={{ padding: "10px 24px", borderRadius: "var(--radius-sm)", background: "var(--text-primary)", color: "#0a0a0a", border: "none", cursor: "pointer", fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                <FaFingerprint style={{ fontSize: "14px" }} /> SEND ENROLL COMMAND
+              </button>
+            )}
+
+            {status === "enrolling" && (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", color: "var(--blue)", fontSize: "14px", fontWeight: 600 }}>
+                <FaSpinner className="spin" style={{ fontSize: "14px" }} /> Waiting for scan on device...
+              </div>
+            )}
+
+            {status === "error" && (
+              <button onClick={startEnroll} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.3)", color: "var(--red)", cursor: "pointer", fontSize: "14px", fontWeight: 700 }}>
+                Try Again
+              </button>
+            )}
+
+            {status === "success" && (
+              <button onClick={onClose} style={{ padding: "9px 24px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.3)", color: "var(--green)", cursor: "pointer", fontSize: "14px", fontWeight: 700 }}>
+                Done
+              </button>
+            )}
+          </div>
+        ) : (
+          <div>
+            <p style={{ color: "var(--text-muted)", fontSize: "14px", margin: "0 0 16px", lineHeight: 1.4 }}>
+              For <strong style={{ color: "var(--text-secondary)" }}>{member.full_name}</strong> — manually add them using their User ID directly on the machine:
+            </p>
+
+            {/* Bada, clearly readable Member ID */}
+            <div style={{ textAlign: "center", padding: "16px", borderRadius: "var(--radius-lg)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", marginBottom: "18px" }}>
+              <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--blue)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "4px" }}>Device pe yeh User ID daalo</div>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: "40px", fontWeight: 900, color: "var(--text-primary)", lineHeight: 1 }}>{member.id}</div>
+            </div>
+
+            <ol style={{ margin: "0 0 18px", padding: "0 0 0 20px", display: "flex", flexDirection: "column", gap: "8px" }}>
+              {steps.map((s, i) => (
+                <li key={i} style={{ fontSize: "13.5px", color: "var(--text-secondary)", lineHeight: 1.4 }}>{s}</li>
+              ))}
+            </ol>
+
+            {err && <div style={{ marginBottom: "14px", padding: "10px 12px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "13px" }}>{err}</div>}
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "20px" }}>
+              {alreadyEnrolled ? (
+                <button onClick={unmarkEnrolled} disabled={saving} style={{ padding: "8px 16px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: saving ? "not-allowed" : "pointer", fontSize: "13.5px", fontWeight: 600 }}>
+                  {saving ? "..." : "Undo (Mark as Not Enrolled)"}
+                </button>
+              ) : (
+                <button onClick={markEnrolled} disabled={saving} style={{ padding: "8px 18px", borderRadius: "var(--radius-sm)", background: "var(--green-bg)", border: "1px solid rgba(74,222,128,0.3)", color: "var(--green)", cursor: saving ? "not-allowed" : "pointer", fontSize: "13.5px", fontWeight: 700, display: "flex", alignItems: "center", gap: "6px" }}>
+                  <FaCheck style={{ fontSize: "11px" }} /> {saving ? "Saving..." : "Mark as Enrolled"}
+                </button>
+              )}
+            </div>
+            
+            <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "16px", marginBottom: 0, textAlign: "center" }}>
+              💡 Yeh apne aap bhi ho jayega jab member pehli baar device pe punch karega.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 // ─── Mobile Member Card ────────────────────────────────────────────────────────
-const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone, onEnroll, onEnrollGuide, enrolled }) => {
+const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone, onEnroll, enrolled }) => {
   const days = daysLeft(m.membership_end);
   const warn = days !== null && days <= 7 && days >= 0;
   return (
@@ -859,7 +883,6 @@ const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDele
         <button onClick={() => onViewBill(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", color: "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaFileInvoiceDollar style={{ fontSize: "11px" }} /> Bill</button>
         <button onClick={() => onNotify(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)", border: warn ? "1px solid rgba(245,158,11,0.35)" : "1px solid var(--border-default)", color: warn ? "#f59e0b" : "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}><FaEnvelope style={{ fontSize: "11px" }} /> Notify</button>
         <button onClick={() => onEnroll(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: enrolled ? "var(--green-bg)" : "rgba(96,165,250,0.08)", border: enrolled ? "1px solid rgba(74,222,128,0.3)" : "1px solid rgba(96,165,250,0.25)", color: enrolled ? "var(--green)" : "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaFingerprint style={{ fontSize: "11px" }} /> {enrolled ? "Enrolled" : "Enroll Finger"}</button>
-        <button onClick={() => onEnrollGuide(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>📋 Guide</button>
         <button onClick={() => onDelete(m.id)} style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center" }}><FaTrash style={{ fontSize: "11px" }} /></button>
       </div>
     </div>
@@ -924,7 +947,6 @@ export default function Members({ onLogout }) {
   const [profileMember, setProfileMember] = useState(null);
   const [enrollMember, setEnrollMember] = useState(null);
   const [enrolledIds, setEnrolledIds] = useState(new Set());
-  const [enrollGuideMember, setEnrollGuideMember] = useState(null); // Enrollment Assistant modal
   const [enrollFilter, setEnrollFilter] = useState("all"); // "all" | "enrolled" | "not_enrolled"
   const [renewMember, setRenewMember] = useState(null);
   const [viewBillMember, setViewBillMember] = useState(null);
@@ -1269,10 +1291,6 @@ export default function Members({ onLogout }) {
                               style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: enrolledIds.has(m.id) ? "var(--green-bg)" : "rgba(96,165,250,0.08)", border: enrolledIds.has(m.id) ? "1px solid rgba(74,222,128,0.3)" : "1px solid rgba(96,165,250,0.25)", color: enrolledIds.has(m.id) ? "var(--green)" : "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, transition: "all 0.15s" }}>
                               <FaFingerprint style={{ fontSize: "11px" }} /> {enrolledIds.has(m.id) ? "Enrolled" : "Enroll Finger"}
                             </button>
-                            <button onClick={() => setEnrollGuideMember(m)} title="Enrollment Guide"
-                              style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>
-                              📋 Guide
-                            </button>
                             <button onClick={() => setDeleteId(m.id)} title="Delete"
                               style={{ padding: "5px 8px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", transition: "all 0.15s" }}
                               onMouseEnter={e => { e.currentTarget.style.background = "var(--red-bg)"; e.currentTarget.style.borderColor = "rgba(248,113,113,0.4)"; e.currentTarget.style.color = "var(--red)"; }}
@@ -1311,7 +1329,6 @@ export default function Members({ onLogout }) {
                   onViewBill={setViewBillMember}
                   onNotify={setNotifyMember} onDelete={setDeleteId}
                   onEnroll={setEnrollMember} enrolled={enrolledIds.has(m.id)}
-                  onEnrollGuide={setEnrollGuideMember}
                   dueInfo={dueMap[m.id]} onMarkPaid={markDuePaid}
                   phoneVisible={phoneVisible}
                   onTogglePhone={(id) => setPhoneVisible(prev => ({ ...prev, [id]: !prev[id] }))}
@@ -1341,17 +1358,9 @@ export default function Members({ onLogout }) {
       {enrollMember && (
         <EnrollFingerprintModal
           member={enrollMember}
+          alreadyEnrolled={enrolledIds.has(enrollMember.id)}
           onClose={() => setEnrollMember(null)}
-          onEnrolled={(id) => setEnrolledIds(prev => new Set(prev).add(id))}
-        />
-      )}
-
-      {enrollGuideMember && (
-        <EnrollmentGuideModal
-          member={enrollGuideMember}
-          alreadyEnrolled={enrolledIds.has(enrollGuideMember.id)}
-          onClose={() => setEnrollGuideMember(null)}
-          onMarked={(id, unmarked) => {
+          onEnrolled={(id, unmarked) => {
             setEnrolledIds(prev => {
               const next = new Set(prev);
               if (unmarked) next.delete(id); else next.add(id);

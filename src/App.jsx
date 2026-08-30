@@ -12,7 +12,6 @@ import Reports         from "./pages/Reports";
 import Profile         from "./pages/Profile";
 import MembershipPlans from "./pages/MembershipPlans";
 import Inquiries       from "./pages/Inquiries";
-import InquiryForm     from "./pages/InquiryForm";
 import NotFound        from "./pages/NotFound";
 
 function App() {
@@ -37,7 +36,6 @@ function App() {
         <Routes>
 
           {/* ✅ PUBLIC ROUTES — login ke bina accessible */}
-          <Route path="/inquiry" element={<InquiryForm />} />
           <Route path="/login"   element={
             isLoggedIn ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />
           } />

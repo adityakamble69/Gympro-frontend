@@ -76,15 +76,25 @@ function ConvertToMemberModal({ inquiry, onClose, onConverted }) {
   const [loading,    setLoading]    = useState(true);
 
   useEffect(() => {
+    // 1. Fetch active plans
     api.get("/membership-plans?status=active")
       .then(r => {
         const list = r.data.data || [];
         setPlans(list);
-        // Auto-select first plan matching inquiry interest
         const match = list.find(p =>
           inquiry.membership_interest && p.duration_type === inquiry.membership_interest
         );
         if (match) setSelPlan(match);
+      })
+      .catch(() => {});
+
+    // 2. Fetch full inquiry details (including aadhar_card)
+    api.get(`/inquiries/${inquiry.id}`)
+      .then(res => {
+        if (res.data.success) {
+          inquiry.aadhar_card = res.data.data.aadhar_card;
+          inquiry.photo = res.data.data.photo;
+        }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -671,10 +681,6 @@ export default function Inquiries({ onLogout }) {
               People interested in joining your gym
             </p>
           </div>
-          <a href={`${window.location.origin}/inquiry`} target="_blank" rel="noreferrer"
-            style={{ display:"flex", alignItems:"center", gap:"6px", padding:"8px 14px", borderRadius:"var(--radius-sm)", background:"var(--bg-elevated)", border:"1px solid var(--border-default)", color:"var(--text-secondary)", textDecoration:"none", fontSize: "13px", fontWeight:600, whiteSpace:"nowrap" }}>
-            <FaExternalLinkAlt style={{ fontSize: "11px" }} /> View Public Form
-          </a>
         </div>
 
         {/* Stats Strip */}
