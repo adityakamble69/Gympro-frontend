@@ -1,16 +1,56 @@
-# React + Vite
+# Gym Management System - Admin Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the front-end dashboard for the Gym Management System, built with **Vite**, **React**, and styled with custom themes. It provides admin control over members, payments, check-ins, reports, notifications, and settings.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📂 Project Structure
 
-## React Compiler
+```text
+frontend/
+├── src/
+│   ├── components/       # Shared UI components (Sidebar, Badges, etc.)
+│   ├── hooks/            # Custom React hooks (useAuth)
+│   ├── pages/            # View pages (Dashboard, Members, Payments, Reports, etc.)
+│   ├── services/         # API instance wrapper (axios configured with auth headers)
+│   ├── styles/           # Styling files
+│   ├── App.jsx           # Routing structure and private route wrappers
+│   └── main.jsx          # React app mounting point
+├── vite.config.js        # Vite bundler configurations
+└── .env                  # API connection variables (Git-ignored)
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## ⚙️ Environment Configuration (`.env`)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Create a `.env` file in the root of the `frontend/` directory:
+
+```env
+# Local Backend URL (default PORT is 8080)
+VITE_API_URL=http://localhost:8080/api
+```
+
+---
+
+## 🚀 How to Run Local Dashboard
+
+### 1. Install Dependencies
+Make sure you are inside the `frontend` folder, then run:
+```bash
+npm install
+```
+
+### 2. Start Dev Server
+To start the React development server:
+```bash
+npm run dev
+```
+*(Vite will spin up the server, typically on `http://localhost:5173` or another port displayed in the console).*
+
+### 3. Build for Production
+To generate a static build bundle for Vercel/Netlify hosting:
+```bash
+npm run build
+```
+*(The optimized compiled build will be generated in the `dist/` directory).*
