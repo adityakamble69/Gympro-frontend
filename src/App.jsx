@@ -3,8 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import { prefetchDashboard } from "./services/prefetch";
 
-const Dashboard       = lazy(() => import("./pages/Dashboard"));
-const Members         = lazy(() => import("./pages/Members"));
+const Dashboard             = lazy(() => import("./pages/Dashboard"));
+const ReceptionistDashboard = lazy(() => import("./pages/ReceptionistDashboard"));
+const Members               = lazy(() => import("./pages/Members"));
 const Attendance      = lazy(() => import("./pages/Attendance"));
 const Trainers        = lazy(() => import("./pages/Trainers"));
 const Payments        = lazy(() => import("./pages/Payments"));
@@ -46,6 +47,9 @@ function App() {
     setIsLoggedIn(false);
   };
 
+  const admin = JSON.parse(localStorage.getItem("gym_admin") || "{}");
+  const isReceptionist = admin.role === "receptionist";
+
   return (
     <BrowserRouter>
       <Suspense fallback={<RouteFallback />}>
@@ -57,17 +61,19 @@ function App() {
           {isLoggedIn ? (
             <>
               <Route path="/"                 element={<Navigate to="/dashboard" />} />
-              <Route path="/dashboard"        element={<Dashboard       onLogout={handleLogout} />} />
+              <Route path="/dashboard"        element={isReceptionist ? <ReceptionistDashboard onLogout={handleLogout} /> : <Dashboard onLogout={handleLogout} />} />
               <Route path="/members"          element={<Members         onLogout={handleLogout} />} />
               <Route path="/attendance"       element={<Attendance      onLogout={handleLogout} />} />
-              <Route path="/trainers"         element={<Trainers        onLogout={handleLogout} />} />
               <Route path="/payments"         element={<Payments        onLogout={handleLogout} />} />
               <Route path="/membership-plans" element={<MembershipPlans onLogout={handleLogout} />} />
-              <Route path="/equipment"        element={<Equipment       onLogout={handleLogout} />} />
               <Route path="/notifications"    element={<Notifications   onLogout={handleLogout} />} />
-              <Route path="/reports"          element={<Reports         onLogout={handleLogout} />} />
               <Route path="/profile"          element={<Profile         onLogout={handleLogout} />} />
               <Route path="/inquiries"        element={<Inquiries       onLogout={handleLogout} />} />
+
+              {/* Admin-only routes guarded from receptionist */}
+              <Route path="/trainers"         element={isReceptionist ? <Navigate to="/dashboard" replace /> : <Trainers onLogout={handleLogout} />} />
+              <Route path="/equipment"        element={isReceptionist ? <Navigate to="/dashboard" replace /> : <Equipment onLogout={handleLogout} />} />
+              <Route path="/reports"          element={isReceptionist ? <Navigate to="/dashboard" replace /> : <Reports onLogout={handleLogout} />} />
             </>
           ) : null}
 

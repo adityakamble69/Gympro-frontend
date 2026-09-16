@@ -27,9 +27,24 @@ export default function Sidebar({ onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
   const admin    = JSON.parse(localStorage.getItem("gym_admin") || "{}");
-  const initials = admin.name?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() || "A";
+  const isReceptionist = admin.role === "receptionist";
+  const initials = admin.name?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() || (isReceptionist ? "R" : "A");
   const [newInquiries, setNewInquiries] = useState(inquiryCountCache.count);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navItems = NAV.filter(item => {
+    if (isReceptionist) {
+      if (item.path === "/reports" || item.path === "/equipment" || item.path === "/trainers") {
+        return false;
+      }
+    }
+    return true;
+  }).map(item => {
+    if (isReceptionist && item.path === "/dashboard") {
+      return { ...item, label: "Front Desk" };
+    }
+    return item;
+  });
 
   useEffect(() => {
     fetchInquiryCount();
@@ -133,7 +148,7 @@ export default function Sidebar({ onLogout }) {
           letterSpacing: "0.12em", padding: "8px 10px 6px", marginBottom: "4px"
         }}>Navigation</p>
 
-        {NAV.map(({ icon: Icon, label, path, badge }) => {
+        {navItems.map(({ icon: Icon, label, path, badge }) => {
           const active    = location.pathname === path;
           const showBadge = badge && newInquiries > 0;
           return (

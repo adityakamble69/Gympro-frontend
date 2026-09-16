@@ -3,7 +3,8 @@ import Sidebar from "../components/Sidebar";
 import api from "../services/api";
 import {
   FaUser, FaEnvelope, FaLock, FaEdit, FaCheck,
-  FaTimes, FaShieldAlt, FaCalendarAlt, FaEye, FaEyeSlash
+  FaTimes, FaShieldAlt, FaCalendarAlt, FaEye, FaEyeSlash,
+  FaUserPlus, FaTrash, FaKey, FaUsers
 } from "react-icons/fa";
 
 // ── Small helper ──────────────────────────────────────────────────────────────
@@ -85,6 +86,16 @@ export default function Profile({ onLogout }) {
   const [pwdSaving, setPwdSaving] = useState(false);
   const [pwdMsg,    setPwdMsg]    = useState({ text: "", type: "" });
 
+  // Staff Management (Super Admin only)
+  const [staffList, setStaffList] = useState([]);
+  const [loadingStaff, setLoadingStaff] = useState(false);
+  const [showAddStaffModal, setShowAddStaffModal] = useState(false);
+  const [resetStaffTarget, setResetStaffTarget] = useState(null);
+  const [newStaff, setNewStaff] = useState({ full_name: "", email: "", password: "", role: "receptionist" });
+  const [resetPwdValue, setResetPwdValue] = useState("");
+  const [staffMsg, setStaffMsg] = useState({ text: "", type: "" });
+  const [staffSaving, setStaffSaving] = useState(false);
+
   useEffect(() => { fetchProfile(); }, []);
 
   const fetchProfile = async () => {
@@ -93,8 +104,76 @@ export default function Profile({ onLogout }) {
       setProfile(res.data.data);
       setFullName(res.data.data.full_name);
       setEmail(res.data.data.email);
+      if (res.data.data.role === "super_admin") {
+        fetchStaff();
+      }
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
+  };
+
+  const fetchStaff = async () => {
+    setLoadingStaff(true);
+    try {
+      const res = await api.get("/profile/staff");
+      setStaffList(res.data.data || []);
+    } catch (e) {
+      console.error("Fetch staff error:", e);
+    } finally {
+      setLoadingStaff(false);
+    }
+  };
+
+  const handleAddStaff = async (e) => {
+    e.preventDefault();
+    if (!newStaff.full_name || !newStaff.email || !newStaff.password) {
+      setStaffMsg({ text: "All fields required", type: "error" });
+      return;
+    }
+    setStaffSaving(true);
+    setStaffMsg({ text: "", type: "" });
+    try {
+      await api.post("/profile/staff", newStaff);
+      setStaffMsg({ text: "Staff account created successfully!", type: "success" });
+      setShowAddStaffModal(false);
+      setNewStaff({ full_name: "", email: "", password: "", role: "receptionist" });
+      fetchStaff();
+      setTimeout(() => setStaffMsg({ text: "", type: "" }), 4000);
+    } catch (err) {
+      setStaffMsg({ text: err.response?.data?.message || "Failed to create staff account", type: "error" });
+    } finally {
+      setStaffSaving(false);
+    }
+  };
+
+  const handleResetStaffPassword = async () => {
+    if (!resetPwdValue || resetPwdValue.length < 6) {
+      setStaffMsg({ text: "Password must be at least 6 characters", type: "error" });
+      return;
+    }
+    setStaffSaving(true);
+    try {
+      await api.put(`/profile/staff/${resetStaffTarget.id}/password`, { new_password: resetPwdValue });
+      setStaffMsg({ text: `Password changed for ${resetStaffTarget.full_name}`, type: "success" });
+      setResetStaffTarget(null);
+      setResetPwdValue("");
+      setTimeout(() => setStaffMsg({ text: "", type: "" }), 4000);
+    } catch (err) {
+      setStaffMsg({ text: err.response?.data?.message || "Failed to reset password", type: "error" });
+    } finally {
+      setStaffSaving(false);
+    }
+  };
+
+  const handleDeleteStaff = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete staff account for ${name}?`)) return;
+    try {
+      await api.delete(`/profile/staff/${id}`);
+      setStaffMsg({ text: `Staff ${name} deleted successfully`, type: "success" });
+      fetchStaff();
+      setTimeout(() => setStaffMsg({ text: "", type: "" }), 4000);
+    } catch (err) {
+      setStaffMsg({ text: err.response?.data?.message || "Failed to delete staff", type: "error" });
+    }
   };
 
   const handleSaveProfile = async () => {
@@ -416,8 +495,237 @@ export default function Profile({ onLogout }) {
               </button>
             </div>
           </div>
+
+          {/* ── Super Admin: Staff & Receptionists Section ── */}
+          {profile?.role === "super_admin" && (
+            <div style={{
+              marginTop: "24px", background: "var(--bg-surface)", border: "1px solid var(--border-subtle)",
+              borderRadius: "var(--radius-lg)", padding: "24px"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
+                <div>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: "17px", fontWeight: 700, color: "var(--text-primary)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <FaUsers style={{ color: "var(--blue)" }} /> Staff & Reception Accounts
+                  </h3>
+                  <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "3px" }}>
+                    Manage login credentials for front-desk receptionists and staff
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setShowAddStaffModal(true)}
+                  style={{
+                    padding: "8px 16px", borderRadius: "var(--radius-sm)",
+                    background: "var(--text-primary)", color: "#0a0a0a", border: "none",
+                    fontWeight: 700, fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px"
+                  }}
+                >
+                  <FaUserPlus /> + Add Receptionist
+                </button>
+              </div>
+
+              <Alert msg={staffMsg.text} type={staffMsg.type} />
+
+              {loadingStaff ? (
+                <div style={{ padding: "20px", textAlign: "center", color: "var(--text-muted)", fontSize: "13px" }}>Loading staff accounts...</div>
+              ) : staffList.length === 0 ? (
+                <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)", fontSize: "13.5px", background: "var(--bg-elevated)", borderRadius: "var(--radius-sm)" }}>
+                  No receptionist accounts created yet. Click "+ Add Receptionist" above to create one.
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {staffList.map(s => (
+                    <div
+                      key={s.id}
+                      style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        padding: "12px 16px", borderRadius: "var(--radius-sm)",
+                        background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
+                        flexWrap: "wrap", gap: "10px"
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <span style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "14.5px" }}>{s.full_name}</span>
+                          <span style={{
+                            fontSize: "11px", fontWeight: 700, padding: "2px 8px", borderRadius: "99px",
+                            background: "rgba(96,165,250,0.12)", color: "var(--blue)", textTransform: "capitalize"
+                          }}>
+                            {s.role}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: "12.5px", color: "var(--text-muted)", marginTop: "2px" }}>
+                          {s.email} • Created {fmtDate(s.created_at)}
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <button
+                          onClick={() => { setResetStaffTarget(s); setResetPwdValue(""); }}
+                          style={{
+                            padding: "6px 12px", borderRadius: "var(--radius-sm)",
+                            background: "var(--bg-surface)", border: "1px solid var(--border-default)",
+                            color: "var(--text-secondary)", fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px"
+                          }}
+                        >
+                          <FaKey style={{ fontSize: "10px" }} /> Reset Password
+                        </button>
+                        <button
+                          onClick={() => handleDeleteStaff(s.id, s.full_name)}
+                          style={{
+                            padding: "6px 10px", borderRadius: "var(--radius-sm)",
+                            background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)",
+                            color: "var(--red)", fontSize: "12px", cursor: "pointer"
+                          }}
+                          title="Delete staff"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
         </div>
       </main>
+
+      {/* ── MODAL: Add New Staff ── */}
+      {showAddStaffModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200, padding: "16px" }}
+          onClick={e => { if (e.target === e.currentTarget) setShowAddStaffModal(false); }}>
+          <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", width: "100%", maxWidth: "440px", padding: "24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 700, margin: 0, color: "var(--text-primary)" }}>
+                Add Receptionist Account
+              </h2>
+              <button onClick={() => setShowAddStaffModal(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: "16px" }}><FaTimes /></button>
+            </div>
+
+            <form onSubmit={handleAddStaff}>
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", display: "block", marginBottom: "4px" }}>Staff Full Name *</label>
+                <input
+                  autoFocus
+                  required
+                  value={newStaff.full_name}
+                  onChange={e => setNewStaff(s => ({ ...s, full_name: e.target.value }))}
+                  placeholder="e.g. Pooja Sharma"
+                  style={{ width: "100%", padding: "9px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", display: "block", marginBottom: "4px" }}>Login Email *</label>
+                <input
+                  required
+                  type="email"
+                  value={newStaff.email}
+                  onChange={e => setNewStaff(s => ({ ...s, email: e.target.value }))}
+                  placeholder="reception@gym.com"
+                  style={{ width: "100%", padding: "9px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", display: "block", marginBottom: "4px" }}>Password * (min 6 chars)</label>
+                <input
+                  required
+                  type="password"
+                  value={newStaff.password}
+                  onChange={e => setNewStaff(s => ({ ...s, password: e.target.value }))}
+                  placeholder="Enter password"
+                  style={{ width: "100%", padding: "9px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", display: "block", marginBottom: "4px" }}>Assigned Role</label>
+                <select
+                  value={newStaff.role}
+                  onChange={e => setNewStaff(s => ({ ...s, role: e.target.value }))}
+                  style={{ width: "100%", padding: "9px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
+                >
+                  <option value="receptionist">Receptionist (Front-Desk Desk Access Only)</option>
+                  <option value="super_admin">Super Admin (Full Financial & System Access)</option>
+                </select>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddStaffModal(false)}
+                  style={{ padding: "8px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={staffSaving}
+                  style={{
+                    padding: "8px 18px", borderRadius: "var(--radius-sm)", background: "var(--text-primary)",
+                    color: "#0a0a0a", border: "none", fontWeight: 700, cursor: staffSaving ? "not-allowed" : "pointer"
+                  }}
+                >
+                  {staffSaving ? "Creating..." : "Create Account"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: Reset Staff Password ── */}
+      {resetStaffTarget && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200, padding: "16px" }}
+          onClick={e => { if (e.target === e.currentTarget) setResetStaffTarget(null); }}>
+          <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xl)", width: "100%", maxWidth: "400px", padding: "24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "18px", fontWeight: 700, margin: 0, color: "var(--text-primary)" }}>
+                Reset Password
+              </h2>
+              <button onClick={() => setResetStaffTarget(null)} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: "16px" }}><FaTimes /></button>
+            </div>
+
+            <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "14px" }}>
+              Set a new password for <strong style={{ color: "var(--text-primary)" }}>{resetStaffTarget.full_name}</strong> ({resetStaffTarget.email}):
+            </p>
+
+            <input
+              autoFocus
+              type="password"
+              value={resetPwdValue}
+              onChange={e => setResetPwdValue(e.target.value)}
+              placeholder="Enter new password (min 6 chars)"
+              style={{ width: "100%", padding: "9px 12px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)", fontSize: "14px", outline: "none", boxSizing: "border-box", marginBottom: "16px" }}
+            />
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+              <button
+                type="button"
+                onClick={() => setResetStaffTarget(null)}
+                style={{ padding: "8px 14px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleResetStaffPassword}
+                disabled={staffSaving || resetPwdValue.length < 6}
+                style={{
+                  padding: "8px 18px", borderRadius: "var(--radius-sm)", background: "var(--text-primary)",
+                  color: "#0a0a0a", border: "none", fontWeight: 700, cursor: (staffSaving || resetPwdValue.length < 6) ? "not-allowed" : "pointer"
+                }}
+              >
+                {staffSaving ? "Saving..." : "Update Password"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
-}
+}

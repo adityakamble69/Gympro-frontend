@@ -1075,7 +1075,7 @@ function EnrollFingerprintModal({ member, alreadyEnrolled, onClose, onEnrolled }
 }
 
 // ─── Mobile Member Card ────────────────────────────────────────────────────────
-const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone, onEnroll, enrolled }) => {
+const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDelete, dueInfo, onMarkPaid, phoneVisible, onTogglePhone, onEnroll, enrolled, isSuperAdmin }) => {
   const days = daysLeft(m.membership_end);
   const warn = days !== null && days <= 7 && days >= 0;
   return (
@@ -1125,7 +1125,9 @@ const MemberCard = ({ m, plans, onProfile, onRenew, onViewBill, onNotify, onDele
         <button onClick={() => onViewBill(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", color: "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaFileInvoiceDollar style={{ fontSize: "11px" }} /> Bill</button>
         <button onClick={() => onNotify(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: warn ? "rgba(245,158,11,0.1)" : "var(--bg-elevated)", border: warn ? "1px solid rgba(245,158,11,0.35)" : "1px solid var(--border-default)", color: warn ? "#f59e0b" : "var(--text-secondary)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}><FaEnvelope style={{ fontSize: "11px" }} /> Notify</button>
         <button onClick={() => onEnroll(m)} style={{ padding: "5px 10px", borderRadius: "var(--radius-sm)", background: enrolled ? "var(--green-bg)" : "rgba(96,165,250,0.08)", border: enrolled ? "1px solid rgba(74,222,128,0.3)" : "1px solid rgba(96,165,250,0.25)", color: enrolled ? "var(--green)" : "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}><FaFingerprint style={{ fontSize: "11px" }} /> {enrolled ? "Enrolled" : "Enroll Finger"}</button>
-        <button onClick={() => onDelete(m.id)} style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center" }}><FaTrash style={{ fontSize: "11px" }} /></button>
+        {isSuperAdmin && (
+          <button onClick={() => onDelete(m.id)} style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center" }}><FaTrash style={{ fontSize: "11px" }} /></button>
+        )}
       </div>
     </div>
   );
@@ -1196,6 +1198,11 @@ export default function Members({ onLogout }) {
   const [deleteId, setDeleteId] = useState(null);
   const [phoneVisible, setPhoneVisible] = useState({});
   const [dueMap, setDueMap] = useState({});
+
+  const currentAdmin = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem("gym_admin") || "{}"); } catch { return {}; }
+  }, []);
+  const isSuperAdmin = currentAdmin.role === "super_admin";
 
   const mainRef = useRef(null);
   const sentinelRef = useRef(null);
@@ -1535,12 +1542,14 @@ export default function Members({ onLogout }) {
                               style={{ padding: "5px 9px", borderRadius: "var(--radius-sm)", background: enrolledIds.has(m.id) ? "var(--green-bg)" : "rgba(96,165,250,0.08)", border: enrolledIds.has(m.id) ? "1px solid rgba(74,222,128,0.3)" : "1px solid rgba(96,165,250,0.25)", color: enrolledIds.has(m.id) ? "var(--green)" : "var(--blue)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600, transition: "all 0.15s" }}>
                               <FaFingerprint style={{ fontSize: "11px" }} /> {enrolledIds.has(m.id) ? "Enrolled" : "Enroll Finger"}
                             </button>
-                            <button onClick={() => setDeleteId(m.id)} title="Delete"
-                              style={{ padding: "5px 8px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", transition: "all 0.15s" }}
-                              onMouseEnter={e => { e.currentTarget.style.background = "var(--red-bg)"; e.currentTarget.style.borderColor = "rgba(248,113,113,0.4)"; e.currentTarget.style.color = "var(--red)"; }}
-                              onMouseLeave={e => { e.currentTarget.style.background = "var(--bg-elevated)"; e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-muted)"; }}>
-                              <FaTrash style={{ fontSize: "11px" }} />
-                            </button>
+                            {isSuperAdmin && (
+                              <button onClick={() => setDeleteId(m.id)} title="Delete"
+                                style={{ padding: "5px 8px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-muted)", cursor: "pointer", fontSize: "12px", display: "flex", alignItems: "center", transition: "all 0.15s" }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "var(--red-bg)"; e.currentTarget.style.borderColor = "rgba(248,113,113,0.4)"; e.currentTarget.style.color = "var(--red)"; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "var(--bg-elevated)"; e.currentTarget.style.borderColor = "var(--border-default)"; e.currentTarget.style.color = "var(--text-muted)"; }}>
+                                <FaTrash style={{ fontSize: "11px" }} />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -1576,6 +1585,7 @@ export default function Members({ onLogout }) {
                   dueInfo={dueMap[m.id]} onMarkPaid={markDuePaid}
                   phoneVisible={phoneVisible}
                   onTogglePhone={(id) => setPhoneVisible(prev => ({ ...prev, [id]: !prev[id] }))}
+                  isSuperAdmin={isSuperAdmin}
                 />
               ))
             )}
