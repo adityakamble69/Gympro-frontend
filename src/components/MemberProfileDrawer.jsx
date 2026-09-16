@@ -1,13 +1,14 @@
 // components/MemberProfileDrawer.jsx
 // Usage: <MemberProfileDrawer member={selectedMember} onClose={() => setSelected(null)} onEdit={(m) => openEdit(m)} />
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   FaTimes, FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt,
   FaBirthdayCake, FaVenusMars, FaCalendarAlt, FaHistory,
   FaEdit, FaMoneyBill, FaClipboardCheck, FaChevronDown,
   FaChevronUp, FaCrown, FaRupeeSign, FaIdCard, FaLayerGroup,
-  FaWallet, FaRunning, FaCheck, FaExclamationTriangle
+  FaWallet, FaRunning, FaCheck, FaExclamationTriangle,
+  FaChevronLeft, FaChevronRight
 } from "react-icons/fa";
 import api from "../services/api";
 
@@ -519,138 +520,532 @@ function TabPayments({ payments, loading, onRefresh }) {
   );
 }
 
-// ── Attendance Heatmap (GitHub-style) ──────────────────────────────────────────
-const HM_CELL = 11;
-const HM_GAP  = 3;
-const HM_DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
-
-function AttendanceHeatmap({ attendance, membershipEnd }) {
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 600;
-  const HEATMAP_WEEKS = isMobile ? 13 : 26; // 3 months on mobile, 6 on desktop
-  const toLocalDate = (d) => {
-    const dt = new Date(d);
-    const y = dt.getFullYear();
-    const m = String(dt.getMonth() + 1).padStart(2, "0");
-    const day = String(dt.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
+// ── Interactive Attendance Calendar ───────────────────────────────────────────
+function AttendanceCalendar({ attendance, membershipEnd, member }) {
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+  
+  // Format helpers
+  const toDateStr = (y, m, d) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  const toLocalDate = (dateVal) => {
+    if (!dateVal) return "";
+    const dt = new Date(dateVal);
+    if (isNaN(dt.getTime())) return "";
+    return toDateStr(dt.getFullYear(), dt.getMonth(), dt.getDate());
   };
-
-  const attendedDates = new Set(
-    attendance.map(a => toLocalDate(a.date))
-  );
-
-  const [selectedDay, setSelectedDay] = useState(null);
 
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const todayStr = toDateStr(today.getFullYear(), today.getMonth(), today.getDate());
 
-  const totalDays = HEATMAP_WEEKS * 7;
-  const start = new Date(today);
-  start.setDate(start.getDate() - (totalDays - 1));
-  start.setDate(start.getDate() - start.getDay()); // back to Sunday
+  const [selectedDateStr, setSelectedDateStr] = useState(todayStr);
 
-  const weeks = [];
-  const monthLabels = [];
-  const cursor = new Date(start);
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth(); // 0 - 11
 
-  for (let w = 0; w < HEATMAP_WEEKS; w++) {
-    const days = [];
-    let monthLabel = null;
-    for (let d = 0; d < 7; d++) {
-      const dateStr  = toLocalDate(cursor);
-      const isFuture = cursor > today;
-      const attended = attendedDates.has(dateStr);
-      const isAfterExpiry = membershipEnd && cursor > membershipEnd;
-      let status = "none";
-      if (attended) status = isAfterExpiry ? "expired" : "active";
-      if (cursor.getDate() === 1) monthLabel = cursor.toLocaleDateString("en-IN", { month: "short" });
-      days.push({ date: new Date(cursor), dateStr, status, isFuture });
-      cursor.setDate(cursor.getDate() + 1);
+  // Map of attendance by dateStr (YYYY-MM-DD)
+  const attendanceMap = useMemo(() => {
+    const map = new Map();
+    (attendance || []).forEach(a => {
+      const dStr = toLocalDate(a.date);
+      if (dStr) map.set(dStr, a);
+    });
+    return map;
+  }, [attendance]);
+
+  // Navigation
+  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+  const goToToday = () => {
+    const now = new Date();
+    setCurrentDate(new Date(now.getFullYear(), now.getMonth(), 1));
+    setSelectedDateStr(todayStr);
+  };
+
+  // Days in month & first day index (0=Sun, 1=Mon, ..., 6=Sat)
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDayIndex = new Date(year, month, 1).getDay();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+  // Generate calendar grid cells (complete weeks)
+  const calendarCells = useMemo(() => {
+    const cells = [];
+
+    // 1. Previous month trailing days
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      const d = daysInPrevMonth - i;
+      const prevM = month === 0 ? 11 : month - 1;
+      const prevY = month === 0 ? year - 1 : year;
+      const dateStr = toDateStr(prevY, prevM, d);
+      const dateObj = new Date(prevY, prevM, d);
+      cells.push({
+        dayNum: d,
+        dateStr,
+        dateObj,
+        isCurrentMonth: false,
+        isFuture: dateObj > todayMidnight,
+        isToday: dateStr === todayStr,
+        record: attendanceMap.get(dateStr)
+      });
     }
-    weeks.push(days);
-    monthLabels.push(monthLabel);
-  }
 
-  const colorFor = (status, isFuture) => {
-    if (isFuture)             return "transparent";
-    if (status === "active")  return "var(--green)";
-    if (status === "expired") return "var(--red)";
-    return "var(--bg-surface)";
+    // 2. Current month days
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = toDateStr(year, month, d);
+      const dateObj = new Date(year, month, d);
+      cells.push({
+        dayNum: d,
+        dateStr,
+        dateObj,
+        isCurrentMonth: true,
+        isFuture: dateObj > todayMidnight,
+        isToday: dateStr === todayStr,
+        record: attendanceMap.get(dateStr)
+      });
+    }
+
+    // 3. Next month leading days (to complete 7-day grid rows)
+    const totalCurrentCells = cells.length;
+    const remainingCells = totalCurrentCells % 7 === 0 ? 0 : 7 - (totalCurrentCells % 7);
+    for (let d = 1; d <= remainingCells; d++) {
+      const nextM = month === 11 ? 0 : month + 1;
+      const nextY = month === 11 ? year + 1 : year;
+      const dateStr = toDateStr(nextY, nextM, d);
+      const dateObj = new Date(nextY, nextM, d);
+      cells.push({
+        dayNum: d,
+        dateStr,
+        dateObj,
+        isCurrentMonth: false,
+        isFuture: dateObj > todayMidnight,
+        isToday: dateStr === todayStr,
+        record: attendanceMap.get(dateStr)
+      });
+    }
+
+    return cells;
+  }, [year, month, daysInMonth, firstDayIndex, daysInPrevMonth, todayStr, attendanceMap]);
+
+  // Monthly stats for the current view
+  const monthStats = useMemo(() => {
+    let presents = 0;
+    let absents = 0;
+    let expiredVisits = 0;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = toDateStr(year, month, d);
+      const dateObj = new Date(year, month, d);
+      const isPastOrToday = dateObj <= todayMidnight;
+      const rec = attendanceMap.get(dateStr);
+
+      if (rec) {
+        presents++;
+        if (membershipEnd && dateObj > membershipEnd) {
+          expiredVisits++;
+        }
+      } else if (isPastOrToday) {
+        absents++;
+      }
+    }
+
+    const totalTrackedDays = presents + absents;
+    const rate = totalTrackedDays > 0 ? Math.round((presents / totalTrackedDays) * 100) : 0;
+    return { presents, absents, expiredVisits, rate };
+  }, [year, month, daysInMonth, attendanceMap, membershipEnd, todayMidnight]);
+
+  // Format time helper (e.g. 07:15 AM)
+  const formatTime = (ts) => {
+    if (!ts) return null;
+    try {
+      const dt = new Date(ts);
+      if (!isNaN(dt.getTime())) {
+        return dt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+      }
+      if (typeof ts === "string" && ts.includes(":")) {
+        const parts = ts.split(":");
+        let h = parseInt(parts[0], 10);
+        const m = parts[1];
+        const ampm = h >= 12 ? "PM" : "AM";
+        h = h % 12 || 12;
+        return `${String(h).padStart(2, "0")}:${m} ${ampm}`;
+      }
+      return String(ts);
+    } catch {
+      return String(ts);
+    }
   };
 
-  const STATUS_INFO = {
-    active:  { text: "Visited",               color: "var(--green)",      bg: "var(--green-bg)" },
-    expired: { text: "Visited (after expiry)", color: "var(--red)",        bg: "var(--red-bg)" },
-    none:    { text: "Absent",                 color: "var(--text-muted)", bg: "rgba(80,80,80,0.12)" },
+  // Selected cell
+  const selectedCell = calendarCells.find(c => c.dateStr === selectedDateStr) || {
+    dateStr: selectedDateStr,
+    dateObj: new Date(selectedDateStr),
+    record: attendanceMap.get(selectedDateStr),
+    isFuture: new Date(selectedDateStr) > todayMidnight,
+    isToday: selectedDateStr === todayStr,
+    isCurrentMonth: true
   };
-  const selInfo = selectedDay ? STATUS_INFO[selectedDay.status] : null;
+
+  const isSelPresent = Boolean(selectedCell?.record);
+  const isSelAfterExpiry = isSelPresent && membershipEnd && selectedCell?.dateObj > membershipEnd;
+  const isSelAbsent = !isSelPresent && !selectedCell?.isFuture && selectedCell?.isCurrentMonth;
+
+  const monthName = currentDate.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
-    <div>
-      {/* Selected day info strip */}
+    <div style={{
+      background: "var(--bg-elevated)",
+      borderRadius: "var(--radius-sm)",
+      padding: "16px",
+      border: "1px solid var(--border-subtle)",
+      display: "flex",
+      flexDirection: "column",
+      gap: "14px"
+    }}>
+      {/* Calendar Header with Controls & Monthly Summary */}
       <div style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "8px 12px", borderRadius: "var(--radius-sm)", marginBottom: "10px",
-        background: "var(--bg-surface)", border: "1px solid var(--border-subtle)",
-        minHeight: "32px"
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: "10px",
+        paddingBottom: "12px",
+        borderBottom: "1px solid var(--border-subtle)"
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
-          <span style={{
-            width: "8px", height: "8px", borderRadius: "2px", flexShrink: 0,
-            background: selInfo ? selInfo.color : "var(--border-strong)"
-          }} />
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {selectedDay
-              ? selectedDay.date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
-              : "Tap a day to see details"}
-          </span>
-        </div>
-        {selInfo && (
-          <span style={{
-            fontSize: "11px", fontWeight: 700, padding: "2px 8px", borderRadius: "99px",
-            background: selInfo.bg, color: selInfo.color, flexShrink: 0
+        {/* Month Selector */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{
+            width: "34px", height: "34px", borderRadius: "var(--radius-sm)",
+            background: "var(--bg-surface)", border: "1px solid var(--border-default)",
+            display: "flex", alignItems: "center", justifyContent: "center", color: "var(--blue)"
           }}>
-            {selInfo.text}
-          </span>
-        )}
-      </div>
+            <FaCalendarAlt style={{ fontSize: "15px" }} />
+          </div>
+          <div>
+            <div style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "17px",
+              fontWeight: 800,
+              color: "var(--text-primary)",
+              letterSpacing: "0.02em"
+            }}>
+              {monthName}
+            </div>
+            <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "1px" }}>
+              Attendance Records Calendar
+            </div>
+          </div>
+        </div>
 
-      <div style={{ overflowX: "auto", paddingBottom: "4px" }}>
-        <div style={{ display: "inline-flex", gap: HM_GAP }}>
-          {/* Day-of-week labels */}
-          <div style={{ display: "flex", flexDirection: "column", gap: HM_GAP, marginRight: "2px", marginTop: "16px" }}>
-            {HM_DAY_LABELS.map((l, i) => (
-              <div key={i} style={{ height: HM_CELL, fontSize: "8px", lineHeight: `${HM_CELL}px`, color: "var(--text-muted)" }}>{l}</div>
-            ))}
+        {/* Navigation & Month summary pill */}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+          {/* Quick Summary Pill */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: "8px",
+            background: "var(--bg-surface)", border: "1px solid var(--border-default)",
+            borderRadius: "var(--radius-sm)", padding: "4px 10px"
+          }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--green)" }}>
+              {monthStats.presents} Present
+            </span>
+            <span style={{ fontSize: "11px", color: "var(--border-strong)" }}>•</span>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--red)" }}>
+              {monthStats.absents} Absent
+            </span>
+            <span style={{ fontSize: "11px", color: "var(--border-strong)" }}>•</span>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--blue)" }}>
+              {monthStats.rate}%
+            </span>
           </div>
 
-          {/* Week columns */}
-          {weeks.map((days, wi) => (
-            <div key={wi} style={{ display: "flex", flexDirection: "column", gap: HM_GAP }}>
-              <div style={{ height: "13px", fontSize: "9px", color: "var(--text-muted)", whiteSpace: "nowrap" }}>
-                {monthLabels[wi] || ""}
-              </div>
-              {days.map((day, di) => {
-                const isSelected = selectedDay && selectedDay.dateStr === day.dateStr;
-                return (
-                  <div
-                    key={di}
-                    onClick={() => !day.isFuture && setSelectedDay(day)}
-                    style={{
-                      width: HM_CELL, height: HM_CELL, borderRadius: "2px",
-                      background: colorFor(day.status, day.isFuture),
-                      border: isSelected
-                        ? "1.5px solid var(--text-primary)"
-                        : (day.status === "none" && !day.isFuture) ? "1px solid var(--border-subtle)" : "none",
-                      boxSizing: "border-box",
-                      cursor: day.isFuture ? "default" : "pointer"
-                    }}
-                  />
-                );
-              })}
-            </div>
-          ))}
+          <button
+            onClick={prevMonth}
+            title="Previous Month"
+            style={{
+              width: "30px", height: "30px", borderRadius: "var(--radius-sm)",
+              background: "var(--bg-surface)", border: "1px solid var(--border-default)",
+              color: "var(--text-secondary)", cursor: "pointer", display: "flex",
+              alignItems: "center", justifyContent: "center", transition: "all 0.15s"
+            }}
+          >
+            <FaChevronLeft style={{ fontSize: "11px" }} />
+          </button>
+
+          <button
+            onClick={goToToday}
+            style={{
+              padding: "5px 11px", borderRadius: "var(--radius-sm)",
+              background: "var(--bg-surface)", border: "1px solid var(--border-default)",
+              color: "var(--text-primary)", cursor: "pointer", fontSize: "11px",
+              fontWeight: 700, fontFamily: "var(--font-display)"
+            }}
+          >
+            Today
+          </button>
+
+          <button
+            onClick={nextMonth}
+            title="Next Month"
+            style={{
+              width: "30px", height: "30px", borderRadius: "var(--radius-sm)",
+              background: "var(--bg-surface)", border: "1px solid var(--border-default)",
+              color: "var(--text-secondary)", cursor: "pointer", display: "flex",
+              alignItems: "center", justifyContent: "center", transition: "all 0.15s"
+            }}
+          >
+            <FaChevronRight style={{ fontSize: "11px" }} />
+          </button>
         </div>
+      </div>
+
+      {/* Days of Week Header */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(7, 1fr)",
+        gap: "6px",
+        textAlign: "center"
+      }}>
+        {dayNames.map((d, i) => (
+          <div
+            key={d}
+            style={{
+              fontSize: "11px",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              color: i === 0 ? "var(--red)" : "var(--text-muted)",
+              paddingBottom: "4px"
+            }}
+          >
+            {d}
+          </div>
+        ))}
+      </div>
+
+      {/* Calendar 7-Column Grid */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(7, 1fr)",
+        gap: "6px"
+      }}>
+        {calendarCells.map((cell, idx) => {
+          const isSelected = cell.dateStr === selectedDateStr;
+          const isPresent = Boolean(cell.record);
+          const isAfterExpiry = isPresent && membershipEnd && cell.dateObj > membershipEnd;
+          const isAbsent = !isPresent && !cell.isFuture && cell.isCurrentMonth;
+          const checkInTime = cell.record ? formatTime(cell.record.check_in) : null;
+
+          // Background & border
+          let bg = "var(--bg-surface)";
+          let border = "1px solid var(--border-subtle)";
+          let dateColor = cell.isCurrentMonth ? "var(--text-primary)" : "rgba(255,255,255,0.2)";
+
+          if (isPresent) {
+            bg = isAfterExpiry ? "rgba(248, 113, 113, 0.15)" : "rgba(74, 222, 128, 0.14)";
+            border = isAfterExpiry ? "1px solid rgba(248, 113, 113, 0.45)" : "1px solid rgba(74, 222, 128, 0.45)";
+            dateColor = isAfterExpiry ? "var(--red)" : "var(--green)";
+          } else if (isAbsent) {
+            bg = "rgba(239, 68, 68, 0.05)";
+            border = "1px dashed rgba(239, 68, 68, 0.25)";
+            dateColor = "var(--text-muted)";
+          } else if (cell.isFuture) {
+            bg = "transparent";
+            border = "1px solid rgba(255, 255, 255, 0.05)";
+            dateColor = "rgba(255, 255, 255, 0.25)";
+          }
+
+          if (cell.isToday) {
+            border = "2px solid var(--blue)";
+          }
+
+          if (isSelected) {
+            border = "2px solid var(--text-primary)";
+            bg = isPresent ? "rgba(74, 222, 128, 0.22)" : "var(--bg-active)";
+          }
+
+          return (
+            <div
+              key={idx}
+              onClick={() => setSelectedDateStr(cell.dateStr)}
+              style={{
+                background: bg,
+                border,
+                borderRadius: "var(--radius-sm)",
+                padding: "6px 5px",
+                minHeight: "56px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                cursor: "pointer",
+                transition: "transform 0.1s ease, border-color 0.15s ease",
+                opacity: cell.isCurrentMonth ? 1 : 0.35,
+                position: "relative",
+                boxSizing: "border-box"
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.02)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+            >
+              {/* Top: Day Number + Today Indicator */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{
+                  fontSize: "12px",
+                  fontWeight: cell.isToday || isPresent ? 800 : 600,
+                  color: dateColor,
+                  lineHeight: 1
+                }}>
+                  {cell.dayNum}
+                </span>
+
+                {cell.isToday && (
+                  <span style={{
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    background: "var(--blue)",
+                    display: "inline-block"
+                  }} title="Today" />
+                )}
+              </div>
+
+              {/* Middle/Bottom Status Indicator */}
+              <div style={{ marginTop: "2px", minHeight: "16px", display: "flex", alignItems: "center" }}>
+                {isPresent ? (
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: "3px",
+                    fontSize: "10px", fontWeight: 700,
+                    color: isAfterExpiry ? "var(--red)" : "var(--green)"
+                  }}>
+                    <span>✓</span>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: "9px" }}>
+                      {checkInTime || (isAfterExpiry ? "Expiry" : "Present")}
+                    </span>
+                  </div>
+                ) : isAbsent ? (
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: "2px",
+                    fontSize: "9px", fontWeight: 600, color: "rgba(248, 113, 113, 0.75)"
+                  }}>
+                    <span>✕</span>
+                    <span style={{ fontSize: "9px" }}>Absent</span>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Selected Day Details Inspector Box */}
+      <div style={{
+        background: "var(--bg-surface)",
+        border: "1px solid var(--border-default)",
+        borderRadius: "var(--radius-sm)",
+        padding: "10px 14px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: "8px"
+      }}>
+        {/* Left: Date info */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{
+            width: "36px", height: "36px", borderRadius: "var(--radius-sm)",
+            background: isSelPresent ? "var(--green-bg)" : isSelAbsent ? "var(--red-bg)" : "var(--bg-elevated)",
+            border: isSelPresent ? "1px solid rgba(74,222,128,0.3)" : isSelAbsent ? "1px solid rgba(248,113,113,0.3)" : "1px solid var(--border-subtle)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontFamily: "var(--font-display)", fontSize: "15px", fontWeight: 800,
+            color: isSelPresent ? "var(--green)" : isSelAbsent ? "var(--red)" : "var(--text-muted)"
+          }}>
+            {selectedCell.dateObj ? selectedCell.dateObj.getDate() : "—"}
+          </div>
+          <div>
+            <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-primary)" }}>
+              {selectedCell.dateObj ? selectedCell.dateObj.toLocaleDateString("en-IN", { weekday: "short", day: "2-digit", month: "short", year: "numeric" }) : selectedDateStr}
+              {selectedCell.isToday && (
+                <span style={{ marginLeft: "6px", fontSize: "10px", padding: "1px 6px", borderRadius: "4px", background: "var(--blue-bg)", color: "var(--blue)", fontWeight: 700 }}>
+                  TODAY
+                </span>
+              )}
+            </div>
+            <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
+              {isSelPresent ? (
+                <span>
+                  Check-in: <strong style={{ color: "var(--text-primary)" }}>{formatTime(selectedCell.record?.check_in) || "Recorded"}</strong>
+                  {selectedCell.record?.check_out && (
+                    <span> → Check-out: <strong style={{ color: "var(--text-primary)" }}>{formatTime(selectedCell.record?.check_out)}</strong></span>
+                  )}
+                  {isSelAfterExpiry && (
+                    <span style={{ color: "var(--red)", marginLeft: "6px", fontWeight: 700 }}>⚠️ Visited after plan expired</span>
+                  )}
+                </span>
+              ) : isSelAbsent ? (
+                <span style={{ color: "var(--red)" }}>Member did not visit gym on this date</span>
+              ) : (
+                <span>Future date (upcoming)</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Badge */}
+        <div>
+          {isSelPresent ? (
+            <span style={{
+              display: "inline-flex", alignItems: "center", gap: "4px",
+              padding: "4px 10px", borderRadius: "99px", fontSize: "11px", fontWeight: 700,
+              background: isSelAfterExpiry ? "var(--red-bg)" : "var(--green-bg)",
+              color: isSelAfterExpiry ? "var(--red)" : "var(--green)",
+              border: isSelAfterExpiry ? "1px solid rgba(248,113,113,0.3)" : "1px solid rgba(74,222,128,0.3)"
+            }}>
+              ✓ {isSelAfterExpiry ? "Present (After Expiry)" : "Present"}
+            </span>
+          ) : isSelAbsent ? (
+            <span style={{
+              display: "inline-flex", alignItems: "center", gap: "4px",
+              padding: "4px 10px", borderRadius: "99px", fontSize: "11px", fontWeight: 700,
+              background: "var(--red-bg)", color: "var(--red)", border: "1px solid rgba(248,113,113,0.3)"
+            }}>
+              ✕ Absent
+            </span>
+          ) : (
+            <span style={{
+              padding: "4px 10px", borderRadius: "99px", fontSize: "11px", fontWeight: 600,
+              background: "var(--bg-elevated)", color: "var(--text-muted)", border: "1px solid var(--border-subtle)"
+            }}>
+              Upcoming
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Calendar Legend */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "16px",
+        flexWrap: "wrap",
+        paddingTop: "6px",
+        borderTop: "1px solid var(--border-subtle)",
+        fontSize: "11px",
+        color: "var(--text-muted)"
+      }}>
+        <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <span style={{ width: "9px", height: "9px", borderRadius: "2px", background: "var(--green)" }} />
+          Present (Active Plan)
+        </span>
+        <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <span style={{ width: "9px", height: "9px", borderRadius: "2px", background: "var(--red)" }} />
+          Present (After Expiry)
+        </span>
+        <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <span style={{ width: "9px", height: "9px", borderRadius: "2px", background: "rgba(239, 68, 68, 0.45)", border: "1px dashed var(--red)" }} />
+          Absent (Nahi Aaya)
+        </span>
+        <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <span style={{ width: "9px", height: "9px", borderRadius: "2px", border: "2px solid var(--blue)" }} />
+          Today
+        </span>
       </div>
     </div>
   );
@@ -706,7 +1101,7 @@ function MonthWiseCount({ attendance, membershipEnd }) {
 }
 
 // ── Tab: Attendance ───────────────────────────────────────────────────────────
-function TabAttendance({ attendance, loading, membershipEnd, thisMonthAtt, afterExpiryCount }) {
+function TabAttendance({ attendance, loading, membershipEnd, thisMonthAtt, afterExpiryCount, member }) {
   return (
     <div style={{ padding: "20px 22px 24px" }}>
       {/* Stats Row */}
@@ -731,25 +1126,15 @@ function TabAttendance({ attendance, loading, membershipEnd, thisMonthAtt, after
         </div>
       )}
 
-      {/* Heatmap */}
+      {/* Calendar Section */}
       {!loading && (
         <div style={{ marginBottom: "20px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", flexWrap: "wrap", gap: "6px" }}>
-            <SectionLabel>Activity — Last 6 Months</SectionLabel>
-            <div style={{ display: "flex", gap: "12px" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11px", color: "var(--text-muted)" }}>
-                <span style={{ width: "8px", height: "8px", borderRadius: "2px", background: "var(--green)" }} /> Active period
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11px", color: "var(--text-muted)" }}>
-                <span style={{ width: "8px", height: "8px", borderRadius: "2px", background: "var(--red)" }} /> After expiry
-              </span>
-            </div>
+            <SectionLabel>Attendance Calendar</SectionLabel>
           </div>
-          <div style={{ background: "var(--bg-elevated)", borderRadius: "var(--radius-sm)", padding: "12px", border: "1px solid var(--border-subtle)" }}>
-            <AttendanceHeatmap attendance={attendance} membershipEnd={membershipEnd} />
-            {/* Month-wise visit count breakdown */}
-            <MonthWiseCount attendance={attendance} membershipEnd={membershipEnd} />
-          </div>
+          <AttendanceCalendar attendance={attendance} membershipEnd={membershipEnd} member={member} />
+          {/* Month-wise visit count breakdown */}
+          <MonthWiseCount attendance={attendance} membershipEnd={membershipEnd} />
         </div>
       )}
 
@@ -1040,6 +1425,7 @@ export default function MemberProfileDrawer({ member, onClose, onEdit, onRecordP
               attChartData={attChartData}
               thisMonthAtt={thisMonthAtt}
               afterExpiryCount={afterExpiryCount}
+              member={member}
             />
           )}
         </div>

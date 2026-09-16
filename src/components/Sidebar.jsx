@@ -7,6 +7,8 @@ import {
 } from "react-icons/fa";
 import api from "../services/api";
 
+let inquiryCountCache = { at: 0, count: 0 };
+
 const NAV = [
   { icon: FaHome,           label: "Dashboard",        path: "/dashboard"        },
   { icon: FaUsers,          label: "Members",          path: "/members"          },
@@ -26,7 +28,7 @@ export default function Sidebar({ onLogout }) {
   const location = useLocation();
   const admin    = JSON.parse(localStorage.getItem("gym_admin") || "{}");
   const initials = admin.name?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() || "A";
-  const [newInquiries, setNewInquiries] = useState(0);
+  const [newInquiries, setNewInquiries] = useState(inquiryCountCache.count);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -52,8 +54,14 @@ export default function Sidebar({ onLogout }) {
 
   const fetchInquiryCount = async () => {
     try {
+      if (Date.now() - inquiryCountCache.at < 15000) {
+        setNewInquiries(inquiryCountCache.count);
+        return;
+      }
       const res = await api.get("/inquiries/stats/summary");
-      setNewInquiries(res.data.data?.new_count || 0);
+      const count = res.data.data?.new_count || 0;
+      inquiryCountCache = { at: Date.now(), count };
+      setNewInquiries(count);
     } catch(e) {}
   };
 

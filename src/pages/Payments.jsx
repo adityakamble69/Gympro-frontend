@@ -1128,7 +1128,7 @@ export default function Payments({ onLogout }) {
   }, [page, search, statusFilter, methodFilter]);
 
   const fetchStats = async () => { try { const r = await api.get("/payments/stats/summary"); setStats(r.data.data); } catch (e) { } };
-  const fetchMembers = async () => { try { const r = await api.get("/members", { params: { limit: 500 } }); setMembers(r.data.data); } catch (e) { } };
+  const fetchMembers = async () => { try { const r = await api.get("/members", { params: { limit: 500, lite: 1 } }); setMembers(r.data.data); } catch (e) { } };
   const fetchPlans = async () => { try { const r = await api.get("/membership-plans?status=active"); setPlans(r.data.data || []); } catch (e) { } };
 
   useEffect(() => { fetchStats(); fetchMembers(); fetchPlans(); }, []);

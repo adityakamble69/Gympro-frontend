@@ -1,18 +1,32 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login           from "./pages/Login";
-import Dashboard       from "./pages/Dashboard";
-import Members         from "./pages/Members";
-import Attendance      from "./pages/Attendance";
-import Trainers        from "./pages/Trainers";
-import Payments        from "./pages/Payments";
-import Equipment       from "./pages/Equipment";
-import Notifications   from "./pages/Notifications";
-import Reports         from "./pages/Reports";
-import Profile         from "./pages/Profile";
-import MembershipPlans from "./pages/MembershipPlans";
-import Inquiries       from "./pages/Inquiries";
-import NotFound        from "./pages/NotFound";
+import Login from "./pages/Login";
+import { prefetchDashboard } from "./services/prefetch";
+
+const Dashboard       = lazy(() => import("./pages/Dashboard"));
+const Members         = lazy(() => import("./pages/Members"));
+const Attendance      = lazy(() => import("./pages/Attendance"));
+const Trainers        = lazy(() => import("./pages/Trainers"));
+const Payments        = lazy(() => import("./pages/Payments"));
+const Equipment       = lazy(() => import("./pages/Equipment"));
+const Notifications   = lazy(() => import("./pages/Notifications"));
+const Reports         = lazy(() => import("./pages/Reports"));
+const Profile         = lazy(() => import("./pages/Profile"));
+const MembershipPlans = lazy(() => import("./pages/MembershipPlans"));
+const Inquiries       = lazy(() => import("./pages/Inquiries"));
+const NotFound        = lazy(() => import("./pages/NotFound"));
+
+function RouteFallback() {
+  return (
+    <div style={{
+      minHeight: "100vh", background: "#000", color: "#888",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontFamily: "system-ui, sans-serif", fontSize: "14px",
+    }}>
+      Loading…
+    </div>
+  );
+}
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
@@ -22,6 +36,8 @@ function App() {
   const handleLogin = (token, admin) => {
     localStorage.setItem("gym_token", token);
     localStorage.setItem("gym_admin", JSON.stringify(admin));
+    prefetchDashboard();
+    import("./pages/Dashboard");
     setIsLoggedIn(true);
   };
 
@@ -31,16 +47,13 @@ function App() {
   };
 
   return (
-    <>
-      <BrowserRouter>
+    <BrowserRouter>
+      <Suspense fallback={<RouteFallback />}>
         <Routes>
-
-          {/* ✅ PUBLIC ROUTES — login ke bina accessible */}
-          <Route path="/login"   element={
+          <Route path="/login" element={
             isLoggedIn ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />
           } />
 
-          {/* PROTECTED ROUTES */}
           {isLoggedIn ? (
             <>
               <Route path="/"                 element={<Navigate to="/dashboard" />} />
@@ -58,12 +71,10 @@ function App() {
             </>
           ) : null}
 
-          {/* 404 — sab unknown routes ke liye */}
           <Route path="*" element={<NotFound />} />
-
         </Routes>
-      </BrowserRouter>
-    </>
+      </Suspense>
+    </BrowserRouter>
   );
 }
 

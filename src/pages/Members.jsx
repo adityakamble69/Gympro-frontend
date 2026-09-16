@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import Sidebar from "../components/Sidebar";
 import api from "../services/api";
 import {
@@ -6,7 +6,7 @@ import {
   FaUsers, FaUser,
   FaWhatsapp, FaCheck, FaPaperPlane, FaSyncAlt, FaTrash,
   FaEye, FaEyeSlash, FaFileInvoiceDollar, FaEdit, FaSave,
-  FaEnvelope, FaFingerprint, FaSpinner
+  FaEnvelope, FaFingerprint, FaSpinner, FaExclamationTriangle
 } from "react-icons/fa";
 import MemberProfileDrawer from "../components/MemberProfileDrawer";
 
@@ -382,7 +382,9 @@ function ViewBillModal({ member, onClose }) {
 function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
   const TYPE_LABEL = { monthly: "Monthly Plans", quarterly: "Quarterly Plans", yearly: "Yearly Plans" };
   const [selectedPlan, setSelectedPlan] = useState(member.membership_type || "");
-  const [startFrom, setStartFrom] = useState("today");
+  const [startFrom, setStartFrom] = useState("expiry");
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
   const [payMethod, setPayMethod] = useState("cash");
   const [notes, setNotes] = useState("");
@@ -395,8 +397,12 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
   const [discountValue, setDiscountValue] = useState("");
   const [dueDate, setDueDate] = useState("");
 
+  const [attendance, setAttendance] = useState([]);
+  const [attendanceLoading, setAttendanceLoading] = useState(true);
+
   const plan = plans.find(p => p.name === selectedPlan);
   const days = daysLeft(member.membership_end);
+  const isExpired = member.membership_end ? new Date(member.membership_end) < new Date() : false;
   const planPrice = plan ? Number(plan.price) : 0;
 
   const discountAmt = (() => {
@@ -416,6 +422,7 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
     }
   }, [plan?.id, discountValue, discountType]);
 
+  // Fetch pending payments
   useEffect(() => {
     const fetchPending = async () => {
       setPendingLoading(true);
@@ -429,18 +436,108 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
     fetchPending();
   }, [member.id]);
 
+  // Fetch member attendance to detect visits after expiry
+  useEffect(() => {
+    const fetchAttendance = async () => {
+      setAttendanceLoading(true);
+      try {
+        const res = await api.get(`/attendance/member/${member.id}`);
+        setAttendance(res.data.data || []);
+      } catch (e) {
+        console.error("Failed to fetch member attendance:", e);
+      } finally {
+        setAttendanceLoading(false);
+      }
+    };
+    fetchAttendance();
+  }, [member.id]);
+
+  // Unique days attended after membership expiry date
+  const afterExpiryVisits = useMemo(() => {
+    if (!member.membership_end) return [];
+    const exp = new Date(member.membership_end);
+    exp.setHours(23, 59, 59, 999);
+
+    const datesSeen = new Set();
+    const list = [];
+    (attendance || []).forEach(a => {
+      const d = new Date(a.date);
+      const dStr = a.date ? a.date.slice(0, 10) : "";
+      if (d > exp && dStr && !datesSeen.has(dStr)) {
+        datesSeen.add(dStr);
+        list.push({ ...a, dateStr: dStr, dateObj: d });
+      }
+    });
+
+    return list.sort((a, b) => a.dateObj - b.dateObj);
+  }, [attendance, member.membership_end]);
+
+  const afterExpiryCount = afterExpiryVisits.length;
+  const firstVisitAfterExpiry = afterExpiryVisits[0]?.dateObj || null;
+
+  // Auto-set smart calculation mode
+  useEffect(() => {
+    if (afterExpiryCount > 0) {
+      setStartFrom("expiry");
+    } else if (member.membership_end) {
+      setStartFrom("expiry");
+    } else {
+      setStartFrom("today");
+    }
+  }, [afterExpiryCount, member.membership_end]);
+
   const totalPending = pendingPayments.reduce((s, p) => s + Number(p.due_amount || p.amount || 0), 0);
 
+  // Smart Date & Days Calculation
   const calcDates = () => {
-    if (!plan) return { start: null, end: null };
-    const base = startFrom === "expiry" && member.membership_end && days > 0
-      ? new Date(member.membership_end) : new Date();
+    if (!plan) return { start: null, end: null, duration: 0, note: "" };
+
+    if (startFrom === "custom") {
+      const s = customStart || new Date().toISOString().split("T")[0];
+      const e = customEnd || new Date().toISOString().split("T")[0];
+      const diffDays = Math.max(1, Math.round((new Date(e) - new Date(s)) / (1000 * 60 * 60 * 24)));
+      return { start: s, end: e, duration: diffDays, note: "Custom dates selected" };
+    }
+
+    let base = new Date();
+    let duration = plan.duration_days;
+    let note = "";
+
+    if (startFrom === "expiry" && member.membership_end) {
+      const expDate = new Date(member.membership_end);
+      const nextDay = new Date(expDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      base = nextDay;
+      if (afterExpiryCount > 0) {
+        note = `Continuous renewal — ${afterExpiryCount} days attended after expiry are covered`;
+      } else {
+        note = "Continuous from previous plan end date";
+      }
+    } else if (startFrom === "first_visit" && firstVisitAfterExpiry) {
+      base = new Date(firstVisitAfterExpiry);
+      note = `Starts from 1st visit after expiry (${fmt(firstVisitAfterExpiry)})`;
+    } else if (startFrom === "deduct" && afterExpiryCount > 0) {
+      base = new Date();
+      duration = Math.max(1, plan.duration_days - afterExpiryCount);
+      note = `Deducted ${afterExpiryCount} days attended after expiry (${duration} days remaining from today)`;
+    } else {
+      // "today"
+      base = new Date();
+      note = "Starts fresh from today";
+    }
+
     const end = new Date(base);
-    end.setDate(end.getDate() + plan.duration_days);
-    return { start: base.toISOString().split("T")[0], end: end.toISOString().split("T")[0] };
+    end.setDate(end.getDate() + duration);
+
+    return {
+      start: base.toISOString().split("T")[0],
+      end: end.toISOString().split("T")[0],
+      duration,
+      note
+    };
   };
 
-  const { start: newStart, end: newEnd } = calcDates();
+  const { start: newStart, end: newEnd, note: dateNote } = calcDates();
 
   const handleRenew = async () => {
     setError("");
@@ -464,7 +561,7 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
         payment_date: new Date().toISOString().split("T")[0],
         due_date: dueAmt > 0 && dueDate ? dueDate : undefined,
         status: dueAmt > 0 ? "pending" : "paid",
-        notes: notes || `Renewal — ${selectedPlan}`,
+        notes: notes || `Renewal — ${selectedPlan}${afterExpiryCount > 0 ? ` (${afterExpiryCount} days attended after expiry adjusted)` : ""}`,
         plan_name: selectedPlan, plan_start: newStart, plan_end: newEnd,
         months_covered: plan ? Math.round(plan.duration_days / 30) : 1,
       });
@@ -543,13 +640,158 @@ function RenewModal({ member, plans, plansByType, onClose, onSuccess }) {
             )}
           </Field>
 
-          <Field label="Start From">
-            <div style={{ display: "flex", gap: "8px" }}>
-              {[["today", "Today"], ["expiry", "After Expiry"]].map(([v, l]) => (
-                <button key={v} onClick={() => setStartFrom(v)} style={{ flex: 1, padding: "8px", borderRadius: "var(--radius-sm)", border: startFrom === v ? "1px solid var(--green)" : "1px solid var(--border-default)", background: startFrom === v ? "var(--green-bg)" : "var(--bg-elevated)", color: startFrom === v ? "var(--green)" : "var(--text-muted)", cursor: "pointer", fontSize: "13px", fontWeight: startFrom === v ? 700 : 400 }}>{l}</button>
-              ))}
+          {/* Alert if member visited after expiry */}
+          {!attendanceLoading && afterExpiryCount > 0 && (
+            <div style={{
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid rgba(245,158,11,0.45)",
+              background: "rgba(245,158,11,0.08)",
+              padding: "12px 14px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "4px"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#f59e0b", fontWeight: 700, fontSize: "13px" }}>
+                <FaExclamationTriangle style={{ fontSize: "12px" }} />
+                <span>Attended {afterExpiryCount} day{afterExpiryCount > 1 ? "s" : ""} after plan expired!</span>
+              </div>
+              <div style={{ fontSize: "12px", color: "var(--text-secondary)" }}>
+                Expired: <strong>{fmt(member.membership_end)}</strong> · 1st visit after expiry: <strong>{fmt(firstVisitAfterExpiry)}</strong>
+              </div>
+              <div style={{ fontSize: "11px", color: "#f59e0b", marginTop: "2px", fontWeight: 600 }}>
+                ⚡ Automatic calculation active: These {afterExpiryCount} days are added into the new membership so member doesn't get free days.
+              </div>
             </div>
-            {plan && newStart && newEnd && <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>📅 {fmt(newStart)} → {fmt(newEnd)}</div>}
+          )}
+
+          <Field label="Start From / Days Calculation">
+            <div style={{ display: "grid", gridTemplateColumns: afterExpiryCount > 0 ? "repeat(auto-fit, minmax(130px, 1fr))" : "1fr 1fr 1fr", gap: "8px" }}>
+              <button
+                type="button"
+                onClick={() => setStartFrom("expiry")}
+                style={{
+                  padding: "9px 10px", borderRadius: "var(--radius-sm)",
+                  border: startFrom === "expiry" ? "1.5px solid var(--green)" : "1px solid var(--border-default)",
+                  background: startFrom === "expiry" ? "var(--green-bg)" : "var(--bg-elevated)",
+                  color: startFrom === "expiry" ? "var(--green)" : "var(--text-muted)",
+                  cursor: "pointer", fontSize: "12px", fontWeight: startFrom === "expiry" ? 700 : 500,
+                  textAlign: "left", display: "flex", flexDirection: "column", gap: "2px",
+                  transition: "all 0.15s"
+                }}
+              >
+                <span style={{ fontWeight: 700 }}>Continuous</span>
+                <span style={{ fontSize: "10px", opacity: 0.85 }}>
+                  {afterExpiryCount > 0 ? "From Expiry Date" : "Add to Current Plan"}
+                </span>
+              </button>
+
+              {afterExpiryCount > 0 && firstVisitAfterExpiry && (
+                <button
+                  type="button"
+                  onClick={() => setStartFrom("first_visit")}
+                  style={{
+                    padding: "9px 10px", borderRadius: "var(--radius-sm)",
+                    border: startFrom === "first_visit" ? "1.5px solid var(--green)" : "1px solid var(--border-default)",
+                    background: startFrom === "first_visit" ? "var(--green-bg)" : "var(--bg-elevated)",
+                    color: startFrom === "first_visit" ? "var(--green)" : "var(--text-muted)",
+                    cursor: "pointer", fontSize: "12px", fontWeight: startFrom === "first_visit" ? 700 : 500,
+                    textAlign: "left", display: "flex", flexDirection: "column", gap: "2px",
+                    transition: "all 0.15s"
+                  }}
+                >
+                  <span style={{ fontWeight: 700 }}>From 1st Visit</span>
+                  <span style={{ fontSize: "10px", opacity: 0.85 }}>{fmt(firstVisitAfterExpiry)}</span>
+                </button>
+              )}
+
+              {afterExpiryCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setStartFrom("deduct")}
+                  style={{
+                    padding: "9px 10px", borderRadius: "var(--radius-sm)",
+                    border: startFrom === "deduct" ? "1.5px solid var(--green)" : "1px solid var(--border-default)",
+                    background: startFrom === "deduct" ? "var(--green-bg)" : "var(--bg-elevated)",
+                    color: startFrom === "deduct" ? "var(--green)" : "var(--text-muted)",
+                    cursor: "pointer", fontSize: "12px", fontWeight: startFrom === "deduct" ? 700 : 500,
+                    textAlign: "left", display: "flex", flexDirection: "column", gap: "2px",
+                    transition: "all 0.15s"
+                  }}
+                >
+                  <span style={{ fontWeight: 700 }}>Deduct {afterExpiryCount}d</span>
+                  <span style={{ fontSize: "10px", opacity: 0.85 }}>Minus {afterExpiryCount} used days</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setStartFrom("today")}
+                style={{
+                  padding: "9px 10px", borderRadius: "var(--radius-sm)",
+                  border: startFrom === "today" ? "1.5px solid var(--green)" : "1px solid var(--border-default)",
+                  background: startFrom === "today" ? "var(--green-bg)" : "var(--bg-elevated)",
+                  color: startFrom === "today" ? "var(--green)" : "var(--text-muted)",
+                  cursor: "pointer", fontSize: "12px", fontWeight: startFrom === "today" ? 700 : 500,
+                  textAlign: "left", display: "flex", flexDirection: "column", gap: "2px",
+                  transition: "all 0.15s"
+                }}
+              >
+                <span style={{ fontWeight: 700 }}>Fresh From Today</span>
+                <span style={{ fontSize: "10px", opacity: 0.85 }}>{fmt(new Date())}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setStartFrom("custom");
+                  if (!customStart) setCustomStart(newStart || new Date().toISOString().split("T")[0]);
+                  if (!customEnd) setCustomEnd(newEnd || new Date().toISOString().split("T")[0]);
+                }}
+                style={{
+                  padding: "9px 10px", borderRadius: "var(--radius-sm)",
+                  border: startFrom === "custom" ? "1.5px solid var(--green)" : "1px solid var(--border-default)",
+                  background: startFrom === "custom" ? "var(--green-bg)" : "var(--bg-elevated)",
+                  color: startFrom === "custom" ? "var(--green)" : "var(--text-muted)",
+                  cursor: "pointer", fontSize: "12px", fontWeight: startFrom === "custom" ? 700 : 500,
+                  textAlign: "left", display: "flex", flexDirection: "column", gap: "2px",
+                  transition: "all 0.15s"
+                }}
+              >
+                <span style={{ fontWeight: 700 }}>Custom</span>
+                <span style={{ fontSize: "10px", opacity: 0.85 }}>Choose dates</span>
+              </button>
+            </div>
+
+            {startFrom === "custom" && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "10px" }}>
+                <div>
+                  <label style={{ fontSize: "11px", color: "var(--text-muted)", display: "block", marginBottom: "4px" }}>Start Date</label>
+                  <input type="date" style={inputStyle} value={customStart} onChange={e => setCustomStart(e.target.value)} />
+                </div>
+                <div>
+                  <label style={{ fontSize: "11px", color: "var(--text-muted)", display: "block", marginBottom: "4px" }}>End Date</label>
+                  <input type="date" style={inputStyle} value={customEnd} onChange={e => setCustomEnd(e.target.value)} />
+                </div>
+              </div>
+            )}
+
+            {plan && newStart && newEnd && (
+              <div style={{
+                marginTop: "10px", padding: "10px 14px", borderRadius: "var(--radius-sm)",
+                background: "var(--bg-elevated)", border: "1px solid var(--border-default)",
+                display: "flex", flexDirection: "column", gap: "4px"
+              }}>
+                <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--green)", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>📅 New Validity:</span>
+                  <span>{fmt(newStart)} → {fmt(newEnd)}</span>
+                </div>
+                {dateNote && (
+                  <div style={{ fontSize: "12px", color: "var(--text-secondary)" }}>
+                    ℹ️ {dateNote}
+                  </div>
+                )}
+              </div>
+            )}
           </Field>
 
           <Field label="Discount (Optional)">
@@ -943,6 +1185,7 @@ export default function Members({ onLogout }) {
   const [aadharBack, setAadharBack] = useState("");
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [mediaReady, setMediaReady] = useState(true);
   const [notifyMember, setNotifyMember] = useState(null);
   const [profileMember, setProfileMember] = useState(null);
   const [enrollMember, setEnrollMember] = useState(null);
@@ -974,7 +1217,15 @@ export default function Members({ onLogout }) {
       setTotalCount(pag.total || 0);
       setCurrentPage(pag.page || 1);
       setHasMore((pag.page || 1) < (pag.totalPages || 1));
-      fetchDuesForMembers(newData);
+      setDueMap((prev) => ({
+        ...prev,
+        ...Object.fromEntries(
+          newData.map((m) => {
+            const payments = Array.isArray(m.pending_payments) ? m.pending_payments : [];
+            return [m.id, { total: Number(m.due_total || 0), payments, loading: false, marking: false }];
+          })
+        ),
+      }));
     } catch (e) { console.error(e); }
     finally { setLoading(false); setLoadingMore(false); isFetching.current = false; }
   }, []);
@@ -986,14 +1237,17 @@ export default function Members({ onLogout }) {
   // Initial load
   useEffect(() => {
     fetchMembers(1, "", false, "all"); fetchPlans();
-    // Enrollment Assistant: sab enrolled member IDs backend se le aao
     api.get("/fingerprint/enrollment-status")
       .then(r => setEnrolledIds(new Set(r.data?.enrolledIds || [])))
       .catch(() => {});
   }, []);
 
-  // Search + filter change — reset list
+  const skipSearchEffect = useRef(true);
   useEffect(() => {
+    if (skipSearchEffect.current) {
+      skipSearchEffect.current = false;
+      return;
+    }
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(() => {
       setMembers([]);
@@ -1020,24 +1274,6 @@ export default function Members({ onLogout }) {
     observer.observe(sentinel);
     return () => observer.disconnect();
   }, [hasMore, loadingMore, loading, currentPage, search, statusFilter, fetchMembers]);
-
-  // ── Dues ───────────────────────────────────────────────────────────────────
-  const fetchDuesForMembers = async (mems) => {
-    if (!mems.length) return;
-    const entries = await Promise.all(
-      mems.map(async (m) => {
-        try {
-          const r = await api.get(`/payments/member/${m.id}`);
-          const pending = (r.data.data || []).filter(p => p.status === "pending");
-          const total = pending.reduce((s, p) => s + Number(p.due_amount || p.amount || 0), 0);
-          return [m.id, { total, payments: pending, loading: false, marking: false }];
-        } catch {
-          return [m.id, { total: 0, payments: [], loading: false, marking: false }];
-        }
-      })
-    );
-    setDueMap(prev => ({ ...prev, ...Object.fromEntries(entries) }));
-  };
 
   const markDuePaid = async (memberId) => {
     const info = dueMap[memberId];
@@ -1076,8 +1312,8 @@ export default function Members({ onLogout }) {
     }
   };
 
-  const openAdd = () => { setForm(EMPTY); setAadharFront(""); setAadharBack(""); setEditingId(null); setFormError(""); setShowModal(true); };
-  const openEdit = (m) => {
+  const openAdd = () => { setForm(EMPTY); setAadharFront(""); setAadharBack(""); setEditingId(null); setFormError(""); setShowModal(true); setMediaReady(true); };
+  const applyMemberToForm = (m) => {
     setForm({
       full_name: m.full_name || "", email: m.email || "", phone: m.phone || "",
       address: m.address || "", photo: m.photo || "",
@@ -1085,12 +1321,20 @@ export default function Members({ onLogout }) {
       membership_type: m.membership_type || "", membership_start: m.membership_start?.split("T")[0] || "",
       membership_end: m.membership_end?.split("T")[0] || "", status: m.status || "active"
     });
-    // Existing Aadhaar is stored as JSON string {front, back} — parse it so it isn't lost on save
     let parsedAadhar = null;
     if (m.aadhar_card) { try { parsedAadhar = JSON.parse(m.aadhar_card); } catch { parsedAadhar = null; } }
     setAadharFront(parsedAadhar?.front || "");
     setAadharBack(parsedAadhar?.back || "");
-    setEditingId(m.id); setFormError(""); setShowModal(true);
+  };
+
+  const openEdit = async (m) => {
+    applyMemberToForm(m);
+    setEditingId(m.id); setFormError(""); setShowModal(true); setMediaReady(false);
+    try {
+      const r = await api.get(`/members/${m.id}`);
+      if (r.data?.data) applyMemberToForm(r.data.data);
+    } catch { /* list fields already filled */ }
+    finally { setMediaReady(true); }
   };
 
   const MAX_IMG_SIZE = 2 * 1024 * 1024; // 2MB
@@ -1456,8 +1700,8 @@ export default function Members({ onLogout }) {
             {formError && <div style={{ marginTop: "16px", padding: "11px 14px", borderRadius: "var(--radius-sm)", background: "var(--red-bg)", border: "1px solid rgba(248,113,113,0.2)", color: "var(--red)", fontSize: "15px" }}>{formError}</div>}
             <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "24px", paddingTop: "20px", borderTop: "1px solid var(--border-subtle)" }}>
               <button onClick={() => setShowModal(false)} style={{ padding: "9px 20px", borderRadius: "var(--radius-sm)", background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)", cursor: "pointer", fontSize: "15px" }}>Cancel</button>
-              <button onClick={handleSave} disabled={saving} style={{ padding: "9px 24px", borderRadius: "var(--radius-sm)", background: saving ? "var(--bg-elevated)" : "var(--text-primary)", color: saving ? "var(--text-muted)" : "#0a0a0a", border: "none", cursor: saving ? "not-allowed" : "pointer", fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em" }}>
-                {saving ? "Saving..." : editingId ? "UPDATE" : "ADD MEMBER"}
+              <button onClick={handleSave} disabled={saving || !mediaReady} style={{ padding: "9px 24px", borderRadius: "var(--radius-sm)", background: (saving || !mediaReady) ? "var(--bg-elevated)" : "var(--text-primary)", color: (saving || !mediaReady) ? "var(--text-muted)" : "#0a0a0a", border: "none", cursor: (saving || !mediaReady) ? "not-allowed" : "pointer", fontSize: "15px", fontWeight: 700, fontFamily: "var(--font-display)", letterSpacing: "0.03em" }}>
+                {saving ? "Saving..." : !mediaReady ? "Loading..." : editingId ? "UPDATE" : "ADD MEMBER"}
               </button>
             </div>
           </div>

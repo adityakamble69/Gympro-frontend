@@ -15,7 +15,11 @@ export default function Login({ onLogin }) {
     setError(""); setLoading(true);
     try {
       const res = await api.post("/auth/login", { email, password });
-      if (res.data.success) onLogin(res.data.token, res.data.admin);
+      if (res.data.success) {
+        localStorage.setItem("gym_token", res.data.token);
+        localStorage.setItem("gym_admin", JSON.stringify(res.data.admin));
+        onLogin(res.data.token, res.data.admin);
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please try again.");
     } finally { setLoading(false); }

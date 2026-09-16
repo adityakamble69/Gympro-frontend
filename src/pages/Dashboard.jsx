@@ -6,6 +6,7 @@ import {
 } from "recharts";
 import Sidebar from "../components/Sidebar";
 import api from "../services/api";
+import { consumeDashboardPrefetch } from "../services/prefetch";
 import { useAuth } from "../hooks/useAuth";
 import {
   FaUsers, FaUserTie, FaClipboardCheck, FaRupeeSign,
@@ -173,30 +174,24 @@ function ExpiredMembersModal({ count, onClose, navigate }) {
 
   const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
+  const duesFromMember = (m) => {
+    const payments = Array.isArray(m.pending_payments) ? m.pending_payments : [];
+    return [m.id, { total: Number(m.due_total || 0), payments, marking: false }];
+  };
+
   const fetchExpired = async (pg = 1) => {
     setLoading(true);
     try {
       const r = await api.get(`/members?page=1&limit=200&status=expired`);
       const all = r.data.data || [];
-      if (pg === 1) setAllExpired(all); // store full list for export
+      if (pg === 1) setAllExpired(all);
       const perPage = 8;
       const start = (pg - 1) * perPage;
       const pageItems = all.slice(start, start + perPage);
       setMembers(pageItems);
       setTotal(all.length);
       setTotalPages(Math.ceil(all.length / perPage) || 1);
-      // fetch dues for visible members
-      const entries = await Promise.all(
-        pageItems.map(async (m) => {
-          try {
-            const pr = await api.get(`/payments/member/${m.id}`);
-            const pending = (pr.data.data || []).filter(p => p.status === "pending");
-            const tot = pending.reduce((s, p) => s + Number(p.due_amount || p.amount || 0), 0);
-            return [m.id, { total: tot, payments: pending, marking: false }];
-          } catch { return [m.id, { total: 0, payments: [], marking: false }]; }
-        })
-      );
-      setDueMap(Object.fromEntries(entries));
+      setDueMap(Object.fromEntries(pageItems.map(duesFromMember)));
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   };
@@ -707,20 +702,25 @@ export default function Dashboard({ onLogout }) {
   const fetchAll = async (isRefresh = false) => {
     isRefresh ? setRefreshing(true) : setLoading(true);
     try {
-      const [attendRes, weekRes, payRes, trainerRes, recentPayRes, recentMemRes] = await Promise.all([
-        api.get("/attendance/stats/summary"),
-        api.get("/attendance/stats/weekly"),
-        api.get("/payments/stats/summary"),
-        api.get("/trainers/stats/summary"),
-        api.get("/payments", { params: { limit: 5, page: 1 } }),
-        api.get("/members", { params: { limit: 5, page: 1 } }),
-      ]);
-      setAttendStats(attendRes.data.data);
-      setWeekly(weekRes.data.data.map(d => ({ ...d, label: new Date(d.day).toLocaleDateString("en-IN", { weekday: "short" }) })));
-      setPayStats(payRes.data.data);
-      setTrainerStats(trainerRes.data.data);
-      setRecentPay(recentPayRes.data.data);
-      setRecentMem(recentMemRes.data.data);
+      let payload = null;
+      if (!isRefresh) {
+        const pending = consumeDashboardPrefetch();
+        if (pending) {
+          const pref = await pending;
+          payload = pref?.data?.data;
+        }
+      }
+      if (!payload) {
+        const r = await api.get("/dashboard/overview", { skipCache: isRefresh });
+        payload = r.data.data;
+      }
+      if (!payload) return;
+      setAttendStats(payload.attendStats);
+      setWeekly((payload.weekly || []).map(d => ({ ...d, label: new Date(d.day).toLocaleDateString("en-IN", { weekday: "short" }) })));
+      setPayStats(payload.payStats);
+      setTrainerStats(payload.trainerStats);
+      setRecentPay(payload.recentPayments || []);
+      setRecentMem(payload.recentMembers || []);
       setLastUpdated(new Date());
     } catch (e) { console.error(e); }
     finally { setLoading(false); setRefreshing(false); }

@@ -38,6 +38,8 @@ function useMobile() {
   return mobile;
 }
 
+let lastNotifSync = 0;
+
 export default function NotificationBell() {
   const navigate  = useNavigate();
   const isMobile  = useMobile();
@@ -83,9 +85,14 @@ export default function NotificationBell() {
   };
 
   const syncNotifications = async () => {
+    if (Date.now() - lastNotifSync < 5 * 60 * 1000) {
+      fetchCount();
+      return;
+    }
     setSyncing(true);
     try {
       await api.post("/notifications/sync");
+      lastNotifSync = Date.now();
       fetchCount();
     } catch (e) { console.error(e); }
     finally { setSyncing(false); }

@@ -194,7 +194,7 @@ export default function MembershipPlans({ onLogout }) {
       const [pRes, sRes, mRes] = await Promise.all([
         api.get("/membership-plans"),
         api.get("/membership-plans/stats"),
-        api.get("/members?limit=1000"),
+        api.get("/members", { params: { limit: 500, lite: 1 } }),
       ]);
       setPlans(pRes.data.data || []);
       setStats(sRes.data.data || {});
