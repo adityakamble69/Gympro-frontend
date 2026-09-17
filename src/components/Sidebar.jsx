@@ -86,26 +86,22 @@ export default function Sidebar({ onLogout }) {
   };
 
   const SidebarContent = () => (
-    <aside style={{
+    <aside className="sidebar-aside" style={{
       width: "220px",
       background: "var(--bg-surface)",
       borderRight: "1px solid var(--border-subtle)",
-      height: "100vh",
       display: "flex",
       flexDirection: "column",
       fontFamily: "var(--font-body)",
-      position: "fixed",
-      top: 0,
-      left: 0,
-      zIndex: 100,
     }}>
       {/* Logo */}
       <div style={{
-        padding: "24px 20px 20px",
+        padding: "20px 18px",
         borderBottom: "1px solid var(--border-subtle)",
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        flexShrink: 0
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <div style={{
@@ -186,12 +182,18 @@ export default function Sidebar({ onLogout }) {
       </nav>
 
       {/* Footer */}
-      <div style={{ borderTop: "1px solid var(--border-subtle)", padding: "12px 10px" }}>
+      <div style={{
+        borderTop: "1px solid var(--border-subtle)",
+        padding: "12px 10px",
+        paddingBottom: "max(16px, env(safe-area-inset-bottom, 16px))",
+        flexShrink: 0,
+        background: "var(--bg-surface)"
+      }}>
         <div
           onClick={() => handleNav("/profile")}
           style={{
             display: "flex", alignItems: "center", gap: "10px",
-            padding: "10px", borderRadius: "var(--radius-sm)",
+            padding: "9px 10px", borderRadius: "var(--radius-sm)",
             background: "var(--bg-elevated)", marginBottom: "8px",
             cursor: "pointer", border: "1px solid transparent",
             transition: "border-color 0.15s"
@@ -207,28 +209,33 @@ export default function Sidebar({ onLogout }) {
           }}>{initials}</div>
           <div style={{ overflow: "hidden", flex: 1 }}>
             <div style={{
-              fontSize: "15px", fontWeight: 600, color: "var(--text-primary)",
+              fontSize: "14px", fontWeight: 600, color: "var(--text-primary)",
               whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
             }}>{admin.name || "Admin"}</div>
-            <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+            <div style={{ fontSize: "11.5px", color: "var(--text-muted)" }}>
               {admin.role?.replace("_", " ") || "admin"}
             </div>
           </div>
         </div>
 
-        <div
+        <button
           onClick={onLogout}
           style={{
-            display: "flex", alignItems: "center", gap: "10px",
-            padding: "9px 10px", borderRadius: "var(--radius-sm)",
-            cursor: "pointer", color: "var(--text-muted)",
-            fontSize: "15px", transition: "all 0.15s"
+            width: "100%",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+            padding: "9px 12px", borderRadius: "var(--radius-sm)",
+            cursor: "pointer",
+            background: "rgba(248,113,113,0.1)",
+            border: "1px solid rgba(248,113,113,0.3)",
+            color: "var(--red)",
+            fontSize: "14px", fontWeight: 700,
+            transition: "all 0.15s"
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = "var(--red-bg)"; e.currentTarget.style.color = "var(--red)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--text-muted)"; }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(248,113,113,0.2)"}
+          onMouseLeave={e => e.currentTarget.style.background = "rgba(248,113,113,0.1)"}
         >
-          <FaSignOutAlt style={{ fontSize: "15px" }} /> Sign Out
-        </div>
+          <FaSignOutAlt style={{ fontSize: "14px" }} /> Sign Out
+        </button>
       </div>
     </aside>
   );
@@ -243,7 +250,15 @@ export default function Sidebar({ onLogout }) {
           width: 220px;
           min-height: 100vh;
         }
-        .hamburger-btn {
+        .sidebar-wrapper .sidebar-aside {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 220px;
+          height: 100vh;
+          z-index: 100;
+        }
+        .mobile-topbar {
           display: none;
         }
         .mobile-overlay {
@@ -259,27 +274,54 @@ export default function Sidebar({ onLogout }) {
             display: none;
           }
 
-          .hamburger-btn {
+          .mobile-topbar {
             display: flex;
             position: fixed;
-            top: 12px;
-            left: 12px;
-            z-index: 1200;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 52px;
             background: var(--bg-surface);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0 14px;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+          }
+
+          .mobile-menu-trigger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: none;
+            border: none;
             color: var(--text-secondary);
-            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            padding: 4px;
+          }
+
+          .mobile-menu-trigger:hover {
+            color: var(--text-primary);
+          }
+
+          .mobile-signout-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            background: rgba(248,113,113,0.12);
+            border: 1px solid rgba(248,113,113,0.3);
+            color: var(--red);
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
             transition: all 0.15s;
           }
-          .hamburger-btn:hover {
-            border-color: var(--border-strong);
-            color: var(--text-primary);
+
+          .mobile-signout-btn:hover {
+            background: rgba(248,113,113,0.22);
           }
 
           /* Overlay backdrop */
@@ -287,7 +329,7 @@ export default function Sidebar({ onLogout }) {
             display: block;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.75);
             z-index: 1201;
             backdrop-filter: blur(2px);
             animation: fadeIn 0.2s ease;
@@ -299,10 +341,21 @@ export default function Sidebar({ onLogout }) {
             top: 0;
             left: 0;
             height: 100dvh;
+            max-height: 100dvh;
+            width: 260px;
             z-index: 1202;
-            transform: translateX(0);
+            box-shadow: 4px 0 40px rgba(0,0,0,0.85);
             animation: slideInDrawer 0.25s cubic-bezier(0.16,1,0.3,1);
-            box-shadow: 4px 0 40px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+          }
+
+          .mobile-drawer .sidebar-aside {
+            position: relative;
+            width: 260px;
+            height: 100dvh;
+            max-height: 100dvh;
           }
 
           .sidebar-close-btn {
@@ -325,19 +378,33 @@ export default function Sidebar({ onLogout }) {
         <SidebarContent />
       </div>
 
-      {/* Mobile Hamburger Button */}
-      <button
-        className="hamburger-btn"
-        onClick={() => setMobileOpen(true)}
-        aria-label="Open menu"
-      >
-        <FaBars style={{ fontSize: "18px" }} />
-      </button>
+      {/* Mobile Top Bar (with direct Sign Out on mobile header) */}
+      <header className="mobile-topbar">
+        <button
+          className="mobile-menu-trigger"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open menu"
+        >
+          <FaBars style={{ fontSize: "18px" }} />
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "16px", color: "var(--text-primary)" }}>
+            Workout World Gym
+          </span>
+        </button>
+
+        <button
+          onClick={onLogout}
+          className="mobile-signout-btn"
+          title="Sign Out"
+        >
+          <FaSignOutAlt style={{ fontSize: "12px" }} />
+          <span>Sign Out</span>
+        </button>
+      </header>
 
       {/* Mobile Drawer + Overlay */}
       {mobileOpen && (
         <>
-          <div className="mobile-overlay" />
+          <div className="mobile-overlay" onClick={() => setMobileOpen(false)} />
           <div className="mobile-drawer">
             <SidebarContent />
           </div>
@@ -345,4 +412,4 @@ export default function Sidebar({ onLogout }) {
       )}
     </>
   );
-}
+}
